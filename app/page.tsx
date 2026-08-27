@@ -2,8 +2,10 @@ import {
   Hero,
   IncomeAxis,
   LatentProblemTable,
+  OperatingModel,
   RecognitionStrip,
   StructuralMismatch,
+  TemporalLedger,
 } from "@/components/sections";
 
 export default function HomePage() {
@@ -14,6 +16,8 @@ export default function HomePage() {
       <LatentProblemTable />
       <StructuralMismatch />
       <IncomeAxis />
+      <OperatingModel />
+      <TemporalLedger />
     </>
   );
 }

@@ -1,5 +1,7 @@
 export { Hero } from "./Hero";
 export { IncomeAxis } from "./IncomeAxis";
 export { LatentProblemTable } from "./LatentProblemTable";
+export { OperatingModel } from "./OperatingModel";
 export { RecognitionStrip } from "./RecognitionStrip";
 export { StructuralMismatch } from "./StructuralMismatch";
+export { TemporalLedger } from "./TemporalLedger";

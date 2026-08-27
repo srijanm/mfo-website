@@ -2,15 +2,18 @@
    acid fill means it has. The node is only ever used where that is literally
    true — thresholds, calendar events, progress and selected state. */
 
+/* --threshold-gap lets a caller close the space between the node and its
+   segments. A tall axis wants the breathing room; a dense ledger wants a
+   continuous rail. */
 .node {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--threshold-gap, 12px);
 }
 
 .vertical {
   flex-direction: column;
-  gap: 8px;
+  gap: var(--threshold-gap, 8px);
 }
 
 .segment {

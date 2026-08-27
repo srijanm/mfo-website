@@ -199,3 +199,98 @@ export const incomeAxis = {
     }),
   ),
 } as const;
+
+/* ------------------------------------------------------------------ H06 */
+
+export const operatingModel = {
+  headline: "You shouldn’t have to know which question to ask.",
+  pillars: [
+    {
+      id: "start-right",
+      title: "We start you off right.",
+      body: "The right registrations, the right structure and the right setup for how you actually earn.",
+    },
+    {
+      id: "we-run-it",
+      title: "We run it, not you.",
+      body: "The relevant deadlines live on our calendar. You hear from us before you would have remembered them.",
+    },
+    {
+      id: "on-the-hook",
+      title: "We’re on the hook.",
+      body: "You know the fee before you start, see drafts before filing and know who is responsible for the work.",
+    },
+  ],
+} as const;
+
+/* ------------------------------------------------------------------ H07 */
+
+/**
+ * The only status language the ledger may use. Typing it as a union rather
+ * than a string is what stops "Done" or "Handled" reaching a marketing example
+ * — they will not compile. There is deliberately no overdue or alarming state
+ * in this list.
+ */
+export type LedgerStatus =
+  | "MFO tracks"
+  | "Upcoming"
+  | "Waiting for you"
+  | "Draft ready"
+  | "Approved"
+  | "Filed";
+
+export type LedgerEntry = {
+  id: string;
+  label: string;
+  status: LedgerStatus;
+  /**
+   * When the entry falls due. A tax date, so it stays null until a CA supplies
+   * and reviews one — which is why every entry below is non-numeric today. The
+   * ledger must read correctly with or without it.
+   */
+  when: ReviewedFact | null;
+};
+
+export const temporalLedger = {
+  headline: "Your work has deadlines. So does earning from it.",
+  body:
+    "Your exact calendar depends on how you earn. Once you’re with MyFinanceOfficer, tracking the relevant tax and compliance dates is our job.",
+
+  yearLabel: "Your year",
+  startLabel: "Start",
+  endLabel: "Year end",
+
+  /*
+   * Stages from §19, not a monthly calendar. Every one carries "MFO tracks":
+   * it is the claim the section actually makes, and any other status would
+   * assert something about a reader who is not a client yet — a filing that
+   * was prepared, a draft they were sent. The rest of the vocabulary exists
+   * for reviewed entries later.
+   */
+  entries: [
+    {
+      id: "setup",
+      label: "Setup and registrations, if relevant",
+      status: "MFO tracks",
+      when: null,
+    },
+    {
+      id: "checkpoint",
+      label: "Tax and compliance checkpoint",
+      status: "MFO tracks",
+      when: null,
+    },
+    {
+      id: "filing-prep",
+      label: "Filing preparation",
+      status: "MFO tracks",
+      when: null,
+    },
+    {
+      id: "next",
+      label: "Next obligation",
+      status: "MFO tracks",
+      when: null,
+    },
+  ] as LedgerEntry[],
+} as const;

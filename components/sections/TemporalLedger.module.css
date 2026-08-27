@@ -1,0 +1,131 @@
+/* H07, §19. A vertical ledger, never a monthly calendar grid. Desktop is copy
+   across 4 columns, a 1px vertical rule, then the ledger across 7. */
+
+.copy {
+  grid-column: 1 / span 4;
+}
+
+.headline {
+  margin: 0;
+  max-width: 16ch;
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+
+.body {
+  margin: 24px 0 0;
+  max-width: 42ch;
+  font-size: var(--fs-body);
+  line-height: 1.52;
+  color: var(--ink-2);
+}
+
+.rules {
+  grid-column: 5 / span 1;
+  justify-self: center;
+  /* The rule stretches to its parent's height, which needs a flex parent. */
+  display: flex;
+}
+
+.ledger {
+  grid-column: 6 / -1;
+}
+
+/* Structural label for the object, in the same voice as a record title. */
+.year {
+  margin: 0 0 4px;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.rows {
+  /* One fixed rail width for every row. Sizing it automatically per row would
+     centre the bookend line and the entry nodes on different axes, because
+     each row is its own grid. */
+  --rail-w: 12px;
+
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: var(--rail-w) minmax(0, 1fr);
+  column-gap: 20px;
+}
+
+.rail {
+  display: flex;
+  justify-content: center;
+}
+
+/* Lets the primitive's connecting segment grow to the height of its row. */
+.railNode {
+  flex: 1;
+  align-items: center;
+  /* Continuous rail: at these row heights an 8px gap either side of the node
+     reads as a dotted line rather than a timeline. */
+  --threshold-gap: 0px;
+}
+
+/* The bookends carry line but no node: nothing changes at the start or end of
+   a year, so a node there would be decoration. */
+.railLine {
+  width: 1px;
+  background: var(--rule);
+}
+
+.bookend {
+  padding: 10px 0;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Symmetric, so the entry text centres exactly on its node. */
+.entry {
+  padding: 22px 0;
+}
+
+.label {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: 1.4;
+}
+
+/* Status is a state, so it reads as text rather than relying on a colour. */
+.status {
+  margin: 6px 0 0;
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+.when {
+  margin: 6px 0 0;
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+@media (max-width: 1023px) {
+  .copy,
+  .ledger {
+    grid-column: 1 / -1;
+  }
+
+  /* §5: the vertical rule is removed below desktop rather than squeezed. */
+  .rules {
+    display: none;
+  }
+
+  .ledger {
+    margin-top: 48px;
+  }
+}
