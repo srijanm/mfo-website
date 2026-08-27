@@ -1,9 +1,11 @@
 import {
+  AdditionalFinancialSupport,
   CoreScopeMatrix,
   Hero,
   IncomeAxis,
   LatentProblemTable,
   OperatingModel,
+  PricingGrid,
   RecognitionStrip,
   StructuralMismatch,
   TemporalLedger,
@@ -22,6 +24,8 @@ export default function HomePage() {
       <TemporalLedger />
       <CoreScopeMatrix />
       <TrustLedger />
+      <PricingGrid />
+      <AdditionalFinancialSupport />
     </>
   );
 }

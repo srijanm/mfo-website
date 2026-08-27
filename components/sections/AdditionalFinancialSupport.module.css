@@ -1,0 +1,78 @@
+/* H11, §23. Deliberately secondary.
+   The headline sits a step down the type scale from H08's and the section
+   takes the dense rhythm, so it reads as adjacent support rather than a second
+   product. No icons, no expanded selling. */
+
+.headline {
+  grid-column: 1 / span 6;
+  margin: 0;
+  max-width: 20ch;
+  font-size: var(--fs-h3);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -.028em;
+}
+
+.body {
+  grid-column: 7 / -1;
+  margin: 0;
+  max-width: 54ch;
+  font-size: var(--fs-body);
+  line-height: 1.52;
+  color: var(--ink-2);
+}
+
+.rows {
+  grid-column: 1 / -1;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.6fr);
+  gap: var(--grid-gap-desktop);
+  padding: 18px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.row:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--fs-ui);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.description {
+  margin: 0;
+  max-width: 62ch;
+  font-size: var(--fs-ui);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+@media (max-width: 1023px) {
+  .headline,
+  .body,
+  .rows {
+    grid-column: 1 / -1;
+  }
+
+  .body {
+    margin-top: 20px;
+  }
+
+  .rows {
+    margin-top: 32px;
+  }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}

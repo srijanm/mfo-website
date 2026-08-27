@@ -1,0 +1,55 @@
+/* The owner-approved plan comparison. Renders only once pricing-scope.ts holds
+   a real mapping; until then PricingGrid never mounts it. One ruled matrix,
+   no cards, no recommendation badge. */
+
+.matrix {
+  margin: 56px 0 0;
+  border-top: 1px solid var(--rule);
+}
+
+.row {
+  display: grid;
+  gap: var(--grid-gap-desktop);
+  padding: 18px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.headRow {
+  padding: 14px 0;
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.area {
+  margin: 0;
+  font-size: var(--fs-ui);
+  font-weight: 500;
+}
+
+/* Inclusion is stated as words, not a tick: the system has no icon set and a
+   glyph alone would carry meaning by shape only. */
+.cell {
+  margin: 0;
+  font-size: var(--fs-ui);
+  color: var(--ink-2);
+}
+
+.cellExcluded {
+  color: var(--muted);
+}
+
+@media (max-width: 1023px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 4px;
+  }
+
+  .headRow {
+    display: none;
+  }
+}
