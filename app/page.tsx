@@ -1,5 +1,6 @@
 import {
   Hero,
+  IncomeAxis,
   LatentProblemTable,
   RecognitionStrip,
   StructuralMismatch,
@@ -12,6 +13,7 @@ export default function HomePage() {
       <RecognitionStrip />
       <LatentProblemTable />
       <StructuralMismatch />
+      <IncomeAxis />
     </>
   );
 }

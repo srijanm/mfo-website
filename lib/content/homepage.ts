@@ -3,6 +3,7 @@
 
 import { unreviewed, type ReviewedFact } from "./reviewed";
 import { primaryCta } from "./navigation";
+import { defaultMilestones } from "./site-content";
 
 export const hero = {
   headline: "Half the work you do didn’t exist when your family’s CA started out.",
@@ -155,4 +156,46 @@ export const structuralMismatch = {
       doesNotOwn: "Fast, contradictory and nobody is accountable for the answer.",
     },
   ],
+} as const;
+
+/* ------------------------------------------------------------------ H05 */
+
+export type IncomeAxisMilestone = {
+  id: string;
+  label: string;
+  /** The question someone actually asks at this point. */
+  question: string;
+  /**
+   * What changes at this milestone. §17 lists this as one of the four parts,
+   * but describing it means stating a tax consequence, and the copy doc does
+   * not supply one. Null until a CA writes and reviews it. The layout must not
+   * depend on it, and must never depend on a numeric threshold appearing here.
+   */
+  whatChanges: ReviewedFact | null;
+  /** What MyFinanceOfficer does about it. */
+  mfo: string;
+};
+
+export const incomeAxis = {
+  headline: "Your obligations change as your income and setup change.",
+  intro:
+    "The point is not to memorise every rule. The point is to have someone watching what comes next.",
+
+  /* Field names taken from §17 rather than invented. Kept here so the copy
+     owner can change the wording without touching a component. */
+  fieldLabels: {
+    question: "Customer question",
+    whatChanges: "What changes",
+    mfo: "What MyFinanceOfficer does",
+  },
+
+  milestones: defaultMilestones.map(
+    (milestone): IncomeAxisMilestone => ({
+      id: milestone.id,
+      label: milestone.label,
+      question: milestone.question,
+      whatChanges: null,
+      mfo: milestone.mfo,
+    }),
+  ),
 } as const;

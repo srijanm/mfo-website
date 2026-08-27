@@ -1,0 +1,133 @@
+/* H05, §17 — static vertical progression.
+   This is exactly what mobile and reduced-motion visitors get, so it carries
+   the whole section on its own: no sticky positioning, no scroll state, no
+   animation, and nothing that only makes sense once something moves. */
+
+.intro {
+  grid-column: 1 / span 7;
+}
+
+.headline {
+  margin: 0;
+  max-width: 20ch;
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+
+.lede {
+  margin: 24px 0 0;
+  max-width: 54ch;
+  font-size: var(--fs-lead);
+  line-height: 1.44;
+  letter-spacing: -.018em;
+  color: var(--ink-2);
+}
+
+.list {
+  grid-column: 1 / -1;
+  margin: 64px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Rail on the left, content on the right. The rail column is sized to the
+   node so the copy column takes everything else — no width is reserved for a
+   value that may never exist. */
+.milestone {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 24px;
+}
+
+.rail {
+  display: flex;
+  justify-content: center;
+  /* Pulls the node down onto the label's optical centre. */
+  padding-top: 6px;
+}
+
+/* Lets the connecting segment inside the primitive grow to the row height
+   rather than sitting at its minimum. */
+.railNode {
+  flex: 1;
+  align-items: center;
+}
+
+.body {
+  padding-bottom: 56px;
+}
+
+.milestone:last-child .body {
+  padding-bottom: 0;
+}
+
+.label {
+  margin: 0;
+  font-size: var(--fs-h3);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -.028em;
+}
+
+/* The label column sizes to its content rather than a fixed measure: a fixed
+   one leaves a gap between the shorter labels and their values. */
+.fields {
+  margin: 20px 0 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px 32px;
+}
+
+.field {
+  display: contents;
+}
+
+.fieldLabel {
+  margin: 0;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.fieldValue {
+  margin: 0;
+  max-width: 62ch;
+  font-size: var(--fs-body);
+  line-height: 1.5;
+}
+
+@media (max-width: 1023px) {
+  .intro {
+    grid-column: 1 / -1;
+  }
+
+  .list {
+    margin-top: 48px;
+  }
+}
+
+@media (max-width: 767px) {
+  .milestone {
+    column-gap: 16px;
+  }
+
+  .body {
+    padding-bottom: 40px;
+  }
+
+  /* Stacked, each field's label sits directly above its value — §29. */
+  .fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .field + .field {
+    padding-top: 12px;
+  }
+
+  .fieldValue {
+    font-size: var(--fs-body);
+  }
+}
