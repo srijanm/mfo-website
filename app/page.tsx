@@ -1,18 +1,18 @@
 import {
   AdditionalFinancialSupport,
   CoreScopeMatrix,
-  Faq,
-  FinalCta,
   Hero,
   IncomeAxis,
   LatentProblemTable,
   OperatingModel,
-  PricingGrid,
   RecognitionStrip,
   StructuralMismatch,
   TemporalLedger,
   TrustLedger,
 } from "@/components/sections";
+import { FaqSection, FinalCtaSection, PricingSection } from "@/components/shared";
+import { finalCta, homepageFaq } from "@/lib/content/homepage";
+import { pricing } from "@/lib/content/pricing";
 
 /**
  * The homepage argument, in the order locked by MASTER_BUILD_SPEC.md §12.
@@ -47,10 +47,10 @@ export default function HomePage() {
       <TemporalLedger />
       <CoreScopeMatrix />
       <TrustLedger />
-      <PricingGrid />
+      <PricingSection content={pricing} />
       <AdditionalFinancialSupport />
-      <Faq />
-      <FinalCta />
+      <FaqSection items={homepageFaq} />
+      <FinalCtaSection content={finalCta} />
     </>
   );
 }

@@ -1,0 +1,91 @@
+/* One layout for all four /who-its-for children. */
+
+.hero {
+  border-bottom: 1px solid var(--rule);
+  padding-block: var(--section-major-desktop);
+}
+
+.copy {
+  grid-column: 1 / span 7;
+}
+
+.headline {
+  margin: 0;
+  max-width: 18ch;
+  font-size: var(--fs-h1);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+
+.lead {
+  margin: 28px 0 0;
+  max-width: 54ch;
+  font-size: var(--fs-lead);
+  line-height: 1.44;
+  letter-spacing: -.018em;
+  color: var(--ink-2);
+}
+
+.record {
+  grid-column: 8 / -1;
+  align-self: end;
+  justify-self: end;
+  width: 100%;
+}
+
+.topics {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.topic {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.topicTitle {
+  margin: 0;
+  font-size: var(--fs-h3);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -.028em;
+}
+
+.topicBody {
+  margin: 12px 0 0;
+  max-width: 62ch;
+  font-size: var(--fs-body);
+  line-height: 1.52;
+  color: var(--ink-2);
+}
+
+@media (max-width: 1023px) {
+  .hero {
+    padding-block: var(--section-major-tablet);
+  }
+
+  .copy,
+  .record {
+    grid-column: 1 / -1;
+  }
+
+  .record {
+    justify-self: start;
+    max-width: 420px;
+    margin-top: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero {
+    padding-block: var(--section-major-mobile);
+  }
+
+  .record {
+    max-width: none;
+  }
+}

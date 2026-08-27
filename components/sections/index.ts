@@ -1,13 +1,9 @@
 export { AdditionalFinancialSupport } from "./AdditionalFinancialSupport";
 export { CoreScopeMatrix } from "./CoreScopeMatrix";
-export { Faq } from "./Faq";
-export { FinalCta } from "./FinalCta";
 export { Hero } from "./Hero";
 export { IncomeAxis } from "./IncomeAxis";
 export { LatentProblemTable } from "./LatentProblemTable";
 export { OperatingModel } from "./OperatingModel";
-export { PlanComparisonMatrix } from "./PlanComparisonMatrix";
-export { PricingGrid } from "./PricingGrid";
 export { RecognitionStrip } from "./RecognitionStrip";
 export { StructuralMismatch } from "./StructuralMismatch";
 export { TemporalLedger } from "./TemporalLedger";

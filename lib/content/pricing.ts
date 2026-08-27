@@ -17,6 +17,17 @@ export function formatAnnualPrice(amount: number): string {
   return annualPriceFormat.format(amount);
 }
 
+export type PricingContent = {
+  headline: string;
+  intro?: string;
+  points: readonly number[];
+  perYear: string;
+  planLabel: string;
+  scopeLine: string;
+  cta: { href: string; label: string };
+  closing: string;
+};
+
 export const pricing = {
   headline: "The price is on the site before we speak.",
   intro:
@@ -40,7 +51,7 @@ export const pricing = {
     included: "Included",
     notIncluded: "—",
   },
-} as const;
+} as const satisfies PricingContent & { comparisonHeadings: unknown };
 
 /* ------------------------------------------------------------------ H11 */
 

@@ -377,7 +377,7 @@ export type FaqItem = {
  * each question is a top-level heading. That keeps the document's heading
  * order intact without inventing a title the section was not written with.
  */
-export const faq: readonly FaqItem[] = [
+export const homepageFaq: readonly FaqItem[] = [
   {
     id: "not-enough-yet",
     question: "I don’t earn enough for this yet.",
@@ -424,8 +424,14 @@ export const faq: readonly FaqItem[] = [
 
 /* ------------------------------------------------------------------ H13 */
 
+export type FinalCtaContent = {
+  headline: string;
+  support: string;
+  cta: { href: string; label: string };
+};
+
 export const finalCta = {
   headline: "Tell us how you earn. We’ll tell you what you actually need.",
   support: "If the answer is “not yet”, we’ll tell you that too.",
   cta: primaryCta,
-} as const;
+} as const satisfies FinalCtaContent;

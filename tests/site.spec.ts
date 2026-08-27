@@ -1,7 +1,16 @@
 import { expect, test, type Page } from "@playwright/test";
 
 /** Extend as pages land; every route gets all three checks. */
-const ROUTES = ["/", "/get-started", "/styleguide"] as const;
+const ROUTES = [
+  "/",
+  "/get-started",
+  "/who-its-for",
+  "/who-its-for/foreign-income",
+  "/who-its-for/freelancers-consultants",
+  "/who-its-for/creators",
+  "/who-its-for/independent-professionals",
+  "/styleguide",
+] as const;
 
 const PAPER = "rgb(246, 247, 242)";
 
