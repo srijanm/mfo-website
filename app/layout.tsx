@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 
+import { SiteFooter, SiteHeader, SkipLink } from "@/components/chrome";
+import { site } from "@/lib/content/navigation";
+
 import "./globals.css";
 
 /* Geist is the only family on the site. Weights are limited to the three the
@@ -14,20 +17,37 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "MyFinanceOfficer",
-  description: "A modern CA firm for modern professions.",
+  title: {
+    default: `${site.name} — ${site.descriptor}`,
+    template: `%s — ${site.name}`,
+  },
+  description:
+    "A modern CA firm for freelancers, creators, consultants and professionals paid by Indian or overseas businesses. We set up and run the India-side tax and compliance.",
 };
 
 export const viewport: Viewport = {
   themeColor: "#F6F7F2",
 };
 
+/* Marks the document as scripted so components can offer a working fallback
+   when JavaScript never runs. Set inline rather than on the server, because the
+   whole point is to distinguish the two. */
+const MARK_SCRIPTED = `document.documentElement.classList.add("js")`;
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en-IN" className={geist.variable}>
-      <body>{children}</body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: MARK_SCRIPTED }} />
+      </head>
+      <body>
+        <SkipLink />
+        <SiteHeader />
+        <main id="main">{children}</main>
+        <SiteFooter />
+      </body>
     </html>
   );
 }

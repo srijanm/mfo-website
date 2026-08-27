@@ -1,0 +1,71 @@
+/* §9. Sticky, paper, 1px bottom rule. No shadow and no backdrop filter — the
+   bar sits on the page rather than floating above it. */
+
+/* Heights are literals from §9 rather than tokens, because the canonical token
+   sheet is a verbatim copy of docs/design-tokens.css and defines no nav height. */
+.header {
+  --nav-h-desktop: 64px;
+  --nav-h-mobile: 60px;
+
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: var(--nav-h-desktop);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+/* The desktop presentation. Replaced by the mobile disclosure below 1024px. */
+.desktopRow {
+  display: none;
+  align-items: center;
+  gap: 28px;
+}
+
+@media (min-width: 1024px) {
+  .desktopRow {
+    display: flex;
+  }
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--fs-ui);
+  color: var(--ink-2);
+  text-decoration: none;
+  /* Reserved so the underline on hover does not shift the row. */
+  border-bottom: 1px solid transparent;
+}
+
+/* Hover darkens the text and adds a 1px underline. No pill background. */
+@media (hover: hover) and (pointer: fine) {
+  .link:hover {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+  }
+}
+
+.current {
+  color: var(--ink);
+}
+
+@media (max-width: 767px) {
+  .bar {
+    height: var(--nav-h-mobile);
+  }
+}

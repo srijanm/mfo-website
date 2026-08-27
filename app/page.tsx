@@ -1,5 +1,5 @@
-/* Intentionally blank. The token layer, guardrails and CI land first; sections
-   are built against MASTER_BUILD_SPEC.md in the passes that follow. */
+/* Intentionally blank. Sections are built against MASTER_BUILD_SPEC.md in the
+   passes that follow; the shell around this is already in the root layout. */
 export default function HomePage() {
-  return <main id="main" />;
+  return null;
 }
