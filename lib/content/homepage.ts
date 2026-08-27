@@ -3,7 +3,7 @@
 
 import { unreviewed, type ReviewedFact } from "./reviewed";
 import { primaryCta } from "./navigation";
-import { defaultMilestones } from "./site-content";
+import { additionalSupport, coreScope, defaultMilestones } from "./site-content";
 
 export const hero = {
   headline: "Half the work you do didn’t exist when your family’s CA started out.",
@@ -293,4 +293,73 @@ export const temporalLedger = {
       when: null,
     },
   ] as LedgerEntry[],
+} as const;
+
+/* ------------------------------------------------------------------ H08 */
+
+/**
+ * Layer A only. §20 is explicit that FX, insurance, loans, wealth planning and
+ * MIS must not appear here: this section describes the core CA relationship,
+ * not what a plan includes.
+ *
+ * The categories come straight from `coreScope`, and the assertion below fails
+ * the build if a Layer B item ever leaks into that list.
+ */
+const LAYER_B_IDS: ReadonlySet<string> = new Set(additionalSupport.map((item) => item.id));
+
+const leakedIntoCoreScope = coreScope.filter((item) => LAYER_B_IDS.has(item.id));
+
+if (leakedIntoCoreScope.length > 0) {
+  throw new Error(
+    `Layer B services must never appear in the core scope section: ${leakedIntoCoreScope
+      .map((item) => item.id)
+      .join(", ")}`,
+  );
+}
+
+export const coreScopeSection = {
+  headline: "The CA and compliance work we are built to run.",
+  columnHeadings: {
+    area: "Area",
+    handled: "What we handle",
+  },
+  items: coreScope,
+} as const;
+
+/* ------------------------------------------------------------------ H09 */
+
+export const trustLedger = {
+  headline: "Judge us by what happens before we file anything.",
+  columnHeadings: {
+    whatWeDo: "What we do",
+    whyItMatters: "Why it matters",
+  },
+  rows: [
+    {
+      id: "draft-first",
+      whatWeDo: "You see the draft first.",
+      whyItMatters: "Nothing should be filed just because you handed the work over.",
+    },
+    {
+      id: "contact-details",
+      whatWeDo: "Your contact details stay yours.",
+      whyItMatters: "Your phone number and email remain on your own portals.",
+    },
+    {
+      id: "named-signatory",
+      whatWeDo: "A named professional signs the return.",
+      whyItMatters: "You know who is responsible for the work.",
+    },
+    {
+      id: "support-upfront",
+      whatWeDo: "Support is agreed upfront.",
+      whyItMatters: "The scope and fee are clear before you start.",
+    },
+    {
+      id: "not-yet",
+      whatWeDo: "Sometimes the answer is “you don’t need that yet.”",
+      whyItMatters:
+        "Good advice is not measured by how many registrations or services we can sell you.",
+    },
+  ],
 } as const;

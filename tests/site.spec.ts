@@ -89,3 +89,44 @@ test.describe("JavaScript disabled", () => {
     });
   }
 });
+
+/**
+ * Positioning guard. §20 forbids FX, insurance, loans, wealth planning and MIS
+ * from appearing in the core scope section: H08 describes the core CA
+ * relationship, and listing Layer B services alongside it is exactly the
+ * all-in-one framing the positioning hierarchy rules out.
+ *
+ * lib/content asserts the same thing at module load, but this catches the case
+ * where the copy itself drifts rather than the ids.
+ */
+test.describe("Layer B never appears in the core scope section", () => {
+  const LAYER_B_TERMS = [
+    "FX",
+    "foreign exchange",
+    "insurance",
+    "loan",
+    "borrowing",
+    "wealth",
+    "investment",
+    "MIS",
+  ];
+
+  test("H08 contains Layer A only", async ({ page }) => {
+    await page.goto("/");
+
+    const section = page.locator("#core-scope");
+    await expect(section).toBeVisible();
+
+    const text = await section.innerText();
+
+    for (const term of LAYER_B_TERMS) {
+      expect(
+        new RegExp(`\\b${term}\\b`, "i").test(text),
+        `"${term}" must not appear in the core scope section`,
+      ).toBe(false);
+    }
+
+    // The eight core categories are all present.
+    expect(await section.locator("h3").count()).toBe(8);
+  });
+});

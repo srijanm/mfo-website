@@ -1,0 +1,93 @@
+/* H08, §20. A ruled matrix of the core CA relationship. Layer A only —
+   FX, insurance, loans, wealth planning and MIS are not part of this section
+   under any circumstances. */
+
+.headline {
+  grid-column: 1 / span 8;
+  margin: 0;
+  max-width: 20ch;
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+
+/* The column labels sit inside the ruled block, below its opening rule, so this
+   matrix and the trust ledger read the same way rather than one placing its
+   headings above the first rule and the other below it. */
+.matrix {
+  grid-column: 1 / -1;
+  margin: 64px 0 0;
+  padding: 20px 0 0;
+  border-top: 1px solid var(--rule);
+  list-style: none;
+}
+
+.headRow,
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr);
+  gap: var(--grid-gap-desktop);
+}
+
+.headRow {
+  padding-bottom: 8px;
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.row {
+  padding: 22px 0;
+  border-top: 1px solid var(--rule);
+}
+
+/* The header already opened the block, so the first row does not repeat it. */
+.headRow + .row {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.row:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.area {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.handled {
+  margin: 0;
+  max-width: 62ch;
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+@media (max-width: 1023px) {
+  .headline {
+    grid-column: 1 / -1;
+  }
+
+  .matrix {
+    margin-top: 48px;
+  }
+
+  /* Stacked, the area name reads as the label for the line under it, so the
+     header row is no longer doing any work — §29. */
+  .headRow {
+    display: none;
+  }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+}

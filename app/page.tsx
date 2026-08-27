@@ -1,4 +1,5 @@
 import {
+  CoreScopeMatrix,
   Hero,
   IncomeAxis,
   LatentProblemTable,
@@ -6,6 +7,7 @@ import {
   RecognitionStrip,
   StructuralMismatch,
   TemporalLedger,
+  TrustLedger,
 } from "@/components/sections";
 
 export default function HomePage() {
@@ -18,6 +20,8 @@ export default function HomePage() {
       <IncomeAxis />
       <OperatingModel />
       <TemporalLedger />
+      <CoreScopeMatrix />
+      <TrustLedger />
     </>
   );
 }

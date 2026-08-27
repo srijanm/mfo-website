@@ -1,0 +1,92 @@
+/* H09, §21. Ruled two-column rows. Explicitly not a grid of green check
+   cards — the rules carry the structure and nothing is decorated with a tick. */
+
+.headline {
+  grid-column: 1 / span 8;
+  margin: 0;
+  max-width: 20ch;
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+
+.rows {
+  grid-column: 1 / -1;
+  margin: 64px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--grid-gap-desktop);
+  padding: 24px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.row:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* The first row's labels act as the column headings. Later rows keep theirs in
+   the accessibility tree but not on screen, so every row is still announced
+   with its labels while the eye reads one header. */
+@media (min-width: 1024px) {
+  .row:not(:first-child) .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.whatWeDo {
+  margin: 0;
+  max-width: 34ch;
+  font-size: var(--fs-lead);
+  font-weight: 400;
+  line-height: 1.32;
+  letter-spacing: -.018em;
+}
+
+.whyItMatters {
+  margin: 0;
+  max-width: 52ch;
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+@media (max-width: 1023px) {
+  .headline {
+    grid-column: 1 / -1;
+  }
+
+  .rows {
+    margin-top: 48px;
+  }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .whatWeDo {
+    font-size: var(--fs-body);
+    font-weight: 500;
+  }
+}
