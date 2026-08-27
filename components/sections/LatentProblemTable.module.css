@@ -1,0 +1,106 @@
+/* H03, §15. Large proposition on top, ruled table below. No warning red —
+   the section states a consequence once and moves on. */
+
+.proposition {
+  grid-column: 1 / span 8;
+}
+
+.headline {
+  margin: 0;
+}
+
+.follow {
+  margin: 12px 0 0;
+  max-width: 24ch;
+  font-size: var(--fs-h3);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -.028em;
+  color: var(--muted);
+}
+
+.intro {
+  margin: 32px 0 0;
+  max-width: 58ch;
+  font-size: var(--fs-lead);
+  line-height: 1.44;
+  letter-spacing: -.018em;
+  color: var(--ink-2);
+}
+
+.table {
+  grid-column: 1 / -1;
+  margin-top: 72px;
+}
+
+.headRow,
+.row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--grid-gap-desktop);
+  padding: 20px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.headRow {
+  padding: 0 0 12px;
+  border-top: 0;
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.cell {
+  margin: 0;
+  font-size: var(--fs-ui);
+  line-height: 1.45;
+}
+
+/* Until the three-column expansion is written and reviewed, the approved
+   single-sentence examples render as ruled rows on their own. */
+.summaryRow {
+  padding: 20px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.summaryRow:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.summaryText {
+  margin: 0;
+  max-width: 68ch;
+  font-size: var(--fs-lead);
+  line-height: 1.42;
+  letter-spacing: -.018em;
+}
+
+@media (max-width: 1023px) {
+  .proposition,
+  .table {
+    grid-column: 1 / -1;
+  }
+
+  .table {
+    margin-top: 48px;
+  }
+
+  /* Stacked, each cell keeps its own label so the columns are still readable
+     without a header row above them — §29. */
+  .headRow {
+    display: none;
+  }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .summaryText {
+    font-size: var(--fs-body);
+  }
+}

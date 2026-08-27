@@ -1,0 +1,112 @@
+/* H04, §16. 5/7 desktop split divided by a 1px vertical rule. Tone is fit and
+   mismatch: every row opens with what the alternative is genuinely good at. */
+
+.copy {
+  grid-column: 1 / span 5;
+}
+
+/* The token sheet defines display-1 and display-2 only, so the H2 step of the
+   scale in §3 is set here from the same token. */
+.headline {
+  margin: 0;
+  max-width: 18ch;
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+
+.body {
+  margin: 28px 0 0;
+  max-width: 46ch;
+  font-size: var(--fs-body);
+  line-height: 1.52;
+  color: var(--ink-2);
+}
+
+/* The rule stretches to the height of its parent, which only happens if that
+   parent is a flex container — as a plain block it would render zero-height. */
+.rules {
+  grid-column: 6 / span 1;
+  justify-self: center;
+  display: flex;
+}
+
+.rows {
+  grid-column: 7 / -1;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.1fr) minmax(0, 1.1fr);
+  gap: var(--grid-gap-desktop);
+  padding: 24px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.row:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.name {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 500;
+  line-height: 1.32;
+}
+
+.field {
+  margin: 0;
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* The first row's labels act as the column headings. Later rows keep theirs in
+   the accessibility tree but not on screen, so every row is still announced
+   with its labels while the eye reads one header. */
+@media (min-width: 1024px) {
+  .row:not(:first-of-type) .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.text {
+  margin: 0;
+  font-size: var(--fs-ui);
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+@media (max-width: 1023px) {
+  .copy,
+  .rows {
+    grid-column: 1 / -1;
+  }
+
+  /* §5: the vertical rule comes out below desktop rather than being squeezed. */
+  .rules {
+    display: none;
+  }
+
+  .rows {
+    margin-top: 48px;
+  }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}

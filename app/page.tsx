@@ -1,5 +1,17 @@
-import { Hero } from "@/components/sections";
+import {
+  Hero,
+  LatentProblemTable,
+  RecognitionStrip,
+  StructuralMismatch,
+} from "@/components/sections";
 
 export default function HomePage() {
-  return <Hero />;
+  return (
+    <>
+      <Hero />
+      <RecognitionStrip />
+      <LatentProblemTable />
+      <StructuralMismatch />
+    </>
+  );
 }

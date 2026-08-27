@@ -1,6 +1,7 @@
 // Homepage copy, verbatim from docs/HOMEPAGE_COPY_AND_CONTENT.md.
 // Components read from here so no proposition is written into JSX.
 
+import { unreviewed, type ReviewedFact } from "./reviewed";
 import { primaryCta } from "./navigation";
 
 export const hero = {
@@ -35,4 +36,123 @@ export const hero = {
    */
   paymentAnnotation:
     "A payslip from abroad does not mean there is an Indian employer handling the India-side tax and compliance for you.",
+} as const;
+
+/* ------------------------------------------------------------------ H02 */
+
+export const recognitionClosing =
+  "Different jobs. Same problem: the income does not always fit neatly into the system a salaried employee gets automatically.";
+
+/* ------------------------------------------------------------------ H03 */
+
+/**
+ * The three-column expansion of an example: what started, why it matters later
+ * and what the customer notices. Writing these means writing tax content, so
+ * they stay null until a CA supplies and reviews them. The section is designed
+ * to be complete without them, the same way pricing is complete without
+ * `approvedPlanScope`.
+ */
+export type LatentProblemColumns = {
+  started: string;
+  mattersLater: string;
+  notices: string;
+};
+
+export type LatentProblemExample = {
+  id: string;
+  /** The approved single-sentence example from the copy doc. */
+  summary: ReviewedFact;
+  columns: LatentProblemColumns | null;
+};
+
+export const latentProblem = {
+  headline: "Nothing goes wrong in your first year.",
+  follow: "It goes wrong later, about something from your first.",
+  intro:
+    "The difficult part is not filing a return once you know what needs to be filed. It is knowing what should have happened before that.",
+
+  columnHeadings: {
+    started: "What started",
+    mattersLater: "Why it matters later",
+    notices: "What the customer notices",
+  },
+
+  examples: [
+    {
+      id: "registration",
+      summary: unreviewed("A registration becomes relevant before anyone flags it."),
+      columns: null,
+    },
+    {
+      id: "advance-tax",
+      summary: unreviewed("Advance tax becomes a recurring surprise."),
+      columns: null,
+    },
+    {
+      id: "tds-mismatch",
+      summary: unreviewed(
+        "Tax deducted by a client does not match the records you can see.",
+      ),
+      columns: null,
+    },
+    {
+      id: "documentation",
+      summary: unreviewed(
+        "Export or foreign-income documentation is missing when someone eventually asks for it.",
+      ),
+      columns: null,
+    },
+  ] as LatentProblemExample[],
+} as const;
+
+/** True only once every example carries a reviewed three-column expansion. */
+export function latentProblemColumnsReady(): boolean {
+  return latentProblem.examples.every((example) => example.columns !== null);
+}
+
+/* ------------------------------------------------------------------ H04 */
+
+/**
+ * Each alternative is described in two halves, split at the sentence boundary
+ * the copy doc already wrote them on. Nothing is reworded, and the tone stays
+ * on fit rather than attack: every row opens with what the alternative is
+ * genuinely good at.
+ */
+export const structuralMismatch = {
+  headline: "Your work changed. Most CA practices were built around a different kind of client.",
+  body:
+    "A few recurring invoices. A contract with a company abroad. Deel or Wise. Creator payments. Barter. Consulting income. The work is not necessarily complicated, but it is different enough that generic advice becomes expensive.",
+
+  columnHeadings: {
+    helps: "Where it helps",
+    doesNotOwn: "What it does not own",
+  },
+
+  alternatives: [
+    {
+      id: "traditional-ca",
+      name: "Traditional CA relationship",
+      helps: "Useful when the practice already knows your kind of work.",
+      doesNotOwn:
+        "The gap appears when the relationship is filing-led and nobody is running the year before the return.",
+    },
+    {
+      id: "filing-software",
+      name: "Filing software",
+      helps: "Useful when you already know what needs to be filed.",
+      doesNotOwn: "It cannot warn you about the question you did not know to ask.",
+    },
+    {
+      id: "marketplace",
+      name: "Service marketplace",
+      helps: "Useful for individual tasks.",
+      doesNotOwn: "Harder when responsibility is split across multiple handoffs.",
+    },
+    {
+      id: "internet-advice",
+      name: "Internet advice",
+      helps: "Useful for orientation.",
+      doesNotOwn: "Fast, contradictory and nobody is accountable for the answer.",
+    },
+  ],
 } as const;
