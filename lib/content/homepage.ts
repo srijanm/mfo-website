@@ -363,3 +363,69 @@ export const trustLedger = {
     },
   ],
 } as const;
+
+/* ------------------------------------------------------------------ H12 */
+
+export type FaqItem = {
+  id: string;
+  question: string;
+  answer: string;
+};
+
+/**
+ * The copy doc gives H12 no heading of its own, so the section has none and
+ * each question is a top-level heading. That keeps the document's heading
+ * order intact without inventing a title the section was not written with.
+ */
+export const faq: readonly FaqItem[] = [
+  {
+    id: "not-enough-yet",
+    question: "I don’t earn enough for this yet.",
+    answer:
+      "That may be true. Tell us how you earn and where you are today. If the sensible answer is to come back later, we will tell you.",
+  },
+  {
+    id: "family-ca",
+    question: "My family already has a CA.",
+    answer:
+      "That can be a perfectly good arrangement. The question is whether they regularly handle the kind of income you have and whether someone is proactively running the year rather than only filing the return.",
+  },
+  {
+    id: "filing-software",
+    question: "Why not just use filing software?",
+    answer:
+      "Filing software can be useful when you already know what needs to be filed. MyFinanceOfficer is built around the part before that: knowing what applies, what changes next and what needs to happen on time.",
+  },
+  {
+    id: "cheaper",
+    question: "Is this cheaper than a normal CA?",
+    answer:
+      "Not necessarily. The point is that the annual fee and scope are clear before you start.",
+  },
+  {
+    id: "ai",
+    question: "Are you using AI to do my taxes?",
+    answer:
+      "We use software to make the work more efficient. A person remains accountable for professional work and signing where required.",
+  },
+  {
+    id: "payslip-abroad",
+    question: "I get a payslip from abroad. Is this still for me?",
+    answer:
+      "Potentially, yes. The important question is not whether a PDF says “payslip”; it is who is handling the India-side tax, payroll and compliance obligations. Tell us how the arrangement works and we will tell you what applies to your situation.",
+  },
+  {
+    id: "broader-support",
+    question: "What if I also need help with FX, insurance or a loan?",
+    answer:
+      "Some annual plans can include broader financial support. Those services sit around the core CA and compliance relationship and are used when they are relevant.",
+  },
+];
+
+/* ------------------------------------------------------------------ H13 */
+
+export const finalCta = {
+  headline: "Tell us how you earn. We’ll tell you what you actually need.",
+  support: "If the answer is “not yet”, we’ll tell you that too.",
+  cta: primaryCta,
+} as const;

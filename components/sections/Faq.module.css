@@ -1,0 +1,26 @@
+/* H12, §24. A ruled accordion. Row heights are enforced on the trigger inside
+   the Disclosure primitive; this file only places the list. */
+
+.list {
+  grid-column: 1 / span 8;
+}
+
+/* The last row closes the block, so the accordion reads as one ruled object
+   rather than a list that stops mid-air. */
+.list > :last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.answer {
+  margin: 0;
+  max-width: 64ch;
+  font-size: var(--fs-body);
+  line-height: 1.52;
+  color: var(--ink-2);
+}
+
+@media (max-width: 1023px) {
+  .list {
+    grid-column: 1 / -1;
+  }
+}

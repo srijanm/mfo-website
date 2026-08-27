@@ -1,5 +1,7 @@
 export { AdditionalFinancialSupport } from "./AdditionalFinancialSupport";
 export { CoreScopeMatrix } from "./CoreScopeMatrix";
+export { Faq } from "./Faq";
+export { FinalCta } from "./FinalCta";
 export { Hero } from "./Hero";
 export { IncomeAxis } from "./IncomeAxis";
 export { LatentProblemTable } from "./LatentProblemTable";

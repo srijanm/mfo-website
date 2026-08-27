@@ -19,10 +19,10 @@ import styles from "./PricingGrid.module.css";
  */
 export function PricingGrid() {
   return (
-    <Section labelledBy="pricing">
+    <Section id="pricing" labelledBy="pricing-headline">
       <Container>
         <Grid>
-          <h2 id="pricing" className={styles.headline}>
+          <h2 id="pricing-headline" className={styles.headline}>
             {pricing.headline}
           </h2>
           <p className={styles.intro}>{pricing.intro}</p>

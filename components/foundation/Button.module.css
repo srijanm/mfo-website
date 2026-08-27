@@ -1,14 +1,17 @@
 /* §10. The acid primary lives in the token sheet as .button-primary; this file
    only adds the reversed variant and the disabled state. */
 
-/* Reversed primary for use on the acid final-CTA field — ink fill, paper text. */
-.ink {
+/* Reversed primary for use on the acid final-CTA field — ink fill, paper text.
+   Compounded with .button deliberately: .button-primary lives in the global
+   sheet at the same specificity, so a single class here would win or lose on
+   stylesheet order alone. Two classes settle it regardless of order. */
+.button.ink {
   background: var(--ink);
   color: var(--paper);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .ink:hover {
+  .button.ink:hover {
     background: var(--paper);
     color: var(--ink);
   }

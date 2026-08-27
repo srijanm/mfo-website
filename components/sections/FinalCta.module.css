@@ -1,0 +1,61 @@
+/* H13, §25. The one full acid field on the page.
+   Ink on acid, and the section's own rule uses the on-acid value so it does not
+   disappear into the field. */
+
+.section {
+  background: var(--acid);
+  border-top: 1px solid var(--rule-on-acid);
+  padding-block: var(--section-major-desktop);
+}
+
+.inner {
+  grid-column: 1 / span 9;
+}
+
+.headline {
+  margin: 0;
+  max-width: 18ch;
+  font-size: var(--fs-display-2);
+  font-weight: 400;
+  line-height: .97;
+  letter-spacing: -.04em;
+  color: var(--ink);
+}
+
+.support {
+  margin: 24px 0 0;
+  max-width: 46ch;
+  font-size: var(--fs-lead);
+  line-height: 1.44;
+  letter-spacing: -.018em;
+  /* Ink-2 rather than muted: muted grey does not hold its contrast on acid. */
+  color: var(--ink-2);
+}
+
+.action {
+  margin-top: 40px;
+}
+
+@media (max-width: 1023px) {
+  .section {
+    padding-block: var(--section-major-tablet);
+  }
+
+  .inner {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 767px) {
+  .section {
+    padding-block: var(--section-major-mobile);
+  }
+
+  .support {
+    font-size: var(--fs-body);
+  }
+
+  .action {
+    margin-top: 32px;
+  }
+}

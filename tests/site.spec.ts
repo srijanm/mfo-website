@@ -130,3 +130,126 @@ test.describe("Layer B never appears in the core scope section", () => {
     expect(await section.locator("h3").count()).toBe(8);
   });
 });
+
+/**
+ * The homepage argument depends on its order. §12 locks it, and the order is
+ * load-bearing: the whole core CA relationship has to land before any mention
+ * of broader financial services, or the positioning collapses into the
+ * everything-office framing the hierarchy exists to prevent.
+ */
+test.describe("homepage architecture", () => {
+  const LOCKED_ORDER = [
+    "Half the work you do",           // 1. Hero
+    "Different jobs. Same problem",   // 2. Recognition
+    "Nothing goes wrong in your first year",  // 3. Latent problem
+    "Your work changed",              // 4. Structural mismatch
+    "Your obligations change",        // 5. Income Axis
+    "You shouldn’t have to know which question to ask",  // 6. Operating model
+    "Your work has deadlines",        // 7. Managed calendar
+    "The CA and compliance work we are built to run",    // 8. Core scope
+    "Judge us by what happens before we file anything",  // 9. Trust ledger
+    "The price is on the site before we speak",          // 10. Pricing
+    "And when something else comes up",                  // 11. Additional support
+    "I don’t earn enough for this yet",                  // 12. FAQ
+    "Tell us how you earn",                              // 13. Final CTA
+  ];
+
+  test("sections appear in the order locked by section 12", async ({ page }) => {
+    await page.goto("/");
+
+    const body = (await page.locator("body").innerText()).replace(/\s+/g, " ");
+
+    let cursor = -1;
+    for (const marker of LOCKED_ORDER) {
+      const at = body.indexOf(marker.replace(/\s+/g, " "));
+      expect(at, `"${marker}" was not found on the page`).toBeGreaterThan(-1);
+      expect(at, `"${marker}" appears out of order`).toBeGreaterThan(cursor);
+      cursor = at;
+    }
+
+    // The footer closes the page.
+    await expect(page.locator("footer")).toBeVisible();
+  });
+
+  test("no Layer B service appears before pricing", async ({ page }) => {
+    await page.goto("/");
+
+    const LAYER_B_TERMS = [
+      "FX",
+      "foreign exchange",
+      "insurance",
+      "loan",
+      "borrowing",
+      "wealth",
+      "investment",
+      "MIS",
+    ];
+
+    const sections = page.locator("main > section");
+    const total = await sections.count();
+
+    let pricingIndex = -1;
+    for (let i = 0; i < total; i += 1) {
+      if ((await sections.nth(i).getAttribute("id")) === "pricing") {
+        pricingIndex = i;
+        break;
+      }
+    }
+
+    expect(pricingIndex, "the pricing section was not found").toBeGreaterThan(-1);
+
+    for (let i = 0; i < pricingIndex; i += 1) {
+      const text = await sections.nth(i).innerText();
+      for (const term of LAYER_B_TERMS) {
+        expect(
+          new RegExp(`\\b${term}\\b`, "i").test(text),
+          `"${term}" appears in section ${i + 1}, before pricing`,
+        ).toBe(false);
+      }
+    }
+  });
+});
+
+/** §24 sets the accordion's minimum row heights. */
+test.describe("FAQ", () => {
+  test("triggers meet the minimum row height and expose state", async ({ page }) => {
+    await page.goto("/");
+
+    const triggers = page.locator("main button[aria-expanded]");
+    expect(await triggers.count()).toBe(7);
+
+    for (let i = 0; i < 7; i += 1) {
+      const box = await triggers.nth(i).boundingBox();
+      expect(box!.height, `FAQ row ${i + 1} is under 64px`).toBeGreaterThanOrEqual(64);
+    }
+
+    const first = triggers.first();
+    await expect(first).toHaveAttribute("aria-expanded", "false");
+    await first.click();
+    await expect(first).toHaveAttribute("aria-expanded", "true");
+  });
+});
+
+/**
+ * §25 requires the final CTA to sit on a full acid field with an ink button and
+ * paper text. This regressed once already: `.button-primary` is global and the
+ * reversed variant was a module class at equal specificity, so the winner was
+ * decided by stylesheet order rather than intent.
+ */
+test.describe("final CTA", () => {
+  const ACID = "rgb(215, 255, 0)";
+  const INK = "rgb(17, 19, 15)";
+  const PAPER = "rgb(246, 247, 242)";
+
+  test("sits on acid with a reversed ink button", async ({ page }) => {
+    await page.goto("/");
+
+    const section = page.locator("main > section").last();
+    await expect(section).toHaveCSS("background-color", ACID);
+
+    const button = section.locator("a").first();
+    await expect(button).toHaveCSS("background-color", INK);
+    await expect(button).toHaveCSS("color", PAPER);
+    await expect(button).toHaveAttribute("href", "/get-started");
+  });
+});
