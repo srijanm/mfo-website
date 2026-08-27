@@ -1,0 +1,25 @@
+/* §10 secondary action: a plain text link with an arrow and no button chrome.
+   The only padding present is what a 44px target needs. */
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: .5em;
+  min-height: 44px;
+  font-size: var(--fs-ui);
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  text-underline-offset: 4px;
+}
+
+.arrow {
+  /* Decorative: the link text already carries the meaning. */
+  line-height: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link:hover {
+    text-decoration: underline;
+  }
+}

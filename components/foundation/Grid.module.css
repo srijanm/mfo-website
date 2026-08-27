@@ -1,0 +1,35 @@
+/* 12 / 8 / 4 columns per MASTER_BUILD_SPEC.md §7. Column counts and gaps come
+   from the token sheet so a breakpoint is never redefined here. */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--grid-gap-desktop);
+}
+
+.item {
+  grid-column: span var(--span-desktop, 12);
+  min-width: 0;
+}
+
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: var(--grid-gap-tablet);
+  }
+
+  .item {
+    grid-column: span var(--span-tablet, 8);
+  }
+}
+
+@media (max-width: 767px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--grid-gap-mobile);
+  }
+
+  .item {
+    grid-column: span var(--span-mobile, 4);
+  }
+}

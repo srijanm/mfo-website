@@ -1,0 +1,114 @@
+// MyFinanceOfficer — canonical marketing content data
+
+export const pricingPoints = [19999, 24999, 34999] as const;
+
+export const recognition = [
+  "Paid by an overseas company",
+  "Consulting for a few clients",
+  "Creator or brand income",
+  "Independent professional income",
+] as const;
+
+export const coreScope = [
+  {
+    id: "setup",
+    title: "Setup & registrations",
+    body: "What you need now, what you do not need yet and what would make that change.",
+  },
+  {
+    id: "income-tax",
+    title: "Income tax",
+    body: "The ongoing tax work around the way you actually earn.",
+  },
+  {
+    id: "gst-export",
+    title: "GST & export compliance",
+    body: "Where relevant to your facts and income.",
+  },
+  {
+    id: "advance-tax",
+    title: "Advance tax",
+    body: "Planning, tracking and filing where relevant.",
+  },
+  {
+    id: "drafts",
+    title: "Drafts & filing",
+    body: "You see what is being filed before it is filed.",
+  },
+  {
+    id: "notices",
+    title: "Notices",
+    body: "Support according to the scope of your engagement.",
+  },
+  {
+    id: "questions",
+    title: "Ongoing questions",
+    body: "One accountable place to get the actual answer.",
+  },
+  {
+    id: "documentation",
+    title: "Income documentation",
+    body: "Records that help you prove what you earn when someone asks.",
+  },
+] as const;
+
+export const additionalSupport = [
+  {
+    id: "fx",
+    title: "FX optimisation",
+    body: "Help thinking through the cost and mechanics of receiving or converting foreign income.",
+  },
+  {
+    id: "insurance",
+    title: "Insurance optimisation",
+    body: "Reviewing whether your current cover makes sense for your situation.",
+  },
+  {
+    id: "loans",
+    title: "Loan optimisation",
+    body: "Helping organise the financial information and decisions around borrowing.",
+  },
+  {
+    id: "wealth",
+    title: "Wealth planning",
+    body: "Planning support as your financial life becomes more complex.",
+  },
+  {
+    id: "mis",
+    title: "MIS",
+    body: "Useful financial visibility and reporting when you need more than an annual return.",
+  },
+] as const;
+
+export const defaultMilestones = [
+  {
+    id: "first-income",
+    label: "First income",
+    question: "Do I need to set anything up now?",
+    mfo: "We tell you what matters now, what does not, and what would make that answer change.",
+  },
+  {
+    id: "first-year",
+    label: "First year",
+    question: "What am I supposed to keep track of?",
+    mfo: "We set up the year properly and put the relevant dates on our calendar rather than yours.",
+  },
+  {
+    id: "registration",
+    label: "Registration becomes relevant",
+    question: "Has something changed because of how much or where I earn?",
+    mfo: "We flag the change before it becomes a late discovery.",
+  },
+  {
+    id: "growth",
+    label: "Income and obligations grow",
+    question: "Am I still using the right structure and filing approach?",
+    mfo: "We revisit the setup as the facts change rather than repeating last year's answer automatically.",
+  },
+  {
+    id: "structure-review",
+    label: "Structure needs reviewing",
+    question: "Do I need a different entity or a more involved setup now?",
+    mfo: "We give you the actual answer, including when the answer is still “not yet.”",
+  },
+] as const;

@@ -1,0 +1,58 @@
+"use client";
+
+import { useId, useState } from "react";
+import type { ReactNode } from "react";
+
+import { cx } from "@/lib/cx";
+
+import styles from "./Disclosure.module.css";
+
+type DisclosureProps = {
+  summary: string;
+  defaultOpen?: boolean;
+  /** Keeps the trigger at the right depth in the page's heading order. */
+  headingLevel?: 2 | 3 | 4;
+  className?: string;
+  children: ReactNode;
+};
+
+/**
+ * A ruled disclosure row driven by a real button with `aria-expanded`, per §30.
+ *
+ * The panel stays in the DOM and is toggled with the `hidden` attribute rather
+ * than being conditionally rendered, so the open and closed markup differ only
+ * by that attribute. Opening and closing is instant — motion is a later layer.
+ */
+export function Disclosure({
+  summary,
+  defaultOpen = false,
+  headingLevel = 3,
+  className,
+  children,
+}: DisclosureProps) {
+  const [open, setOpen] = useState(defaultOpen);
+  const panelId = useId();
+  const triggerId = useId();
+  const Heading = `h${headingLevel}` as const;
+
+  return (
+    <div className={cx(styles.row, open && styles.isOpen, className)}>
+      <Heading>
+        <button
+          type="button"
+          id={triggerId}
+          className={styles.trigger}
+          aria-expanded={open}
+          aria-controls={panelId}
+          onClick={() => setOpen((wasOpen) => !wasOpen)}
+        >
+          <span>{summary}</span>
+          <span aria-hidden="true" className={styles.marker} />
+        </button>
+      </Heading>
+      <div id={panelId} role="region" aria-labelledby={triggerId} className={styles.panel} hidden={!open}>
+        {children}
+      </div>
+    </div>
+  );
+}

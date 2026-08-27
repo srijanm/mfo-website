@@ -1,0 +1,16 @@
+/* §5. 1px is the only permitted weight; 0.5px is explicitly excluded. */
+
+.rule {
+  border: 0;
+  margin: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.strong {
+  border-top-color: var(--rule-strong);
+}
+
+/* An active threshold segment may become 2px acid — §6. */
+.active {
+  border-top: 2px solid var(--acid);
+}

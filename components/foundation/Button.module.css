@@ -1,0 +1,22 @@
+/* §10. The acid primary lives in the token sheet as .button-primary; this file
+   only adds the reversed variant and the disabled state. */
+
+/* Reversed primary for use on the acid final-CTA field — ink fill, paper text. */
+.ink {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ink:hover {
+    background: var(--paper);
+    color: var(--ink);
+  }
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  border-color: var(--rule-strong);
+  background: transparent;
+  color: var(--muted);
+}

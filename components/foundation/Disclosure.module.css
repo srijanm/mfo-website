@@ -1,0 +1,73 @@
+/* A ruled disclosure row. Rows are separated by 1px rules rather than boxed —
+   §5. Minimum row heights follow §24: 64px desktop, 56px mobile. */
+
+.row {
+  border-top: 1px solid var(--rule);
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  min-height: 64px;
+  padding: 18px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-lead);
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: -.018em;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* The marker is a state indicator, not decoration: it reads open or closed
+   alongside aria-expanded, so state is never carried by colour alone. */
+.marker {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  position: relative;
+}
+
+.marker::before,
+.marker::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto 0;
+  height: 1px;
+  background: var(--ink);
+}
+
+.marker::after {
+  inset: 0 50% auto auto;
+  width: 1px;
+  height: 100%;
+}
+
+.isOpen .marker::after {
+  display: none;
+}
+
+.panel {
+  padding: 0 0 24px;
+  max-width: 64ch;
+  color: var(--ink-2);
+}
+
+/* Explicit, because a class that sets display would otherwise outrank the
+   hidden attribute and the panel would stay on screen when closed. */
+.panel[hidden] {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .trigger {
+    min-height: 56px;
+    font-size: var(--fs-body);
+  }
+}

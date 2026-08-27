@@ -1,0 +1,65 @@
+/* §6, the line + node primitive. Hollow means nothing has changed here yet;
+   acid fill means it has. The node is only ever used where that is literally
+   true — thresholds, calendar events, progress and selected state. */
+
+.node {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vertical {
+  flex-direction: column;
+  gap: 8px;
+}
+
+.segment {
+  flex: 1 1 auto;
+  min-width: 24px;
+  height: 1px;
+  background: var(--rule);
+}
+
+.vertical .segment {
+  width: 1px;
+  min-width: 0;
+  min-height: 24px;
+  height: auto;
+}
+
+/* A segment already passed fills 2px acid. */
+.segmentActive {
+  height: 2px;
+  background: var(--acid);
+}
+
+.vertical .segmentActive {
+  width: 2px;
+  height: auto;
+}
+
+.dot {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  /* A circle, not a rounded rectangle: percentage radius is exempt from the
+     6px ceiling that governs rectangular surfaces. */
+  border-radius: 50%;
+  border: 1px solid var(--ink);
+  background: transparent;
+}
+
+.dotActive {
+  background: var(--acid);
+}
+
+.label {
+  flex: none;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.labelActive {
+  color: var(--ink);
+}

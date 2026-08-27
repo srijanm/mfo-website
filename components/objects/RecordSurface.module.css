@@ -1,0 +1,87 @@
+/* §11. These are the only card-shaped things on the site, permitted because the
+   content is itself a literal object: a payment, a filing, an obligation.
+   White is reserved for exactly this — §4. Radius is the 6px ceiling and there
+   is no shadow. */
+
+.surface {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-object);
+  padding: 20px;
+  max-width: 420px;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.titleRule {
+  border: 0;
+  margin: 12px 0 0;
+  border-top: 1px solid var(--rule);
+}
+
+.amount {
+  margin: 16px 0 0;
+  font-size: var(--fs-h3);
+  font-weight: 400;
+  letter-spacing: -.028em;
+  line-height: 1.1;
+}
+
+.group {
+  margin: 20px 0 0;
+  display: grid;
+  /* Labels take a fixed measure so values align down a single edge, the way
+     they do in the spec's anatomy. */
+  grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr);
+  gap: 8px 16px;
+  font-size: var(--fs-ui);
+}
+
+.label {
+  margin: 0;
+  color: var(--muted);
+}
+
+.value {
+  margin: 0;
+  color: var(--ink);
+}
+
+.note {
+  margin: 20px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+
+@media (max-width: 767px) {
+  .surface {
+    max-width: none;
+  }
+
+  .group {
+    grid-template-columns: minmax(0, 7.5rem) minmax(0, 1fr);
+  }
+}
+
+/* At 320px a two-column record cannot hold its value column, so labels and
+   values stack rather than wrap mid-word — §29. */
+@media (max-width: 359px) {
+  .group {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px 0;
+  }
+
+  .value {
+    margin-bottom: 10px;
+  }
+}
