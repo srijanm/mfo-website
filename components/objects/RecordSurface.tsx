@@ -27,10 +27,19 @@ type RecordSurfaceProps = {
  * Shared chrome for the three information objects in §11: uppercase object
  * title, a rule, an optional headline figure, then aligned label/value rows.
  *
- * Rows are a description list, so a screen reader reads each label with its
- * value instead of a run of loose text.
+ * All rows live in one description list even when the anatomy shows them in
+ * groups, so every value aligns down a single edge. Separate lists would each
+ * size their own label column and the values would step in and out. Groups are
+ * separated by spacing on the first row of each later group.
  */
 export function RecordSurface({ title, amount, groups, note, className }: RecordSurfaceProps) {
+  const rows = groups.flatMap((group, groupIndex) =>
+    group.map((row, rowIndex) => ({
+      ...row,
+      startsGroup: groupIndex > 0 && rowIndex === 0,
+    })),
+  );
+
   return (
     <figure className={cx(styles.surface, className)}>
       <figcaption className={styles.title}>{title}</figcaption>
@@ -38,16 +47,17 @@ export function RecordSurface({ title, amount, groups, note, className }: Record
 
       {amount ? <p className={cx(styles.amount, "data-number")}>{amount}</p> : null}
 
-      {groups.map((rows, groupIndex) => (
-        <dl key={rows.map((row) => row.label).join("|") || groupIndex} className={styles.group}>
-          {rows.map((row) => (
-            <div key={row.label} style={{ display: "contents" }}>
-              <dt className={styles.label}>{row.label}</dt>
-              <dd className={cx(styles.value, "data-number")}>{row.value ?? EMPTY_VALUE}</dd>
-            </div>
-          ))}
-        </dl>
-      ))}
+      <dl className={styles.rows}>
+        {rows.map((row) => (
+          <div
+            key={row.label}
+            className={cx(styles.row, row.startsGroup && styles.groupStart)}
+          >
+            <dt className={styles.label}>{row.label}</dt>
+            <dd className={cx(styles.value, "data-number")}>{row.value ?? EMPTY_VALUE}</dd>
+          </div>
+        ))}
+      </dl>
 
       {note ? <p className={styles.note}>{note}</p> : null}
     </figure>

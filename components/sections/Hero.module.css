@@ -1,0 +1,125 @@
+/* H01, MASTER_BUILD_SPEC.md §13.
+   Left aligned, never centred. The header already carries a 1px bottom rule,
+   so the hero takes no top rule of its own. */
+
+.hero {
+  /* §9 puts the bar at 64px; the rule below it adds the 65th pixel, so this is
+     what actually fills the viewport without leaving a sliver of scroll. */
+  --nav-total: 65px;
+
+  display: flex;
+  min-height: max(700px, calc(100svh - var(--nav-total)));
+}
+
+.inner {
+  display: flex;
+  width: 100%;
+  padding-block: 64px 72px;
+}
+
+/* Headline sits at the top, the copy and the payment object at the bottom, so
+   the object lands lower right as the spec describes. */
+.grid {
+  flex: 1;
+  align-content: space-between;
+  /* Scales with viewport height so the composition still lands inside the fold
+     on a short laptop screen instead of pushing the actions past it. */
+  row-gap: clamp(32px, 4vh, 72px);
+}
+
+.headline {
+  grid-column: 1 / span 9;
+  text-wrap: balance;
+}
+
+.copy {
+  grid-column: 1 / span 5;
+  align-self: end;
+}
+
+.subhead {
+  margin: 0;
+  max-width: 46ch;
+  font-size: var(--fs-lead);
+  line-height: 1.44;
+  letter-spacing: -.018em;
+  color: var(--ink-2);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  margin-top: 32px;
+}
+
+.object {
+  grid-column: 8 / -1;
+  align-self: end;
+  justify-self: end;
+  width: 100%;
+}
+
+/* On a short viewport the headline and the record cannot both sit above the
+   fold — that is inherent to the composition, not a spacing bug. The target
+   height is dropped and the padding tightened rather than shrinking the type or
+   the record. The primary action is also in the sticky header throughout. */
+@media (max-height: 820px) {
+  .hero {
+    min-height: 0;
+  }
+
+  .inner {
+    padding-block: 56px 64px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .hero {
+    min-height: 0;
+  }
+
+  .inner {
+    padding-block: 56px 72px;
+  }
+
+  .grid {
+    row-gap: 48px;
+  }
+
+  /* Below desktop the three blocks stack in reading order: copy, then the
+     calls to action, then the payment object — §13. */
+  .headline,
+  .copy,
+  .object {
+    grid-column: 1 / -1;
+  }
+
+  .object {
+    justify-self: start;
+    max-width: 420px;
+  }
+}
+
+@media (max-width: 767px) {
+  .inner {
+    padding-block: 40px 56px;
+  }
+
+  .grid {
+    row-gap: 36px;
+  }
+
+  .subhead {
+    font-size: var(--fs-body);
+  }
+
+  .actions {
+    margin-top: 24px;
+  }
+
+  .object {
+    max-width: none;
+  }
+}

@@ -34,14 +34,25 @@
   line-height: 1.1;
 }
 
-.group {
+/* One grid for every row in the record, so the label column is sized once and
+   all values align down a single edge — the way they do in the anatomy. */
+.rows {
   margin: 20px 0 0;
   display: grid;
-  /* Labels take a fixed measure so values align down a single edge, the way
-     they do in the spec's anatomy. */
   grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr);
   gap: 8px 16px;
   font-size: var(--fs-ui);
+}
+
+/* Each row contributes its cells directly to the grid above. */
+.row {
+  display: contents;
+}
+
+/* The anatomy separates rows into groups with a blank line. */
+.groupStart dt,
+.groupStart dd {
+  padding-top: 12px;
 }
 
 .label {
@@ -68,17 +79,27 @@
     max-width: none;
   }
 
-  .group {
-    grid-template-columns: minmax(0, 7.5rem) minmax(0, 1fr);
+  /* Sizing the label column to its content rather than a fixed measure gives
+     the values enough room to stay on one line at narrow widths. */
+  .rows {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 20px;
   }
 }
 
-/* At 320px a two-column record cannot hold its value column, so labels and
-   values stack rather than wrap mid-word — §29. */
-@media (max-width: 359px) {
-  .group {
+/* At phone widths a two-column record cannot hold its value column without
+   wrapping most values, so labels and values stack instead — §29 calls for
+   exactly this on mobile. */
+@media (max-width: 479px) {
+  .rows {
     grid-template-columns: minmax(0, 1fr);
     gap: 2px 0;
+  }
+
+  /* Stacked, the group gap belongs above the label. Left on the value it would
+     open a space between a label and the value it describes. */
+  .groupStart dd {
+    padding-top: 0;
   }
 
   .value {
