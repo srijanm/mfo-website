@@ -34,6 +34,34 @@
   width: 100%;
 }
 
+/* Checklist: what we ask about, on ruled rows. */
+.checklistTitle {
+  grid-column: 1 / span 4;
+  margin: 0;
+  padding-top: 28px;
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-h3);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -.028em;
+}
+
+.checklist {
+  grid-column: 5 / -1;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+  list-style: none;
+}
+
+.checklistItem {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--fs-lead);
+  line-height: 1.32;
+  letter-spacing: -.018em;
+}
+
 .topics {
   grid-column: 1 / -1;
   margin: 0;
@@ -69,8 +97,18 @@
   }
 
   .copy,
-  .record {
+  .record,
+  .checklistTitle,
+  .checklist {
     grid-column: 1 / -1;
+  }
+
+  .checklistTitle {
+    margin-bottom: 28px;
+  }
+
+  .checklist {
+    border-top: 0;
   }
 
   .record {

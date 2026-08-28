@@ -383,3 +383,93 @@ test.describe("get-started intake", () => {
     ).toBeVisible();
   });
 });
+
+/**
+ * The audience pages. The foreign-income spec is explicit that FX appears only
+ * as secondary support, in section 5 — so nothing before that section may name
+ * a Layer B service, and the three other audience pages carry none at all.
+ */
+test.describe("who it's for", () => {
+  const LAYER_B_TERMS = [
+    "FX",
+    "foreign exchange",
+    "insurance",
+    "loan",
+    "borrowing",
+    "wealth",
+    "investment",
+    "MIS",
+  ];
+
+  const AUDIENCES = [
+    "foreign-income",
+    "freelancers-consultants",
+    "creators",
+    "independent-professionals",
+  ];
+
+  test("the hub links to every audience page", async ({ page }) => {
+    await page.goto("/who-its-for");
+
+    // Scoped to main: the footer legitimately links to these pages as well.
+    for (const slug of AUDIENCES) {
+      await expect(page.locator(`main a[href="/who-its-for/${slug}"]`)).toHaveCount(1);
+    }
+  });
+
+  test("foreign income names no Layer B service before secondary support", async ({ page }) => {
+    await page.goto("/who-its-for/foreign-income");
+
+    const sections = page.locator("main > section");
+    const total = await sections.count();
+
+    // Secondary support is the section that opens with the approved headline.
+    let supportIndex = -1;
+    for (let i = 0; i < total; i += 1) {
+      if ((await sections.nth(i).innerText()).includes("And when something else comes up")) {
+        supportIndex = i;
+        break;
+      }
+    }
+
+    expect(supportIndex, "the additional-support section was not found").toBeGreaterThan(-1);
+
+    for (let i = 0; i < supportIndex; i += 1) {
+      const text = await sections.nth(i).innerText();
+      for (const term of LAYER_B_TERMS) {
+        expect(
+          new RegExp(`\\b${term}\\b`, "i").test(text),
+          `"${term}" appears in section ${i + 1}, before secondary support`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  test("the other audience pages carry no Layer B service at all", async ({ page }) => {
+    for (const slug of AUDIENCES.slice(1)) {
+      await page.goto(`/who-its-for/${slug}`);
+      const text = await page.locator("main").innerText();
+
+      for (const term of LAYER_B_TERMS) {
+        expect(
+          new RegExp(`\\b${term}\\b`, "i").test(text),
+          `"${term}" appears on /who-its-for/${slug}, whose spec does not list it`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  test("each audience page has one h1 and its own headline", async ({ page }) => {
+    const seen = new Set<string>();
+
+    for (const slug of AUDIENCES) {
+      await page.goto(`/who-its-for/${slug}`);
+      const headings = page.locator("h1");
+      await expect(headings).toHaveCount(1);
+
+      const text = await headings.innerText();
+      expect(seen.has(text), `${slug} repeats another audience's headline`).toBe(false);
+      seen.add(text);
+    }
+  });
+});

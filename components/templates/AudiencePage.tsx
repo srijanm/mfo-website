@@ -1,9 +1,15 @@
 import { Container, Grid, Section } from "@/components/foundation";
 import { IncomingPaymentRecord } from "@/components/objects";
+import {
+  AdditionalFinancialSupport,
+  CoreScopeMatrix,
+  IncomeAxis,
+  TemporalLedger,
+} from "@/components/sections";
 import { FaqSection, FinalCtaSection, PricingSection } from "@/components/shared";
-import type { Audience } from "@/lib/content/audiences";
-import { finalCta, homepageFaq } from "@/lib/content/homepage";
-import { pricing } from "@/lib/content/pricing";
+import type { Audience, AudienceBlock } from "@/lib/content/audiences";
+import { faqByIds, finalCta } from "@/lib/content/homepage";
+import { pricingPage } from "@/lib/content/pricing";
 import { factValue } from "@/lib/content/reviewed";
 
 import styles from "./AudiencePage.module.css";
@@ -13,16 +19,64 @@ type AudiencePageProps = {
 };
 
 /**
- * One template for all four /who-its-for children. They share a structure —
- * hero, an optional information object, the page's topics, then pricing, FAQ
- * and the closing CTA — so they share a component and differ only by content.
+ * One template for all four /who-its-for children.
  *
- * Topic bodies are reviewed content and currently null, so the template renders
- * the titles it has and omits bodies it does not. Nothing about how anyone is
- * taxed is written here.
+ * Each page's body is a list of shared blocks in the order its spec names
+ * them, so the pages differ by content and sequence rather than by code. Every
+ * block renders copy that already exists elsewhere on the site, which means an
+ * audience page cannot assert anything the homepage does not.
+ *
+ * Layer B appears only where a spec asks for it, and only at the position it
+ * asks for — on the foreign-income page that is after the core scope and after
+ * the topic questions, never before.
  */
 export function AudiencePage({ audience }: AudiencePageProps) {
   const writtenTopics = audience.sections.filter((section) => section.body !== null);
+
+  const renderBlock = (block: AudienceBlock) => {
+    switch (block) {
+      case "checklist":
+        return audience.checklist ? (
+          <Section key={block} labelledBy="checklist">
+            <Container>
+              <Grid>
+                <h2 id="checklist" className={styles.checklistTitle}>
+                  {audience.checklist.title}
+                </h2>
+                <ul className={styles.checklist}>
+                  {audience.checklist.items.map((item) => (
+                    <li key={item} className={styles.checklistItem}>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </Grid>
+            </Container>
+          </Section>
+        ) : null;
+
+      case "core-scope":
+        return <CoreScopeMatrix key={block} />;
+
+      case "calendar":
+        return <TemporalLedger key={block} />;
+
+      case "axis":
+        return <IncomeAxis key={block} compact />;
+
+      case "topic-faq":
+        return audience.topicFaq ? (
+          <FaqSection
+            key={block}
+            headline={audience.topicFaq.title}
+            items={faqByIds(audience.topicFaq.ids)}
+          />
+        ) : null;
+
+      case "additional-support":
+        return <AdditionalFinancialSupport key={block} />;
+    }
+  };
 
   return (
     <>
@@ -71,8 +125,12 @@ export function AudiencePage({ audience }: AudiencePageProps) {
         </Section>
       ) : null}
 
-      <PricingSection content={pricing} />
-      <FaqSection items={homepageFaq} />
+      {audience.blocks.map(renderBlock)}
+
+      <PricingSection content={pricingPage.tiers} />
+
+      <FaqSection items={faqByIds(audience.generalFaqIds)} />
+
       <FinalCtaSection content={finalCta} />
     </>
   );
