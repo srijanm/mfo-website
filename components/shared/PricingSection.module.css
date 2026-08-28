@@ -21,6 +21,12 @@
   color: var(--ink-2);
 }
 
+/* Without a headline above it the tier block opens the section, so it does not
+   carry the top margin that separates it from one. */
+.tiers:first-child {
+  margin-top: 0;
+}
+
 .tiers {
   grid-column: 1 / -1;
   display: grid;

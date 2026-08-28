@@ -59,6 +59,20 @@
   padding-bottom: 56px;
 }
 
+/* Compact reuse: the same content, less air between milestones. */
+.listCompact {
+  margin-top: 40px;
+}
+
+.listCompact .body {
+  padding-bottom: 36px;
+}
+
+.listCompact .label {
+  font-size: var(--fs-lead);
+  letter-spacing: -.018em;
+}
+
 .milestone:last-child .body {
   padding-bottom: 0;
 }

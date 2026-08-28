@@ -435,3 +435,10 @@ export const finalCta = {
   support: "If the answer is “not yet”, we’ll tell you that too.",
   cta: primaryCta,
 } as const satisfies FinalCtaContent;
+
+/** Look up approved FAQ entries by id, preserving the requested order. */
+export function faqByIds(ids: readonly string[]): FaqItem[] {
+  return ids
+    .map((id) => homepageFaq.find((item) => item.id === id))
+    .filter((item): item is FaqItem => item !== undefined);
+}

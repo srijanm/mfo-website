@@ -18,7 +18,8 @@ export function formatAnnualPrice(amount: number): string {
 }
 
 export type PricingContent = {
-  headline: string;
+  /** Omitted where the page hero already carries the proposition. */
+  headline?: string;
   intro?: string;
   points: readonly number[];
   perYear: string;
@@ -59,4 +60,31 @@ export const additionalSupportSection = {
   headline: "And when something else comes up.",
   body:
     "Tax and compliance are the part we run all year. Because we already understand how you earn, some plans can also include help with adjacent financial decisions.",
+} as const;
+
+/* ------------------------------------------------------- /pricing page */
+
+/**
+ * The pricing page. Its hero states the proposition, so the tier block passes
+ * no headline of its own — the same PricingSection, one less repetition.
+ *
+ * The FAQ reuses the questions from the homepage set that are pricing
+ * objections rather than writing new ones, and the closing CTA reuses the
+ * approved final-CTA copy with the label §22 names for this page.
+ */
+export const pricingPage = {
+  headline: "Three annual prices. The scope is agreed before you start.",
+  lead: pricing.intro,
+
+  tiers: {
+    points: pricing.points,
+    perYear: pricing.perYear,
+    planLabel: pricing.planLabel,
+    scopeLine: pricing.scopeLine,
+    cta: pricing.cta,
+    closing: pricing.closing,
+  } satisfies PricingContent,
+
+  /** The pricing objections, selected from the approved FAQ set. */
+  faqIds: ["not-enough-yet", "cheaper", "broader-support"] as const,
 } as const;

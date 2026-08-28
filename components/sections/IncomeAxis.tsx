@@ -1,4 +1,5 @@
 import { Container, Grid, Section, ThresholdNode } from "@/components/foundation";
+import { cx } from "@/lib/cx";
 import { incomeAxis } from "@/lib/content/homepage";
 import { factValue } from "@/lib/content/reviewed";
 
@@ -19,21 +20,30 @@ import styles from "./IncomeAxis.module.css";
  * column takes the rest, so no space is reserved for a threshold value that may
  * never exist — §17 requires the layout not to depend on one.
  */
-export function IncomeAxis() {
+type IncomeAxisProps = {
+  /**
+   * Tighter spacing and no lede, for reuse inside a page that has already
+   * introduced the idea. Still not sticky and still not animated — the
+   * component has no other mode.
+   */
+  compact?: boolean;
+};
+
+export function IncomeAxis({ compact = false }: IncomeAxisProps) {
   const { fieldLabels, milestones } = incomeAxis;
 
   return (
-    <Section labelledBy="income-axis">
+    <Section dense={compact} labelledBy="income-axis">
       <Container>
         <Grid>
           <div className={styles.intro}>
             <h2 id="income-axis" className={styles.headline}>
               {incomeAxis.headline}
             </h2>
-            <p className={styles.lede}>{incomeAxis.intro}</p>
+            {compact ? null : <p className={styles.lede}>{incomeAxis.intro}</p>}
           </div>
 
-          <ol className={styles.list}>
+          <ol className={cx(styles.list, compact && styles.listCompact)}>
             {milestones.map((milestone, index) => (
               <li key={milestone.id} className={styles.milestone}>
                 <div className={styles.rail}>

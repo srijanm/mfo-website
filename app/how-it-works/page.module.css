@@ -1,0 +1,155 @@
+.hero {
+  border-bottom: 1px solid var(--rule);
+  padding-block: var(--section-major-desktop);
+}
+
+.heroCopy {
+  grid-column: 1 / span 8;
+}
+
+.title {
+  margin: 0;
+  max-width: 18ch;
+  font-size: var(--fs-h1);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+
+.lead {
+  margin: 28px 0 0;
+  max-width: 54ch;
+  font-size: var(--fs-lead);
+  line-height: 1.44;
+  letter-spacing: -.018em;
+  color: var(--ink-2);
+}
+
+/* The section title shares the content's opening rule, so the two sit on one
+   continuous line across the row rather than the title floating above it. */
+.sectionTitle {
+  grid-column: 1 / span 4;
+  margin: 0;
+  padding-top: 28px;
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-h3);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -.028em;
+}
+
+/* Section 1: two ruled columns, divided on desktop only. */
+.exchange {
+  grid-column: 5 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--rule);
+}
+
+.exchangeCell {
+  padding: 28px 28px 0 0;
+  font-size: var(--fs-lead);
+  line-height: 1.32;
+  letter-spacing: -.018em;
+}
+
+.exchangeCell + .exchangeCell {
+  padding-left: 28px;
+  border-left: 1px solid var(--rule);
+}
+
+/* Section 2: setup milestones on the node primitive. */
+.steps {
+  grid-column: 5 / -1;
+  margin: 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--rule);
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr);
+  column-gap: 20px;
+}
+
+.stepRail {
+  display: flex;
+  justify-content: center;
+}
+
+.stepNode {
+  flex: 1;
+  align-items: center;
+  --threshold-gap: 0px;
+}
+
+.stepLabel {
+  margin: 0;
+  padding: 16px 0;
+  font-size: var(--fs-lead);
+  line-height: 1.32;
+  letter-spacing: -.018em;
+}
+
+/* Section 4 */
+.filing {
+  grid-column: 5 / -1;
+  padding-top: 28px;
+  border-top: 1px solid var(--rule);
+}
+
+.filingLead {
+  margin: 0 0 28px;
+  max-width: 46ch;
+  font-size: var(--fs-body);
+  line-height: 1.52;
+  color: var(--ink-2);
+}
+
+@media (max-width: 1023px) {
+  .hero {
+    padding-block: var(--section-major-tablet);
+  }
+
+  .heroCopy,
+  .sectionTitle,
+  .exchange,
+  .steps,
+  .filing {
+    grid-column: 1 / -1;
+  }
+
+  .sectionTitle {
+    margin-bottom: 28px;
+  }
+
+  /* Stacked, the title already opens the block, so the content does not
+     repeat the rule directly beneath it. */
+  .exchange,
+  .steps,
+  .filing {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .exchange {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .exchangeCell {
+    padding: 20px 0;
+  }
+
+  .exchangeCell + .exchangeCell {
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--rule);
+  }
+}
+
+@media (max-width: 767px) {
+  .hero {
+    padding-block: var(--section-major-mobile);
+  }
+}

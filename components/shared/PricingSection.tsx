@@ -27,12 +27,14 @@ type PricingSectionProps = {
  */
 export function PricingSection({ content, id = "pricing" }: PricingSectionProps) {
   return (
-    <Section id={id} labelledBy={`${id}-headline`}>
+    <Section id={id} labelledBy={content.headline ? `${id}-headline` : undefined}>
       <Container>
         <Grid>
-          <h2 id={`${id}-headline`} className={styles.headline}>
-            {content.headline}
-          </h2>
+          {content.headline ? (
+            <h2 id={`${id}-headline`} className={styles.headline}>
+              {content.headline}
+            </h2>
+          ) : null}
           {content.intro ? <p className={styles.intro}>{content.intro}</p> : null}
 
           <ul className={styles.tiers}>
