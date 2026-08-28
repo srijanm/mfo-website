@@ -34,6 +34,11 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+  /* Padded out to a 44px-wide target; the negative margin keeps the text on
+     the same left edge as the column heading above it. */
+  min-width: 44px;
+  padding-inline: 4px;
+  margin-inline-start: -4px;
   font-size: var(--fs-ui);
   color: var(--ink-2);
   text-decoration: none;

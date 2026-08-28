@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useId, useRef, useState } from "react";
 
-import { Button, ThresholdNode } from "@/components/foundation";
+import { Button, TextLink, ThresholdNode } from "@/components/foundation";
 import { detailsStep, getStarted, intakeSteps } from "@/lib/content/get-started";
 import { HONEYPOT_FIELD, type FieldErrors, type LeadPayload } from "@/lib/leads/types";
 
@@ -291,10 +291,14 @@ export function LeadForm() {
         ) : null}
       </div>
 
-      <p className={styles.alternative}>
-        {getStarted.alternative.prompt}{" "}
-        <Link href={getStarted.alternative.href}>{getStarted.alternative.label}</Link>
-      </p>
+      {/* The link sits on its own row rather than inline in the sentence, so it
+          clears the project's 44px target minimum. */}
+      <div className={styles.alternative}>
+        <p className={styles.alternativePrompt}>{getStarted.alternative.prompt}</p>
+        <TextLink href={getStarted.alternative.href}>
+          {getStarted.alternative.label}
+        </TextLink>
+      </div>
     </form>
   );
 }

@@ -991,3 +991,121 @@ test.describe("income axis", () => {
     expectsStaticFallback("no JavaScript");
   });
 });
+
+/**
+ * Design-system and accessibility measurements.
+ *
+ * These are computed from the rendered page rather than asserted about the
+ * source, because every one of them has already been broken once by a rule
+ * that looked right in a stylesheet — a heading class that was referenced but
+ * never defined, a form control that does not inherit its font, a nav link
+ * four pixels short of the target minimum.
+ */
+test.describe("measured", () => {
+  const ROUTES = [
+    "/", "/how-it-works", "/pricing", "/who-its-for/foreign-income",
+    "/about", "/get-started", "/guides/how-we-decide-what-you-need",
+  ];
+
+  test("only Geist, and no weight above 600", async ({ page }) => {
+    for (const route of ROUTES) {
+      await page.goto(route);
+
+      const type = await page.evaluate(() => {
+        const fonts = new Set<string>();
+        const heavy: string[] = [];
+        for (const el of document.querySelectorAll("body *")) {
+          const style = getComputedStyle(el);
+          fonts.add(style.fontFamily.split(",")[0].replace(/["']/g, ""));
+          const ownsText = [...el.childNodes].some(
+            (node) => node.nodeType === 3 && node.textContent?.trim(),
+          );
+          if (ownsText && parseInt(style.fontWeight, 10) > 600) {
+            heavy.push(`${el.tagName} ${style.fontWeight} "${el.textContent?.trim().slice(0, 30)}"`);
+          }
+        }
+        return { fonts: [...fonts], heavy };
+      });
+
+      expect(type.fonts, `${route} uses a font other than Geist`).toEqual(["Geist"]);
+      expect(type.heavy, `${route} renders text above weight 600`).toEqual([]);
+    }
+  });
+
+  test("every interaction target clears 44px", async ({ page }) => {
+    for (const route of ROUTES) {
+      await page.goto(route);
+
+      const small = await page.evaluate(() =>
+        [...document.querySelectorAll("a[href], button, input, select, textarea")]
+          .filter((el) => {
+            const style = getComputedStyle(el);
+            if (style.display === "none" || style.visibility === "hidden") return false;
+            const box = el.getBoundingClientRect();
+            if (box.width === 0 && box.height === 0) return false;
+            return box.width < 44 || box.height < 44;
+          })
+          .map((el) => {
+            const box = el.getBoundingClientRect();
+            return `${el.tagName} ${Math.round(box.width)}x${Math.round(box.height)} "${(el.textContent ?? "").trim().slice(0, 24)}"`;
+          }),
+      );
+
+      expect(small, `${route} has targets under 44px`).toEqual([]);
+    }
+  });
+
+  test("normal text meets 4.5:1 and large text 3:1", async ({ page }) => {
+    for (const route of ROUTES) {
+      await page.goto(route);
+
+      const failures = await page.evaluate(() => {
+        const channel = (c: number) => {
+          const v = c / 255;
+          return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+        };
+        const luminance = ([r, g, b]: number[]) =>
+          0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+        const parse = (value: string) =>
+          (value.match(/[\d.]+/g) ?? []).slice(0, 4).map(Number);
+        const backdrop = (el: Element): number[] => {
+          let node: Element | null = el;
+          while (node && node !== document.documentElement) {
+            const c = parse(getComputedStyle(node).backgroundColor);
+            if (c.length >= 3 && (c[3] === undefined || c[3] > 0)) return c.slice(0, 3);
+            node = node.parentElement;
+          }
+          return [246, 247, 242];
+        };
+
+        const out: string[] = [];
+        for (const el of document.querySelectorAll("body *")) {
+          const ownsText = [...el.childNodes].some(
+            (node) => node.nodeType === 3 && node.textContent?.trim(),
+          );
+          if (!ownsText) continue;
+
+          const style = getComputedStyle(el);
+          if (style.visibility === "hidden" || style.opacity === "0") continue;
+
+          const size = parseFloat(style.fontSize);
+          const weight = parseInt(style.fontWeight, 10) || 400;
+          const large = size >= 24 || (size >= 18.66 && weight >= 700);
+          const fg = parse(style.color).slice(0, 3);
+          const bg = backdrop(el);
+          const a = luminance(fg);
+          const b = luminance(bg);
+          const ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+          const required = large ? 3 : 4.5;
+
+          if (ratio + 0.01 < required) {
+            out.push(`${el.tagName} ${ratio.toFixed(2)}:1 (needs ${required}) "${el.textContent?.trim().slice(0, 30)}"`);
+          }
+        }
+        return out;
+      });
+
+      expect(failures, `${route} has text below the contrast minimum`).toEqual([]);
+    }
+  });
+});

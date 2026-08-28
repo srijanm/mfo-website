@@ -80,10 +80,14 @@
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 6px;
 }
 
+/* Each entry is its own row rather than an inline run, so it clears the 44px
+   target minimum without opening the list up. */
 .tocList a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
   font-size: var(--fs-ui);
   color: var(--ink-2);
   text-decoration: none;

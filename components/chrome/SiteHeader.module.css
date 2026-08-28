@@ -32,7 +32,9 @@
 .desktopRow {
   display: none;
   align-items: center;
-  gap: 28px;
+  /* 20px gap plus 4px of padding either side reads as the same 28px between
+     words, while giving every link a 44px-wide interaction target. */
+  gap: 20px;
 }
 
 @media (min-width: 1024px) {
@@ -44,7 +46,10 @@
 .link {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 44px;
+  min-width: 44px;
+  padding-inline: 4px;
   font-size: var(--fs-ui);
   color: var(--ink-2);
   text-decoration: none;
