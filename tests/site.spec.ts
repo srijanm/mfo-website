@@ -22,9 +22,18 @@ const ROUTES = [
 
 const PAPER = "rgb(246, 247, 242)";
 
-/** Collapses whitespace so two renders can be compared for content, not layout. */
-async function visibleText(page: Page): Promise<string> {
-  const text = await page.locator("body").innerText();
+/**
+ * All text in the document, regardless of how it is currently presented.
+ *
+ * Deliberately textContent rather than innerText. The requirement is that no
+ * content is *missing* without JavaScript — not that both renders look the
+ * same. A sticky crossfade legitimately shows one panel at a time, and a
+ * decorative progress strip legitimately appears only once scripted; neither
+ * loses information, and both would break an innerText comparison while a
+ * genuinely client-only paragraph would still be caught here.
+ */
+async function documentText(page: Page): Promise<string> {
+  const text = await page.locator("body").evaluate((el) => el.textContent ?? "");
   return text.replace(/\s+/g, " ").trim();
 }
 
@@ -94,12 +103,12 @@ test.describe("JavaScript disabled", () => {
     test(`${route} renders all content without JavaScript`, async ({ page, browser }) => {
       await page.goto(route);
       await expect(page.locator("body")).toHaveCSS("background-color", PAPER);
-      const withoutJs = await visibleText(page);
+      const withoutJs = await documentText(page);
 
       const scripted = await browser.newContext({ javaScriptEnabled: true });
       const scriptedPage = await scripted.newPage();
       await scriptedPage.goto(`${test.info().project.use.baseURL}${route}`);
-      const withJs = await visibleText(scriptedPage);
+      const withJs = await documentText(scriptedPage);
       await scripted.close();
 
       expect(withoutJs).toBe(withJs);

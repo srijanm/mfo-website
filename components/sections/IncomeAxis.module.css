@@ -145,3 +145,113 @@
     font-size: var(--fs-body);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   The sticky desktop composition.
+
+   Everything below applies ONLY at desktop width, ONLY when the document is
+   scripted, and ONLY when the visitor has not asked for reduced motion.
+   Outside those three conditions none of it exists and the section is the
+   static vertical progression above — which is exactly what §17 requires for
+   mobile and reduced motion.
+   --------------------------------------------------------------------------- */
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  :global(html.js) .sticky .scroller {
+    position: relative;
+    /* Section scroll length, §17. Normal document scrolling: the page is
+       simply tall, and nothing intercepts the wheel. */
+    height: 320vh;
+  }
+
+  /* Empty blocks whose only job is to be intersected. They carry no content,
+     so nothing is duplicated and nothing is read twice. */
+  :global(html.js) .sticky .sentinels {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-auto-rows: 1fr;
+  }
+
+  :global(html.js) .sticky .panel {
+    position: sticky;
+    top: var(--nav-h-total, 64px);
+    height: calc(100svh - var(--nav-h-total, 64px));
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-block: 48px 56px;
+  }
+
+  :global(html.js) .sticky .panelInner {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    /* The detail panels are stacked; only the active one is shown. */
+    position: relative;
+  }
+
+  :global(html.js) .sticky .list {
+    margin: 0;
+    width: 100%;
+    display: grid;
+  }
+
+  :global(html.js) .sticky .milestone {
+    grid-area: 1 / 1;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  :global(html.js) .sticky .milestoneActive {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* The vertical rail belongs to the stacked version only. */
+  :global(html.js) .sticky .rail {
+    display: none;
+  }
+
+  :global(html.js) .sticky .body {
+    padding-bottom: 0;
+    max-width: 40ch;
+  }
+
+  :global(html.js) .sticky .label {
+    font-size: var(--fs-display-2);
+    line-height: .97;
+    letter-spacing: -.04em;
+    max-width: 16ch;
+  }
+
+  :global(html.js) .sticky .fields {
+    margin-top: 32px;
+    grid-template-columns: auto minmax(0, 1fr);
+    max-width: 54ch;
+  }
+
+  /* The full-width line and node axis, lower portion of the panel. */
+  :global(html.js) .sticky .axis {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+  }
+
+  :global(html.js) .sticky .axisNode {
+    flex: 1;
+  }
+
+  :global(html.js) .sticky .axisNode:last-child {
+    flex: 0 1 auto;
+  }
+}
+
+/* Outside the sticky treatment the axis strip does not exist at all. */
+.axis {
+  display: none;
+}
