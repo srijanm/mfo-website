@@ -11,6 +11,11 @@ const ROUTES = [
   "/who-its-for/freelancers-consultants",
   "/who-its-for/creators",
   "/who-its-for/independent-professionals",
+  "/about",
+  "/contact",
+  "/privacy",
+  "/terms",
+  "/guides",
   "/styleguide",
 ] as const;
 
@@ -471,5 +476,40 @@ test.describe("who it's for", () => {
       expect(seen.has(text), `${slug} repeats another audience's headline`).toBe(false);
       seen.add(text);
     }
+  });
+});
+
+/**
+ * Every link in the header and footer must resolve. A dead link in the footer
+ * is the kind of thing that survives to launch because nothing tests it.
+ */
+test.describe("navigation", () => {
+  test("no header or footer link 404s", async ({ page, request }) => {
+    await page.goto("/");
+
+    const hrefs = await page.evaluate(() =>
+      [...document.querySelectorAll("header a, footer a")]
+        .map((a) => a.getAttribute("href"))
+        .filter((href): href is string => !!href && href.startsWith("/")),
+    );
+
+    expect(hrefs.length).toBeGreaterThan(10);
+
+    for (const href of [...new Set(hrefs)]) {
+      const response = await request.get(href);
+      expect(response.status(), `${href} returned ${response.status()}`).toBe(200);
+    }
+  });
+});
+
+/** No stock photography anywhere; real team images only, on /about. */
+test.describe("about", () => {
+  test("ships no photography and states where it will go", async ({ page }) => {
+    await page.goto("/about");
+
+    await expect(page.locator("main img")).toHaveCount(0);
+    await expect(
+      page.getByText("The named professionals responsible for the work"),
+    ).toBeVisible();
   });
 });

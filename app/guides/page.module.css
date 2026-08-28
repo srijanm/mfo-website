@@ -1,0 +1,75 @@
+.page {
+  padding-block: var(--section-major-desktop);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--fs-h1);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+
+.lead {
+  margin: 24px 0 0;
+  max-width: 58ch;
+  font-size: var(--fs-lead);
+  line-height: 1.44;
+  letter-spacing: -.018em;
+  color: var(--ink-2);
+}
+
+/* Ruled article rows. Never a card mosaic. */
+.rows {
+  margin: 56px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+  list-style: none;
+}
+
+.row {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.rowTitle {
+  margin: 0;
+  font-size: var(--fs-h3);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -.028em;
+}
+
+.answer {
+  margin: 10px 0 0;
+  max-width: 62ch;
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.meta {
+  margin: 10px 0 0;
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+.pending {
+  margin: 48px 0 0;
+  padding-top: 28px;
+  border-top: 1px solid var(--rule);
+  max-width: 58ch;
+  font-size: var(--fs-body);
+  line-height: 1.52;
+  color: var(--muted);
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding-block: var(--section-major-mobile);
+  }
+
+  .lead {
+    font-size: var(--fs-body);
+  }
+}
