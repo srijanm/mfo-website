@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { Reveal } from "@/components/motion";
 import { cx } from "@/lib/cx";
 
 import styles from "./RecordSurface.module.css";
@@ -47,7 +48,7 @@ export function RecordSurface({ title, amount, groups, note, className }: Record
 
       {amount ? <p className={cx(styles.amount, "data-number")}>{amount}</p> : null}
 
-      <dl className={styles.rows}>
+      <Reveal as="dl" variant="rows" className={styles.rows}>
         {rows.map((row) => (
           <div
             key={row.label}
@@ -57,7 +58,7 @@ export function RecordSurface({ title, amount, groups, note, className }: Record
             <dd className={cx(styles.value, "data-number")}>{row.value ?? EMPTY_VALUE}</dd>
           </div>
         ))}
-      </dl>
+      </Reveal>
 
       {note ? <p className={styles.note}>{note}</p> : null}
     </figure>

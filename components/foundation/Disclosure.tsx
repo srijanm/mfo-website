@@ -19,9 +19,10 @@ type DisclosureProps = {
 /**
  * A ruled disclosure row driven by a real button with `aria-expanded`, per §30.
  *
- * The panel stays in the DOM and is toggled with the `hidden` attribute rather
- * than being conditionally rendered, so the open and closed markup differ only
- * by that attribute. Opening and closing is instant — motion is a later layer.
+ * The panel stays in the DOM and is toggled by class, so open and closed markup
+ * differ by one class. It animates between zero and its natural height in
+ * 220ms; `visibility` does the hiding, because `display` cannot transition and
+ * opacity alone would leave the closed panel in the accessibility tree.
  */
 export function Disclosure({
   summary,
@@ -50,8 +51,15 @@ export function Disclosure({
           <span aria-hidden="true" className={styles.marker} />
         </button>
       </Heading>
-      <div id={panelId} role="region" aria-labelledby={triggerId} className={styles.panel} hidden={!open}>
-        {children}
+      <div
+        id={panelId}
+        role="region"
+        aria-labelledby={triggerId}
+        className={cx(styles.panelWrap, open && styles.panelWrapOpen)}
+      >
+        <div className={styles.panel}>
+          <div className={styles.panelBody}>{children}</div>
+        </div>
       </div>
     </div>
   );

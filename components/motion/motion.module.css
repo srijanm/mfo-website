@@ -1,0 +1,123 @@
+/* Motion primitives.
+   =====================================================================
+   CRITICAL: every hidden resting state below is gated behind BOTH
+   `@media (prefers-reduced-motion: no-preference)` AND `html.js`.
+
+   globals.css kills transitions under reduced motion with !important, so an
+   element left at opacity 0 would never transition back and would render blank.
+   And without JavaScript no observer ever runs, so nothing would receive the
+   class that reveals it. Outside those two conditions, none of these rules
+   apply at all and the content is simply present.
+   ===================================================================== */
+
+/* Durations and easings come from the canonical token sheet. Only the two
+   stagger steps and the travel distance are declared here, because the token
+   sheet does not carry them. */
+/* ---------- Fade and rise ---------- */
+
+.fade {
+  --reveal-delay: 0ms;
+  --travel: 12px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .fade {
+    opacity: 0;
+    transform: translateY(var(--travel));
+    transition:
+      opacity var(--motion-headline) var(--ease-reveal) var(--reveal-delay),
+      transform var(--motion-headline) var(--ease-reveal) var(--reveal-delay);
+    will-change: opacity, transform;
+  }
+
+  :global(html.js) .fade.isVisible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Rule draw ----------
+   A border cannot be scaled, so the animated rule is a pseudo-element and the
+   border is dropped only while animating. */
+
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .rule {
+    position: relative;
+    border-top-color: transparent;
+  }
+
+  :global(html.js) .rule::before {
+    content: "";
+    position: absolute;
+    inset: -1px 0 auto 0;
+    height: 1px;
+    background: var(--rule);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--motion-rule) var(--ease-reveal);
+  }
+
+  :global(html.js) .rule.isVisible::before {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- Sequential rows ----------
+   Children resolve one after another. No typing effect: a row arrives whole. */
+
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .rows > * {
+    --stagger-row: 50ms;
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  :global(html.js) .rows.isVisible > * {
+    --stagger-row: 50ms;
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity var(--motion-slow) var(--ease-system),
+      transform var(--motion-slow) var(--ease-system);
+  }
+
+  :global(html.js) .rows.isVisible > *:nth-child(1) { transition-delay: 0ms; }
+  :global(html.js) .rows.isVisible > *:nth-child(2) { transition-delay: calc(var(--stagger-row) * 1); }
+  :global(html.js) .rows.isVisible > *:nth-child(3) { transition-delay: calc(var(--stagger-row) * 2); }
+  :global(html.js) .rows.isVisible > *:nth-child(4) { transition-delay: calc(var(--stagger-row) * 3); }
+  :global(html.js) .rows.isVisible > *:nth-child(5) { transition-delay: calc(var(--stagger-row) * 4); }
+  :global(html.js) .rows.isVisible > *:nth-child(6) { transition-delay: calc(var(--stagger-row) * 5); }
+  :global(html.js) .rows.isVisible > *:nth-child(n + 7) { transition-delay: calc(var(--stagger-row) * 6); }
+}
+
+/* ---------- Masked words ----------
+   Words are plain inline spans at rest, so layout is byte-identical to
+   unsplit text. Only while animating do they become inline-block masks. */
+
+.word {
+  display: inline;
+}
+
+.wordInner {
+  display: inline;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .word {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+  }
+
+  :global(html.js) .wordInner {
+    --stagger-word: 40ms;
+    display: inline-block;
+    transform: translateY(100%);
+    transition: transform var(--motion-headline) var(--ease-reveal);
+    transition-delay: calc(var(--word-index, 0) * var(--stagger-word));
+  }
+
+  :global(html.js) .masked.isVisible .wordInner {
+    transform: none;
+  }
+}

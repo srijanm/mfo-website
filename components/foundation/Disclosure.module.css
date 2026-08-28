@@ -53,16 +53,44 @@
   display: none;
 }
 
+/* The panel animates between zero and its natural height. `visibility` does
+   the hiding rather than `display`, because display cannot transition — and
+   unlike opacity alone, it still removes the panel from the accessibility tree
+   while closed. */
+.panelWrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+}
+
+.panelWrapOpen {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .panelWrap {
+    transition:
+      grid-template-rows 220ms var(--ease-system),
+      visibility 0s linear 220ms;
+  }
+
+  .panelWrapOpen {
+    transition:
+      grid-template-rows 220ms var(--ease-system),
+      visibility 0s linear 0s;
+  }
+}
+
 .panel {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.panelBody {
   padding: 0 0 24px;
   max-width: 64ch;
   color: var(--ink-2);
-}
-
-/* Explicit, because a class that sets display would otherwise outrank the
-   hidden attribute and the panel would stay on screen when closed. */
-.panel[hidden] {
-  display: none;
 }
 
 @media (max-width: 767px) {

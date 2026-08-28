@@ -698,3 +698,140 @@ test.describe("metadata", () => {
     expect((await response.body()).byteLength).toBeGreaterThan(1000);
   });
 });
+
+/**
+ * Motion.
+ *
+ * The failure this guards against is silent: globals.css kills transitions
+ * under reduced motion with !important, so anything left at opacity 0 renders
+ * blank rather than un-animated. Same for anyone without JavaScript, where no
+ * observer ever runs. Both are asserted, on every route that animates.
+ */
+test.describe("motion", () => {
+  const ROUTES = ["/", "/how-it-works", "/pricing", "/who-its-for/foreign-income", "/about"];
+
+  /** Text hidden inside a collapsed disclosure is meant to be hidden. */
+  const hiddenTextOutsideDisclosures = async (page: import("@playwright/test").Page) =>
+    page.evaluate(() => {
+      const collapsed = new Set<Element>();
+      for (const button of document.querySelectorAll('button[aria-expanded="false"]')) {
+        const panel = document.getElementById(button.getAttribute("aria-controls") ?? "");
+        if (panel) collapsed.add(panel);
+      }
+
+      const hidden: string[] = [];
+      for (const el of document.querySelectorAll("main *")) {
+        const style = getComputedStyle(el);
+        const ownsText = [...el.childNodes].some(
+          (node) => node.nodeType === 3 && node.textContent?.trim(),
+        );
+        if (!ownsText) continue;
+        if (style.opacity !== "0" && style.visibility !== "hidden") continue;
+        if ([...collapsed].some((panel) => panel.contains(el))) continue;
+        hidden.push(`${el.tagName}.${String(el.className).slice(0, 40)}`);
+      }
+      return hidden;
+    });
+
+  /** Section 0 is the page hero, which carries no top rule by design. */
+  const sectionsMissingRule = async (page: import("@playwright/test").Page) =>
+    page.evaluate(() =>
+      [...document.querySelectorAll("main > section")]
+        .slice(1)
+        .filter((section) => {
+          const style = getComputedStyle(section);
+          const pseudo = getComputedStyle(section, "::before");
+          const border =
+            parseFloat(style.borderTopWidth) > 0 &&
+            style.borderTopColor !== "rgba(0, 0, 0, 0)";
+          const drawn =
+            pseudo.content !== "none" && pseudo.transform !== "matrix(0, 0, 0, 1, 0, 0)";
+          return !(border || drawn);
+        })
+        .map((section) => section.querySelector("h2")?.textContent?.trim().slice(0, 40) ?? "?"),
+    );
+
+  test.describe("with reduced motion", () => {
+    test.use({ contextOptions: { reducedMotion: "reduce" } });
+
+    for (const route of ROUTES) {
+      test(`${route} shows everything and draws every rule`, async ({ page }) => {
+        await page.goto(route);
+        expect(await hiddenTextOutsideDisclosures(page)).toEqual([]);
+        expect(await sectionsMissingRule(page)).toEqual([]);
+      });
+    }
+  });
+
+  test.describe("without JavaScript", () => {
+    test.use({ javaScriptEnabled: false });
+
+    for (const route of ROUTES) {
+      test(`${route} shows everything and draws every rule`, async ({ page }) => {
+        await page.goto(route);
+        expect(await hiddenTextOutsideDisclosures(page)).toEqual([]);
+        expect(await sectionsMissingRule(page)).toEqual([]);
+      });
+    }
+  });
+
+  test("a revealed section never hides again on scroll back", async ({ page }) => {
+    await page.goto("/");
+
+    const pricing = page.locator("#pricing");
+    await pricing.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(900);
+
+    const afterReveal = await pricing.evaluate(
+      (el) => getComputedStyle(el, "::before").transform,
+    );
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(400);
+    await pricing.scrollIntoViewIfNeeded();
+
+    const afterReturn = await pricing.evaluate(
+      (el) => getComputedStyle(el, "::before").transform,
+    );
+
+    expect(afterReveal).toBe(afterReturn);
+    expect(afterReveal).not.toBe("matrix(0, 0, 0, 1, 0, 0)");
+  });
+
+  test("the hero settles and then stops", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForTimeout(1600);
+
+    const stillMoving = await page.evaluate(() =>
+      document
+        .querySelectorAll("main > section:first-child *")
+        .length > 0 &&
+      [...document.querySelectorAll("main > section:first-child *")].some(
+        (el) => el.getAnimations().some((animation) => animation.playState === "running"),
+      ),
+    );
+
+    expect(stillMoving).toBe(false);
+  });
+
+  test("the FAQ opens within the specified window", async ({ page }) => {
+    await page.goto("/");
+
+    const trigger = page.locator("main button[aria-expanded]").first();
+    await trigger.scrollIntoViewIfNeeded();
+
+    const panelId = await trigger.getAttribute("aria-controls");
+    const duration = await page.evaluate((id) => {
+      const panel = document.getElementById(id!);
+      return getComputedStyle(panel!).transitionDuration;
+    }, panelId);
+
+    const ms = duration
+      .split(",")
+      .map((value) => parseFloat(value) * 1000)
+      .filter((value) => value > 0);
+
+    expect(Math.max(...ms)).toBeGreaterThanOrEqual(180);
+    expect(Math.max(...ms)).toBeLessThanOrEqual(240);
+  });
+});
