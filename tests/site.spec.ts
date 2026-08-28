@@ -844,3 +844,150 @@ test.describe("motion", () => {
     expect(Math.max(...ms)).toBeLessThanOrEqual(240);
   });
 });
+
+/**
+ * The Income Axis.
+ *
+ * The sticky composition is an enhancement layered on one copy of the content.
+ * What is asserted here is that the enhancement behaves, and — more
+ * importantly — that every route out of it lands on the static vertical
+ * progression with nothing hidden.
+ */
+test.describe("income axis", () => {
+  const axisSection = (page: import("@playwright/test").Page) =>
+    page.locator("main > section").filter({ has: page.locator("#income-axis") });
+
+  test.describe("desktop, scripted", () => {
+    test("scrolls normally through a sticky panel and never takes focus", async ({ page }) => {
+      await page.goto("/");
+      const section = axisSection(page);
+      const box = (await section.boundingBox())!;
+
+      const geometry = await section.evaluate((el) => {
+        const panel = el.querySelector('[class*="panel"]')!;
+        const scroller = el.querySelector('[class*="scroller"]')!;
+        const style = getComputedStyle(panel);
+        return {
+          scrollLength: scroller.getBoundingClientRect().height / window.innerHeight,
+          position: style.position,
+          top: style.top,
+        };
+      });
+
+      // §17: approximately 300–340vh.
+      expect(geometry.scrollLength).toBeGreaterThanOrEqual(3);
+      expect(geometry.scrollLength).toBeLessThanOrEqual(3.4);
+      expect(geometry.position).toBe("sticky");
+      expect(geometry.top).toBe("64px");
+
+      // Focus is never moved by scrolling.
+      await page.keyboard.press("Tab");
+      const before = await page.evaluate(() => document.activeElement?.textContent);
+      await page.evaluate((y) => window.scrollTo(0, y), box.y + box.height / 2);
+      await page.waitForTimeout(400);
+      const after = await page.evaluate(() => document.activeElement?.textContent);
+      expect(after).toBe(before);
+    });
+
+    test("the active milestone advances through the section", async ({ page }) => {
+      await page.goto("/");
+      const box = (await axisSection(page).boundingBox())!;
+
+      /* Read the state, not the paint: a colour sampled during the fill
+         transition is a transient value and makes this flaky. */
+      const activeIndex = () =>
+        page.evaluate(() => {
+          const nodes = [...document.querySelectorAll('[class*="axisNode"]')];
+          return nodes.findIndex((node) =>
+            /axisNodeActive/.test(String(node.className)),
+          );
+        });
+
+      await page.evaluate((y) => window.scrollTo(0, y), box.y + 40);
+      await page.waitForTimeout(200);
+      const first = await activeIndex();
+
+      /* Sampled well inside the section. The observer's root is the viewport
+         midline, which sits half a screen below the scroll position, so past
+         roughly 0.84 of the section it has already cleared the last sentinel
+         and nothing fires — the reading would be stale rather than wrong. */
+      await page.evaluate((y) => window.scrollTo(0, y), box.y + box.height * 0.7);
+      await page.waitForTimeout(200);
+      const last = await activeIndex();
+
+      expect(first).toBe(0);
+      expect(last).toBeGreaterThan(first);
+    });
+
+    test("uses the motion-token values and never loops", async ({ page }) => {
+      await page.goto("/");
+      const box = (await axisSection(page).boundingBox())!;
+      await page.evaluate((y) => window.scrollTo(0, y), box.y + box.height * 0.45);
+      await page.waitForTimeout(700);
+
+      const motion = await axisSection(page).evaluate((el) => {
+        const active = [...el.querySelectorAll('[class*="axisNode"]')].find((node) =>
+          /axisNodeActive/.test(String(node.className)),
+        )!;
+        const dot = getComputedStyle(active.querySelector('span[class*="dot"]')!);
+        const looping = [...el.querySelectorAll("*")].filter(
+          (node) => getComputedStyle(node).animationIterationCount === "infinite",
+        ).length;
+        return {
+          transform: dot.transform,
+          fill: dot.backgroundColor,
+          pulseDuration: dot.animationDuration,
+          pulseCount: dot.animationIterationCount,
+          looping,
+        };
+      });
+
+      // motion-tokens: activeNodeScale 1.18, nodePulse 0.42s, one iteration.
+      expect(motion.transform).toBe("matrix(1.18, 0, 0, 1.18, 0, 0)");
+      // Settled, so the fill has finished interpolating.
+      expect(motion.fill).toBe("rgb(215, 255, 0)");
+      expect(motion.pulseDuration).toBe("0.42s");
+      expect(motion.pulseCount).toBe("1");
+      expect(motion.looping).toBe(0);
+    });
+  });
+
+  /** Every fallback lands on the static vertical progression. */
+  const expectsStaticFallback = (label: string) => {
+    test(`${label} falls back to the static vertical progression`, async ({ page }) => {
+      await page.goto("/");
+
+      const state = await axisSection(page).evaluate((el) => {
+        const panel = el.querySelector('[class*="panel"]')!;
+        const milestones = [...el.querySelectorAll("li")];
+        return {
+          position: getComputedStyle(panel).position,
+          total: milestones.length,
+          hidden: milestones.filter((item) => {
+            const style = getComputedStyle(item);
+            return style.opacity === "0" || style.visibility === "hidden";
+          }).length,
+        };
+      });
+
+      expect(state.position).toBe("static");
+      expect(state.total).toBe(5);
+      expect(state.hidden).toBe(0);
+    });
+  };
+
+  test.describe("with reduced motion", () => {
+    test.use({ contextOptions: { reducedMotion: "reduce" } });
+    expectsStaticFallback("reduced motion");
+  });
+
+  test.describe("on mobile", () => {
+    test.use({ viewport: { width: 375, height: 800 } });
+    expectsStaticFallback("mobile");
+  });
+
+  test.describe("without JavaScript", () => {
+    test.use({ javaScriptEnabled: false });
+    expectsStaticFallback("no JavaScript");
+  });
+});

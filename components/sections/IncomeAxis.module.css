@@ -197,17 +197,28 @@
     display: grid;
   }
 
+  /* Detail crossfade with 10px of copy travel — motion-tokens distance.copy.
+     The outgoing panel fades on the shorter duration so the two do not both
+     sit at half opacity in the middle of the exchange. */
   :global(html.js) .sticky .milestone {
     grid-area: 1 / 1;
     grid-template-columns: minmax(0, 1fr);
     column-gap: 0;
     opacity: 0;
+    transform: translateY(10px);
     pointer-events: none;
+    transition:
+      opacity var(--motion-normal) var(--ease-system),
+      transform var(--motion-normal) var(--ease-system);
   }
 
   :global(html.js) .sticky .milestoneActive {
     opacity: 1;
+    transform: none;
     pointer-events: auto;
+    transition:
+      opacity var(--motion-slow) var(--ease-reveal),
+      transform var(--motion-slow) var(--ease-reveal);
   }
 
   /* The vertical rail belongs to the stacked version only. */
@@ -254,4 +265,55 @@
 /* Outside the sticky treatment the axis strip does not exist at all. */
 .axis {
   display: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Pass 2: the transitions.
+
+   Same three gates as the composition itself — desktop, scripted, and only
+   where reduced motion has not been asked for. Under reduced motion these
+   rules do not exist, and globals.css would flatten their durations anyway.
+   --------------------------------------------------------------------------- */
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  /* The acid progress line grows from the left rather than appearing. 320ms is
+     motion-tokens incomeAxis.lineDuration. */
+  :global(html.js) .sticky .axisNode :global(span[class*="segment"]) {
+    transition:
+      background-color 320ms var(--ease-system),
+      height 320ms var(--ease-system);
+  }
+
+  /* Node fill, and the 1.18 scale from motion-tokens incomeAxis. */
+  :global(html.js) .sticky .axisNode :global(span[class*="dot"]) {
+    transition:
+      background-color var(--motion-normal) var(--ease-system),
+      transform var(--motion-normal) var(--ease-system);
+  }
+
+  :global(html.js) .sticky .axisNodeActive :global(span[class*="dot"]) {
+    transform: scale(1.18);
+    /* One pulse, once, on becoming active. Not a loop: the animation runs a
+       single iteration and the element is never re-triggered while it stays
+       active. 420ms is motion-tokens duration.nodePulse. */
+    animation: nodePulse 420ms var(--ease-system) 1;
+  }
+
+  :global(html.js) .sticky .axisNode :global(span[class*="label"]) {
+    transition: color var(--motion-normal) var(--ease-system);
+  }
+}
+
+/* A single expansion and settle. No overshoot, no spring: the scale returns to
+   its resting 1.18 rather than past it. */
+@keyframes nodePulse {
+  0% {
+    transform: scale(1);
+  }
+  60% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1.18);
+  }
 }

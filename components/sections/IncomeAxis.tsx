@@ -140,7 +140,10 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
                 {milestones.map((milestone, index) => (
                   <ThresholdNode
                     key={milestone.id}
-                    className={styles.axisNode}
+                    className={cx(
+                      styles.axisNode,
+                      index === active && styles.axisNodeActive,
+                    )}
                     label={milestone.label}
                     active={index === active}
                     lineBefore={index > 0}
