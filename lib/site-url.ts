@@ -23,6 +23,18 @@ export function isProductionDeployment(): boolean {
   return process.env.VERCEL_ENV === "production";
 }
 
+/**
+ * Whether search engines may index the site.
+ *
+ * Deliberately separate from "is it live". The site can be deployed, shared and
+ * used long before its legal pages are written and its tax content reviewed,
+ * and being indexed in that state is hard to undo. Opt in explicitly by setting
+ * SITE_INDEXABLE=true once the content is signed off.
+ */
+export function isIndexable(): boolean {
+  return process.env.SITE_INDEXABLE === "true";
+}
+
 export function absoluteUrl(path: string): string {
   return new URL(path, `${siteUrl()}/`).toString();
 }

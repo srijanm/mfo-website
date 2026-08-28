@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { site } from "@/lib/content/navigation";
-import { absoluteUrl } from "@/lib/site-url";
+import { absoluteUrl, isIndexable } from "@/lib/site-url";
 
 type PageMetadataInput = {
   title: string;
@@ -34,7 +34,9 @@ export function pageMetadata({
     title,
     description,
     alternates: { canonical: url },
-    robots: noIndex ? { index: false, follow: true } : undefined,
+    /* A page is indexable only if it is individually indexable AND the site as
+       a whole has been opted in. */
+    robots: noIndex || !isIndexable() ? { index: false, follow: true } : undefined,
     openGraph: {
       type: "website",
       siteName: site.name,

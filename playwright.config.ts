@@ -27,6 +27,9 @@ export default defineConfig({
   ],
   webServer: {
     command: `npm run build && npx next start --port ${PORT}`,
+    /* Tests assert the behaviour of an indexable site; production opts in
+       separately once its content is signed off. */
+    env: { SITE_INDEXABLE: "true" },
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

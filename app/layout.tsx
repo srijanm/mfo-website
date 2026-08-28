@@ -3,7 +3,7 @@ import { Geist } from "next/font/google";
 
 import { SiteFooter, SiteHeader, SkipLink } from "@/components/chrome";
 import { site } from "@/lib/content/navigation";
-import { absoluteUrl, siteUrl } from "@/lib/site-url";
+import { absoluteUrl, isIndexable, siteUrl } from "@/lib/site-url";
 
 import "./globals.css";
 
@@ -29,6 +29,7 @@ export const metadata: Metadata = {
   },
   description: DESCRIPTION,
   applicationName: site.name,
+  robots: isIndexable() ? undefined : { index: false, follow: true },
   alternates: { canonical: absoluteUrl("/") },
   openGraph: {
     type: "website",
