@@ -2,14 +2,9 @@
   padding-block: var(--section-major-desktop);
 }
 
-.intro {
-  grid-column: 1 / span 7;
-  margin-bottom: 56px;
-}
-
 .title {
   margin: 0;
-  max-width: 18ch;
+  max-width: 16ch;
   font-size: var(--fs-h1);
   font-weight: 400;
   line-height: 1;
@@ -18,30 +13,19 @@
 
 .lead {
   margin: 24px 0 0;
-  max-width: 54ch;
+  max-width: 52ch;
   font-size: var(--fs-lead);
   line-height: 1.44;
   letter-spacing: -.018em;
   color: var(--ink-2);
 }
 
-@media (max-width: 1023px) {
-  .page {
-    padding-block: var(--section-major-tablet);
-  }
-
-  .intro {
-    grid-column: 1 / -1;
-    margin-bottom: 40px;
-  }
+.action {
+  margin-top: 24px;
 }
 
 @media (max-width: 767px) {
   .page {
     padding-block: var(--section-major-mobile);
-  }
-
-  .lead {
-    font-size: var(--fs-body);
   }
 }

@@ -262,3 +262,122 @@ test.describe("final CTA", () => {
     await expect(button).toHaveAttribute("href", "/get-started");
   });
 });
+
+/**
+ * The intake. §27 fixes the four steps; the spec also requires that nothing
+ * personal is persisted client-side and that a failed send never reads as a
+ * success.
+ */
+test.describe("get-started intake", () => {
+  /* Click the label, the way a person does: the radio itself is visually
+     hidden behind the styled marker. */
+  const pick = async (page: import("@playwright/test").Page, option: string) => {
+    await page
+      .locator("label")
+      .filter({ hasText: new RegExp(`^${option.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}$`) })
+      .click();
+  };
+
+  const choose = async (page: import("@playwright/test").Page, option: string) => {
+    await pick(page, option);
+    await page.getByRole("button", { name: "Continue" }).click();
+  };
+
+  test("walks four steps, remembers answers and steps back", async ({ page }) => {
+    await page.goto("/get-started");
+
+    await expect(page.getByText("Step 1 of 4")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "How are you paid?" })).toBeVisible();
+
+    await choose(page, "An overseas company");
+    await expect(page.getByText("Step 2 of 4")).toBeVisible();
+
+    await choose(page, "First year");
+    await choose(page, "Foreign income");
+
+    await expect(page.getByText("Step 4 of 4")).toBeVisible();
+    await expect(page.getByLabel("Name")).toBeVisible();
+    await expect(page.getByLabel("Email")).toBeVisible();
+    await expect(page.getByLabel("Phone")).toBeVisible();
+
+    // Back returns to the previous question with the answer still selected.
+    await page.getByRole("button", { name: "Back" }).click();
+    await expect(page.getByText("Step 3 of 4")).toBeVisible();
+    await expect(page.getByRole("radio", { name: "Foreign income" })).toBeChecked();
+  });
+
+  test("continuing without a choice reports an error tied to the field", async ({ page }) => {
+    await page.goto("/get-started");
+    await page.getByRole("button", { name: "Continue" }).click();
+
+    // Scoped to the form: Next renders its own route announcer with role=alert.
+    const error = page.locator("form").getByRole("alert");
+    await expect(error).toBeVisible();
+
+    // The error is announced with the group, not left floating.
+    const describedBy = await page.locator("fieldset").getAttribute("aria-describedby");
+    expect(describedBy).toBeTruthy();
+    expect(await page.locator(`#${describedBy}`).innerText()).toBe(await error.innerText());
+  });
+
+  test("persists nothing client-side", async ({ page }) => {
+    await page.goto("/get-started");
+    await choose(page, "Indian clients");
+    await expect(page.getByText("Step 2 of 4")).toBeVisible();
+
+    const stored = await page.evaluate(() => ({
+      local: { ...localStorage },
+      session: { ...sessionStorage },
+      cookie: document.cookie,
+    }));
+
+    expect(Object.keys(stored.local)).toHaveLength(0);
+    expect(Object.keys(stored.session)).toHaveLength(0);
+    expect(stored.cookie).toBe("");
+  });
+
+  test("a failed send never shows the success state", async ({ page }) => {
+    await page.goto("/get-started");
+
+    await choose(page, "Both");
+    await choose(page, "Not sure");
+    await choose(page, "Getting set up");
+
+    await page.getByLabel("Name").fill("Test Person");
+    await page.getByLabel("Email").fill("test@example.com");
+    await page.getByLabel("Phone").fill("9999999999");
+
+    // The route has no delivery credentials in CI, so this send fails.
+    await page.route("**/api/leads", (route) =>
+      route.fulfill({ status: 502, contentType: "application/json", body: JSON.stringify({ ok: false, errors: { form: "Provider responded 500." } }) }),
+    );
+
+    await page.getByRole("button", { name: "Send" }).click();
+
+    await expect(page.getByText("That did not send.")).toBeVisible();
+    await expect(page.getByText("Got it. We’ll review how you earn")).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Get in touch" })).toBeVisible();
+  });
+
+  test("shows the success state only when the send succeeds", async ({ page }) => {
+    await page.goto("/get-started");
+
+    await choose(page, "Both");
+    await choose(page, "Not sure");
+    await choose(page, "Getting set up");
+
+    await page.getByLabel("Name").fill("Test Person");
+    await page.getByLabel("Email").fill("test@example.com");
+    await page.getByLabel("Phone").fill("9999999999");
+
+    await page.route("**/api/leads", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) }),
+    );
+
+    await page.getByRole("button", { name: "Send" }).click();
+
+    await expect(
+      page.getByText("Got it. We’ll review how you earn and tell you what makes sense from here."),
+    ).toBeVisible();
+  });
+});

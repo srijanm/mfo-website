@@ -1,27 +1,35 @@
 import type { Metadata } from "next";
 
-import { Container } from "@/components/foundation";
+import { Container, Grid } from "@/components/foundation";
+import { LeadForm } from "@/components/get-started/LeadForm";
+import { getStarted } from "@/lib/content/get-started";
 
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "Get started",
+  description: getStarted.lead,
+  robots: { index: false, follow: true },
 };
 
 /**
- * Route stub. The four-step intake specified in MASTER_BUILD_SPEC.md §27 is
- * built in a later pass; this exists so every primary call to action already
- * lands somewhere real.
+ * The four-step intake from §27.
+ *
+ * Nothing here recommends a plan. The form collects how someone earns and
+ * where they are; what follows is a conversation, not logic applied to tax
+ * rules.
  */
 export default function GetStartedPage() {
   return (
     <Container className={styles.page}>
-      <h1 className={styles.title}>Tell us how you earn.</h1>
-      <p className={styles.lead}>
-        The intake questions are being built. When they are ready, this is where you will
-        describe how you are paid and where you are today, and we will tell you what
-        applies to your situation.
-      </p>
+      <Grid>
+        <div className={styles.intro}>
+          <h1 className={styles.title}>{getStarted.title}</h1>
+          <p className={styles.lead}>{getStarted.lead}</p>
+        </div>
+
+        <LeadForm />
+      </Grid>
     </Container>
   );
 }

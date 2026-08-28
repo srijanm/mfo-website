@@ -1,0 +1,222 @@
+/* The four-step intake. One question per screen, full-width ruled choices,
+   visible progress, a back button. Nothing animates. Acid appears only on the
+   selected choice and the primary action. */
+
+.form {
+  grid-column: 1 / span 7;
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.progressLabel {
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.question {
+  margin: 40px 0 0;
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+
+/* The step heading takes focus on advance so assistive tech announces the new
+   question. It is not a click target, so it carries no focus ring. */
+.question:focus {
+  outline: none;
+}
+
+.fieldset {
+  margin: 32px 0 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+.legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.choices {
+  border-top: 1px solid var(--rule);
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--fs-lead);
+  line-height: 1.32;
+  letter-spacing: -.018em;
+  cursor: pointer;
+}
+
+.radio {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+/* The selected marker is the line-and-node primitive: hollow until chosen,
+   acid once it is. Selection is never carried by colour alone — the checked
+   radio is what assistive tech reads. */
+.marker {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: transparent;
+}
+
+.radio:checked + .marker {
+  background: var(--acid);
+}
+
+.radio:focus-visible + .marker {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.fields {
+  margin: 32px 0 0;
+  display: grid;
+  gap: 24px;
+  max-width: 34rem;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.label {
+  font-size: var(--fs-ui);
+  font-weight: 500;
+}
+
+.optional {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-button);
+  background: var(--white);
+  color: var(--ink);
+  font: 400 var(--fs-body)/1.4 var(--font-sans);
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.input[aria-invalid="true"],
+.textarea[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+.error {
+  font-size: var(--fs-small);
+  color: var(--error);
+}
+
+.honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 40px;
+}
+
+/* Back is secondary: a plain control with no chrome beyond its target size. */
+.back {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font: 500 var(--fs-ui)/1 var(--font-sans);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.alternative {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-ui);
+  color: var(--ink-2);
+}
+
+.alternative a {
+  color: var(--ink);
+}
+
+.outcome {
+  margin: 0;
+  max-width: 42ch;
+  font-size: var(--fs-h3);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -.028em;
+}
+
+.outcomeBody {
+  margin: 20px 0 0;
+  max-width: 52ch;
+  font-size: var(--fs-body);
+  line-height: 1.52;
+  color: var(--ink-2);
+}
+
+@media (max-width: 1023px) {
+  .form {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 767px) {
+  .question {
+    font-size: var(--fs-h3);
+  }
+
+  .actions {
+    gap: 20px;
+  }
+}
