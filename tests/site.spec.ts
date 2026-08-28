@@ -589,3 +589,112 @@ test.describe("guides", () => {
     }
   });
 });
+
+/**
+ * Metadata. The risk here is silent drift: a page shipping a title but no
+ * canonical, or a noindex page turning up in the sitemap. Both are invisible
+ * in a browser, so they are asserted instead.
+ */
+test.describe("metadata", () => {
+  const INDEXED = [
+    "/",
+    "/how-it-works",
+    "/who-its-for",
+    "/who-its-for/foreign-income",
+    "/pricing",
+    "/guides",
+    "/about",
+    "/contact",
+  ];
+
+  const NOT_INDEXED = [
+    "/get-started",
+    "/privacy",
+    "/terms",
+    "/styleguide",
+    "/guides/how-we-decide-what-you-need",
+  ];
+
+  test("every indexed page carries a title, description, canonical and social tags", async ({
+    page,
+  }) => {
+    for (const route of INDEXED) {
+      await page.goto(route);
+
+      const meta = await page.evaluate(() => ({
+        title: document.title,
+        description: document
+          .querySelector('meta[name="description"]')
+          ?.getAttribute("content"),
+        canonical: document.querySelector('link[rel="canonical"]')?.getAttribute("href"),
+        ogTitle: document
+          .querySelector('meta[property="og:title"]')
+          ?.getAttribute("content"),
+        ogDescription: document
+          .querySelector('meta[property="og:description"]')
+          ?.getAttribute("content"),
+        ogImage: document
+          .querySelector('meta[property="og:image"]')
+          ?.getAttribute("content"),
+        twitterCard: document
+          .querySelector('meta[name="twitter:card"]')
+          ?.getAttribute("content"),
+        robots: document.querySelector('meta[name="robots"]')?.getAttribute("content"),
+      }));
+
+      expect(meta.title, `${route} has no title`).toBeTruthy();
+      expect(meta.description, `${route} has no description`).toBeTruthy();
+      expect(meta.canonical, `${route} has no canonical`).toBeTruthy();
+      expect(meta.canonical, `${route} canonical is not absolute`).toMatch(/^https?:\/\//);
+      expect(meta.ogTitle, `${route} has no og:title`).toBeTruthy();
+      expect(meta.ogDescription, `${route} has no og:description`).toBeTruthy();
+      expect(meta.ogImage, `${route} has no og:image`).toBeTruthy();
+      expect(meta.twitterCard, `${route} has no twitter:card`).toBe("summary_large_image");
+      expect(meta.robots ?? "", `${route} should be indexable`).not.toContain("noindex");
+    }
+  });
+
+  test("pages that should not be indexed say so", async ({ page }) => {
+    for (const route of NOT_INDEXED) {
+      await page.goto(route);
+      const robots = await page
+        .locator('meta[name="robots"]')
+        .getAttribute("content");
+      expect(robots ?? "", `${route} is missing noindex`).toContain("noindex");
+    }
+  });
+
+  test("the sitemap lists the indexed pages and nothing that is not", async ({ request }) => {
+    const response = await request.get("/sitemap.xml");
+    expect(response.status()).toBe(200);
+
+    const xml = await response.text();
+    const paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) =>
+      new URL(match[1]).pathname,
+    );
+
+    for (const route of INDEXED) {
+      expect(paths, `${route} is missing from the sitemap`).toContain(route);
+    }
+
+    for (const route of NOT_INDEXED) {
+      expect(paths, `${route} must not be in the sitemap`).not.toContain(route);
+    }
+  });
+
+  test("robots.txt closes preview and local builds to crawlers", async ({ request }) => {
+    const response = await request.get("/robots.txt");
+    expect(response.status()).toBe(200);
+
+    // Tests never run against a production deployment.
+    expect(await response.text()).toContain("Disallow: /");
+  });
+
+  test("the share image renders in the site's own language", async ({ request }) => {
+    const response = await request.get("/opengraph-image");
+
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toContain("image/png");
+    expect((await response.body()).byteLength).toBeGreaterThan(1000);
+  });
+});

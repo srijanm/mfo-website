@@ -12,6 +12,7 @@ import {
   guidesIndex,
   shouldShowToc,
 } from "@/lib/content/guides";
+import { pageMetadata } from "@/lib/metadata";
 
 import styles from "@/components/guides/GuideArticle.module.css";
 
@@ -27,13 +28,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!guide) return {};
 
-  return {
+  const metadata = pageMetadata({
     title: guide.title,
     description: guide.answer,
+    path: `/guides/${guide.slug}`,
     /* A placeholder is never indexed. It is not reviewed guidance and must not
        be found by anyone searching for an answer. */
-    robots: guide.status === "placeholder" ? { index: false, follow: false } : undefined,
-  };
+    noIndex: guide.status === "placeholder",
+  });
+
+  return guide.status === "placeholder"
+    ? { ...metadata, robots: { index: false, follow: false } }
+    : {
+        ...metadata,
+        openGraph: { ...metadata.openGraph, type: "article" },
+      };
 }
 
 /** Anchors so the table of contents can reach each section. */

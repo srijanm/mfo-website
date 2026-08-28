@@ -3,14 +3,17 @@ import type { Metadata } from "next";
 import { Container, Grid } from "@/components/foundation";
 import { LeadForm } from "@/components/get-started/LeadForm";
 import { getStarted } from "@/lib/content/get-started";
+import { pageMetadata } from "@/lib/metadata";
 
 import styles from "./page.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Get started",
   description: getStarted.lead,
-  robots: { index: false, follow: true },
-};
+  path: "/get-started",
+  /* An intake form. Nothing here to find in a search result. */
+  noIndex: true,
+});
 
 /**
  * The four-step intake from §27.

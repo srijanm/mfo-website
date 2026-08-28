@@ -3,14 +3,17 @@ import { notFound } from "next/navigation";
 
 import { LegalPage } from "@/components/legal/LegalPage";
 import { legalPageBySlug } from "@/lib/content/legal";
+import { pageMetadata } from "@/lib/metadata";
 
 const content = legalPageBySlug("privacy");
 
-export const metadata: Metadata = {
-  title: content?.title,
-  /* Not indexed while this is a notice rather than the policy itself. */
-  robots: content?.document ? undefined : { index: false, follow: true },
-};
+export const metadata: Metadata = pageMetadata({
+  title: content?.title ?? "",
+  description: content?.body ?? "",
+  path: "/privacy",
+  /* Not indexed while this is a notice, not the policy. */
+  noIndex: !content?.document,
+});
 
 export default function PrivacyPage() {
   if (!content) notFound();

@@ -6,14 +6,16 @@ import { IncomeAxis, TemporalLedger } from "@/components/sections";
 import { FinalCtaSection, PricingSection } from "@/components/shared";
 import { finalCta } from "@/lib/content/homepage";
 import { howItWorks } from "@/lib/content/how-it-works";
+import { pageMetadata } from "@/lib/metadata";
 import { pricingPage } from "@/lib/content/pricing";
 
 import styles from "./page.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "How it works",
   description: howItWorks.lead,
-};
+  path: "/how-it-works",
+});
 
 /**
  * The six sections from SECONDARY_PAGE_SPECS.md, assembled almost entirely

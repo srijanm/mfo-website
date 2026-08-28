@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { AudiencePage } from "@/components/templates/AudiencePage";
 import { audienceBySlug, audiences } from "@/lib/content/audiences";
+import { pageMetadata } from "@/lib/metadata";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -17,7 +18,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const audience = audienceBySlug(slug);
 
-  return audience ? { title: audience.name, description: audience.summary } : {};
+  if (!audience) return {};
+
+  return pageMetadata({
+    title: audience.name,
+    description: audience.summary,
+    path: `/who-its-for/${audience.slug}`,
+  });
 }
 
 export default async function AudienceRoute({ params }: PageProps) {

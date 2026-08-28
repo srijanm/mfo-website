@@ -5,13 +5,15 @@ import { AdditionalFinancialSupport, CoreScopeMatrix } from "@/components/sectio
 import { FaqSection, FinalCtaSection, PricingSection } from "@/components/shared";
 import { faqByIds, finalCta } from "@/lib/content/homepage";
 import { pricing, pricingPage } from "@/lib/content/pricing";
+import { pageMetadata } from "@/lib/metadata";
 
 import styles from "./page.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Pricing",
   description: pricingPage.lead,
-};
+  path: "/pricing",
+});
 
 /**
  * The pricing page.

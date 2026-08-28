@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 
 import { SiteFooter, SiteHeader, SkipLink } from "@/components/chrome";
 import { site } from "@/lib/content/navigation";
+import { absoluteUrl, siteUrl } from "@/lib/site-url";
 
 import "./globals.css";
 
@@ -16,13 +17,41 @@ const geist = Geist({
   variable: "--font-geist",
 });
 
+const DESCRIPTION =
+  "A modern CA firm for freelancers, creators, consultants and professionals paid by Indian or overseas businesses. We set up and run the India-side tax and compliance.";
+
 export const metadata: Metadata = {
+  /* Makes every relative canonical, OG and image URL resolve absolutely. */
+  metadataBase: new URL(siteUrl()),
   title: {
     default: `${site.name} — ${site.descriptor}`,
     template: `%s — ${site.name}`,
   },
-  description:
-    "A modern CA firm for freelancers, creators, consultants and professionals paid by Indian or overseas businesses. We set up and run the India-side tax and compliance.",
+  description: DESCRIPTION,
+  applicationName: site.name,
+  alternates: { canonical: absoluteUrl("/") },
+  openGraph: {
+    type: "website",
+    siteName: site.name,
+    title: `${site.name} — ${site.descriptor}`,
+    description: DESCRIPTION,
+    url: absoluteUrl("/"),
+    locale: "en_IN",
+    images: [
+      {
+        url: absoluteUrl("/opengraph-image"),
+        width: 1200,
+        height: 630,
+        alt: `${site.name} — ${site.descriptor}`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${site.name} — ${site.descriptor}`,
+    description: DESCRIPTION,
+    images: [absoluteUrl("/opengraph-image")],
+  },
 };
 
 export const viewport: Viewport = {

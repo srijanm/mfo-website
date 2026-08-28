@@ -19,12 +19,15 @@ import {
 } from "@/components/objects";
 import { reviewed, unreviewed } from "@/lib/content/reviewed";
 import { defaultMilestones } from "@/lib/content/site-content";
+import { absoluteUrl } from "@/lib/site-url";
 
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "Styleguide",
+  /* Internal. Not indexed, and not linked from the site. */
   robots: { index: false, follow: false },
+  alternates: { canonical: absoluteUrl("/styleguide") },
 };
 
 /* Sample values exist only to exercise the components. Nothing here is site

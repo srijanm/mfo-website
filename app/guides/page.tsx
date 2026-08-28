@@ -3,13 +3,15 @@ import Link from "next/link";
 
 import { Container } from "@/components/foundation";
 import { guidesIndex, listedGuides } from "@/lib/content/guides";
+import { pageMetadata } from "@/lib/metadata";
 
 import styles from "./page.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: guidesIndex.title,
   description: guidesIndex.lead,
-};
+  path: "/guides",
+});
 
 /**
  * The guides index. A knowledge library: ruled article rows, never a card

@@ -3,12 +3,15 @@ import type { Metadata } from "next";
 import { Container } from "@/components/foundation";
 import { TextLink } from "@/components/foundation";
 import { primaryCta } from "@/lib/content/navigation";
+import { pageMetadata } from "@/lib/metadata";
 
 import styles from "./page.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Contact",
-};
+  description: "How to reach MyFinanceOfficer.",
+  path: "/contact",
+});
 
 /**
  * Minimal for now, but it must exist: the intake links here when a send fails

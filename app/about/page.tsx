@@ -5,13 +5,15 @@ import { TrustLedger } from "@/components/sections";
 import { FinalCtaSection } from "@/components/shared";
 import { about } from "@/lib/content/about";
 import { finalCta } from "@/lib/content/homepage";
+import { pageMetadata } from "@/lib/metadata";
 
 import styles from "./page.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About",
   description: about.headline,
-};
+  path: "/about",
+});
 
 /**
  * /about.
