@@ -1,0 +1,174 @@
+/* An article. Reading measure 720–780px per the spec, Geist only, no second
+   family and no decorative rules beyond the system's own. */
+
+.page {
+  padding-block: var(--section-major-desktop) var(--section-major-tablet);
+}
+
+.article {
+  max-width: 760px;
+}
+
+/* The placeholder notice. Deliberately the first thing in the document and
+   deliberately not styled as a warning — §4 keeps red functional. It reads as
+   a ruled statement of fact about the page. */
+.placeholder {
+  margin-bottom: 48px;
+  padding: 20px 0;
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+}
+
+.placeholderLabel {
+  margin: 0;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.placeholderBody {
+  margin: 10px 0 0;
+  font-size: var(--fs-ui);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--fs-h1);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -.04em;
+}
+
+.answer {
+  margin: 24px 0 0;
+  font-size: var(--fs-lead);
+  line-height: 1.44;
+  letter-spacing: -.018em;
+  color: var(--ink-2);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+.toc {
+  margin-top: 40px;
+  padding: 20px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.tocLabel {
+  margin: 0 0 12px;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.tocList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.tocList a {
+  font-size: var(--fs-ui);
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tocList a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+
+/* Body */
+
+.body {
+  margin-top: 48px;
+}
+
+.body h2 {
+  margin: 48px 0 0;
+  font-size: var(--fs-h3);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -.028em;
+  scroll-margin-top: 88px;
+}
+
+.body h2 + p {
+  margin-top: 16px;
+}
+
+.body p {
+  margin: 20px 0 0;
+  font-size: var(--fs-body);
+  line-height: 1.6;
+}
+
+.body ul {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.body li {
+  padding: 12px 0;
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+}
+
+/* Ruled callout. A rule and a label, never a tinted box. */
+.callout {
+  margin: 32px 0 0;
+  padding: 20px 0;
+  border-top: 1px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule);
+}
+
+.calloutLabel {
+  margin: 0;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.calloutBody {
+  margin: 8px 0 0;
+  font-size: var(--fs-ui);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.back {
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding-block: var(--section-major-mobile);
+  }
+
+  .body h2 {
+    margin-top: 40px;
+  }
+}

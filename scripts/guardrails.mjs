@@ -16,7 +16,10 @@ import process from "node:process";
 
 const ROOT = process.cwd();
 const SCAN_DIRS = ["app", "components", "lib"];
-const SCAN_EXTENSIONS = new Set([".css", ".ts", ".tsx", ".js", ".jsx", ".mjs"]);
+
+/** Guide sources, checked separately against a stricter content rule. */
+const GUIDES_DIR = "content/guides";
+const SCAN_EXTENSIONS = new Set([".css", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".mdx"]);
 
 /** MASTER_BUILD_SPEC.md §4. The only hex values permitted anywhere. */
 const LOCKED_PALETTE = new Set([
@@ -73,6 +76,29 @@ const TAX_WORD = /\b(tax|taxes|GST|TDS|compliance|filing|filings|returns?|rules?
 
 /** Money written into a component instead of lib/content/. */
 const RUPEE_AMOUNT = /(?:₹|\bRs\.?\s*|\bINR\s+)\s*\d[\d,]*/;
+
+/**
+ * A placeholder guide is written to show the shape of the library, not to
+ * answer anything. It must be impossible to mistake for reviewed guidance, so
+ * it may not state a tax fact of any kind: no thresholds, no dates, no rates,
+ * no rules, and no telling the reader what they must or should do.
+ */
+const TAX_CLAIM_PATTERNS = [
+  [/(?:₹|\bRs\.?\s*|\bINR\s+)\s*\d/i, "a rupee amount"],
+  [/\b\d[\d,.]*\s*(?:lakh|crore|lakhs|crores)\b/i, "a lakh or crore figure"],
+  [/\b\d+(?:\.\d+)?\s*(?:%|per\s*cent|percent)/i, "a rate"],
+  [/\b\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i, "a date"],
+  [/\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2}\b/i, "a date"],
+  [/\b\d{4}-\d{2}-\d{2}\b/, "a date"],
+  [/\bFY\s*\d{2}/i, "a financial year"],
+  [/\bsection\s+\d+/i, "a statutory reference"],
+  [/\b44A[DB]A?\b/i, "a statutory reference"],
+  [/\byou\s+(?:must|should|need\s+to|have\s+to|are\s+required)\b/i, "an instruction to the reader"],
+  [/\byou'?ll\s+need\s+to\b/i, "an instruction to the reader"],
+  [/\b(?:is|are)\s+(?:mandatory|compulsory|required\s+by)\b/i, "a statement of obligation"],
+  [/\bthreshold\s+(?:of|is)\b/i, "a threshold"],
+  [/\b(?:due\s+date|deadline)\s+(?:is|of|falls)\b/i, "a due date"],
+];
 
 const violations = [];
 
@@ -322,12 +348,61 @@ function checkFile(file) {
   });
 }
 
+/**
+ * Reads frontmatter without a parser: only `status` matters here, and pulling
+ * in a dependency for one field would be worse than a regex.
+ */
+function checkGuide(file) {
+  const text = readFileSync(file, "utf8");
+  const frontmatter = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+
+  if (!frontmatter) {
+    report(file, 1, "guide-frontmatter", "A guide needs frontmatter with a status.", "");
+    return;
+  }
+
+  const status = frontmatter[1].match(/^status:\s*["']?([a-z]+)/m)?.[1];
+
+  if (status !== "placeholder" && status !== "reviewed") {
+    report(file, 1, "guide-frontmatter", 'status must be "placeholder" or "reviewed".', "");
+    return;
+  }
+
+  if (status !== "placeholder") return;
+
+  const body = text.slice(frontmatter[0].length);
+  const offset = text.slice(0, frontmatter[0].length).split("\n").length - 1;
+
+  body.split("\n").forEach((lineText, index) => {
+    for (const [pattern, description] of TAX_CLAIM_PATTERNS) {
+      const match = lineText.match(pattern);
+      if (!match) continue;
+
+      report(
+        file,
+        offset + index + 1,
+        "placeholder-guide",
+        `A placeholder guide must state no tax fact, and this contains ${description} ("${match[0].trim()}").`,
+        lineText,
+      );
+      break;
+    }
+  });
+}
+
 async function main() {
   const files = (
     await Promise.all(SCAN_DIRS.map((dir) => collectFiles(path.join(ROOT, dir))))
   ).flat();
 
   files.forEach(checkFile);
+
+  const guideFiles = (await collectFiles(path.join(ROOT, GUIDES_DIR))).filter((file) =>
+    file.endsWith(".mdx"),
+  );
+
+  guideFiles.forEach(checkGuide);
+  files.push(...guideFiles);
 
   if (violations.length === 0) {
     console.log(`guardrails: ${files.length} files scanned, no violations.`);

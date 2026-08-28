@@ -2,24 +2,26 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Container } from "@/components/foundation";
-import { guides, guidesIndex } from "@/lib/content/guides";
+import { guidesIndex, listedGuides } from "@/lib/content/guides";
 
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: guidesIndex.title,
   description: guidesIndex.lead,
-  robots: guides.length > 0 ? undefined : { index: false, follow: true },
 };
 
 /**
- * The guides index.
+ * The guides index. A knowledge library: ruled article rows, never a card
+ * mosaic.
  *
- * Built now because the header and footer both link here, and a dead link in
- * the navigation is the kind of thing that survives to launch. Ruled rows, no
- * card mosaic. Empty until guides are written and reviewed.
+ * Placeholder posts are excluded from a production build, so nobody arrives at
+ * one by browsing. Their routes still resolve, and each carries a notice and a
+ * noindex tag.
  */
 export default function GuidesPage() {
+  const guides = listedGuides();
+
   return (
     <Container className={styles.page}>
       <h1 className={styles.title}>{guidesIndex.title}</h1>
@@ -33,9 +35,10 @@ export default function GuidesPage() {
                 <Link href={`/guides/${guide.slug}`}>{guide.title}</Link>
               </h2>
               <p className={styles.answer}>{guide.answer}</p>
-              {guide.audience || guide.lastReviewed ? (
+              {guide.audience || guide.lastReviewed || guide.status === "placeholder" ? (
                 <p className={styles.meta}>
                   {[
+                    guide.status === "placeholder" ? guidesIndex.placeholder.label : null,
                     guide.audience,
                     guide.lastReviewed
                       ? `${guidesIndex.lastReviewedLabel} ${guide.lastReviewed}`

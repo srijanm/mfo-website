@@ -16,6 +16,7 @@ const ROUTES = [
   "/privacy",
   "/terms",
   "/guides",
+  "/guides/how-we-decide-what-you-need",
   "/styleguide",
 ] as const;
 
@@ -511,5 +512,80 @@ test.describe("about", () => {
     await expect(
       page.getByText("The named professionals responsible for the work"),
     ).toBeVisible();
+  });
+});
+
+/**
+ * Guides. A placeholder is written to show the shape of the library, not to
+ * answer anything, so it must be impossible to mistake for reviewed guidance:
+ * excluded from the index in production, noindex on the page, and carrying a
+ * notice before anything else in the document.
+ */
+test.describe("guides", () => {
+  const PLACEHOLDERS = [
+    "how-we-decide-what-you-need",
+    "what-running-the-calendar-means",
+    "what-a-draft-before-filing-looks-like",
+  ];
+
+  test("the production index lists no placeholder", async ({ page }) => {
+    await page.goto("/guides");
+
+    // Tests run against a production build, which is where the rule applies.
+    for (const slug of PLACEHOLDERS) {
+      await expect(page.locator(`a[href="/guides/${slug}"]`)).toHaveCount(0);
+    }
+
+    await expect(page.getByText("The first guides are being written")).toBeVisible();
+  });
+
+  test("every placeholder is marked and not indexed", async ({ page }) => {
+    for (const slug of PLACEHOLDERS) {
+      await page.goto(`/guides/${slug}`);
+
+      const robots = page.locator('meta[name="robots"]');
+      await expect(robots).toHaveAttribute("content", /noindex/);
+
+      // The notice precedes the headline in the document, not just on screen.
+      const noticeFirst = await page.evaluate(() => {
+        const article = document.querySelector("article");
+        const notice = [...article!.querySelectorAll("p")].find((p) =>
+          p.textContent?.trim() === "Placeholder",
+        );
+        const h1 = article!.querySelector("h1");
+        if (!notice || !h1) return false;
+        return notice.compareDocumentPosition(h1) & Node.DOCUMENT_POSITION_FOLLOWING;
+      });
+
+      expect(noticeFirst, `${slug} does not lead with the placeholder notice`).toBeTruthy();
+      await expect(page.getByText("This is not reviewed guidance")).toBeVisible();
+    }
+  });
+
+  test("articles hold the specified reading measure", async ({ page }) => {
+    await page.goto(`/guides/${PLACEHOLDERS[0]}`);
+
+    const width = await page
+      .locator("article")
+      .evaluate((el) => el.getBoundingClientRect().width);
+
+    expect(width).toBeGreaterThanOrEqual(720);
+    expect(width).toBeLessThanOrEqual(780);
+  });
+
+  test("a table of contents appears only where a guide is long enough", async ({ page }) => {
+    // Five sections: long enough.
+    await page.goto(`/guides/${PLACEHOLDERS[0]}`);
+    await expect(page.getByRole("navigation", { name: "On this page" })).toBeVisible();
+
+    const links = page.getByRole("navigation", { name: "On this page" }).locator("a");
+    const count = await links.count();
+    expect(count).toBe(await page.locator("article h2").count());
+
+    // Each entry reaches a real anchor.
+    for (let i = 0; i < count; i += 1) {
+      const href = await links.nth(i).getAttribute("href");
+      await expect(page.locator(href!)).toHaveCount(1);
+    }
   });
 });
