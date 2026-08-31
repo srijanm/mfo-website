@@ -1,8 +1,20 @@
 /* H12, §24. A ruled accordion. Row heights are enforced on the trigger inside
-   the Disclosure primitive; this file only places the list. */
+   the Disclosure primitive; this file only places the list.
+
+   The list spans the container so its rules are exactly as wide as every other
+   rule on the site. The questions keep the 8-column measure they were set on,
+   as a cap on the trigger rather than on the block, so the rules no longer stop
+   465px short of the container edge. */
 
 .list {
-  grid-column: 1 / span 8;
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 1024px) {
+  .list {
+    /* An 8-column span of the 12-column grid: (8W - 4g) / 12. */
+    --disclosure-measure: calc((100% * 8 - 4 * var(--grid-gap)) / 12);
+  }
 }
 
 /* Defined here because the component references it. Without this the heading
@@ -30,8 +42,4 @@
   color: var(--ink-2);
 }
 
-@media (max-width: 1023px) {
-  .list {
-    grid-column: 1 / -1;
-  }
-}
+

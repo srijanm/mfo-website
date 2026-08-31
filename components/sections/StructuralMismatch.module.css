@@ -1,8 +1,19 @@
-/* H04, §16. 5/7 desktop split divided by a 1px vertical rule. Tone is fit and
-   mismatch: every row opens with what the alternative is genuinely good at. */
+/* H04, §16. A bounded 5/7 rule grid.
+   The divider is the right cell's left border, so it starts on the block's top
+   rule and ends on its bottom rule rather than floating. The rows inside the
+   right cell are flush with it, so every row rule runs the cell's full width
+   and terminates exactly on that divider.
+   Tone is fit and mismatch: every row opens with what the alternative is
+   genuinely good at. */
 
+.split {
+  --rule-grid-pad-block: 0px;
+  --rule-grid-pad-inline: 40px;
+}
+
+/* Aligns the headline with the first row's text across the divider. */
 .copy {
-  grid-column: 1 / span 5;
+  padding-block: 24px 0;
 }
 
 /* The token sheet defines display-1 and display-2 only, so the H2 step of the
@@ -24,28 +35,17 @@
   color: var(--ink-2);
 }
 
-/* The rule stretches to the height of its parent, which only happens if that
-   parent is a flex container — as a plain block it would render zero-height. */
-.rules {
-  grid-column: 6 / span 1;
-  justify-self: center;
-  display: flex;
-}
-
-.rows {
-  grid-column: 7 / -1;
-}
-
 .row {
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.1fr) minmax(0, 1.1fr);
-  gap: var(--grid-gap-desktop);
-  padding: 24px 0;
+  gap: var(--grid-gap);
+  padding: 24px 0 24px 40px;
   border-top: 1px solid var(--rule);
 }
 
-.row:last-child {
-  border-bottom: 1px solid var(--rule);
+/* The block's own top rule already opened the first row. */
+.row:first-child {
+  border-top: 0;
 }
 
 .name {
@@ -91,22 +91,19 @@
 }
 
 @media (max-width: 1023px) {
-  .copy,
-  .rows {
-    grid-column: 1 / -1;
+  /* §5: the divider comes out below desktop and the block stacks into ruled
+     rows. The copy cell then needs the vertical rhythm the padding gave it. */
+  .split {
+    --rule-grid-pad-block: 28px;
   }
 
-  /* §5: the vertical rule comes out below desktop rather than being squeezed. */
-  .rules {
-    display: none;
-  }
-
-  .rows {
-    margin-top: 48px;
+  .copy {
+    padding-block: 0 28px;
   }
 
   .row {
     grid-template-columns: minmax(0, 1fr);
     gap: 16px;
+    padding: 24px 0;
   }
 }

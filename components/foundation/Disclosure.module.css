@@ -5,8 +5,12 @@
   border-top: 1px solid var(--rule);
 }
 
+/* The row rule spans the container like every other rule on the site; the
+   trigger sits on its own measure inside it, so the marker stays beside the
+   question rather than at the far edge of the page. */
 .trigger {
   display: flex;
+  max-width: var(--disclosure-measure, none);
   align-items: center;
   justify-content: space-between;
   gap: 20px;

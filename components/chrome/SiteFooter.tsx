@@ -5,6 +5,7 @@ import {
   legalEntity,
   site,
 } from "@/lib/content/navigation";
+import { cx } from "@/lib/cx";
 
 import styles from "./SiteFooter.module.css";
 
@@ -14,7 +15,7 @@ import styles from "./SiteFooter.module.css";
  */
 export function SiteFooter() {
   return (
-    <footer className={styles.footer}>
+    <footer className={cx("container-rule", styles.footer)}>
       <Container>
         <nav aria-label="Footer" className={styles.columns}>
           {footerColumns.map((column) => (

@@ -1,5 +1,5 @@
-/* H06, §18. Three columns divided by vertical rules. No icons, no cards —
-   the rules and the whitespace do the grouping. */
+/* H06, §18. Three columns on the bounded rule grid. No icons, no cards — the
+   rules and the whitespace do the grouping. */
 
 .headline {
   grid-column: 1 / span 8;
@@ -12,24 +12,17 @@
 }
 
 .pillars {
+  --rule-grid-pad-block: 32px;
+  --rule-grid-pad-inline: 32px;
+
   grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 72px 0 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--rule);
 }
 
-/* The divider is a border on each column after the first rather than a
-   separate element, so the three columns stay exactly equal. */
-.pillar {
-  padding: 32px 32px 0 0;
-}
-
-.pillar + .pillar {
-  padding-left: 32px;
-  border-left: 1px solid var(--rule);
+@media (min-width: 1024px) {
+  .pillars {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .title {
@@ -53,22 +46,10 @@
     grid-column: 1 / -1;
   }
 
-  /* §5: vertical rules come out and the horizontal rhythm carries the
-     grouping instead — three ruled rows. */
   .pillars {
-    grid-template-columns: minmax(0, 1fr);
+    --rule-grid-pad-block: 28px;
+
     margin-top: 48px;
-    border-top: 0;
-  }
-
-  .pillar {
-    padding: 28px 0;
-    border-top: 1px solid var(--rule);
-  }
-
-  .pillar + .pillar {
-    padding-left: 0;
-    border-left: 0;
   }
 
   .body {

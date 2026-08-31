@@ -37,21 +37,13 @@
 }
 
 /* ---------- Rule draw ----------
-   A border cannot be scaled, so the animated rule is a pseudo-element and the
-   border is dropped only while animating. */
+   The section rule is already a pseudo-element sized to the container in
+   globals.css, so this only scales the thing that is there. It does not draw a
+   rule of its own: a second one would be positioned on the section box rather
+   than the container and would run the full bleed again. */
 
 @media (prefers-reduced-motion: no-preference) {
-  :global(html.js) .rule {
-    position: relative;
-    border-top-color: transparent;
-  }
-
   :global(html.js) .rule::before {
-    content: "";
-    position: absolute;
-    inset: -1px 0 auto 0;
-    height: 1px;
-    background: var(--rule);
     transform: scaleX(0);
     transform-origin: left center;
     transition: transform var(--motion-rule) var(--ease-reveal);

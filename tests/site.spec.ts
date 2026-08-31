@@ -1109,3 +1109,138 @@ test.describe("measured", () => {
     }
   });
 });
+
+/**
+ * The rule system.
+ *
+ * Two structural invariants, checked on the rendered page rather than in the
+ * stylesheets, because what matters is where a rule actually lands — not how
+ * its CSS was authored.
+ */
+test.describe("rule system", () => {
+  const VIEWPORTS = [
+    { name: "desktop", width: 1440, height: 900 },
+    { name: "tablet", width: 900, height: 900 },
+    { name: "mobile", width: 390, height: 800 },
+  ] as const;
+
+  /**
+   * A cell border with a gap beside it terminates in empty space. So a grid
+   * with a non-zero gap may carry at most one bordered child, and that child
+   * must span the whole row — anything else puts a rule next to a gap.
+   *
+   * Form controls are exempt: their border is a control affordance. So is any
+   * bordered box with a corner radius, because a rule has no radius — that is
+   * a literal record surface or a button, not a line.
+   */
+  const gapsBesideRules = (page: Page) =>
+    page.evaluate(() => {
+      const px = (value: string) => parseFloat(value) || 0;
+      /* Fully transparent only. Matching on the string would read rgb(0, 0, 0)
+         as transparent, because it also ends in ", 0)". */
+      const invisible = (colour: string) => {
+        const parts = (colour.match(/[\d.]+/g) ?? []).map(Number);
+        return parts.length > 3 && parts[3] === 0;
+      };
+      const CONTROL = /^(INPUT|TEXTAREA|SELECT|BUTTON)$/;
+      const SIDES = ["Top", "Right", "Bottom", "Left"] as const;
+      const CORNERS = [
+        "borderTopLeftRadius",
+        "borderTopRightRadius",
+        "borderBottomLeftRadius",
+        "borderBottomRightRadius",
+      ] as const;
+
+      const name = (el: Element) =>
+        `${el.tagName.toLowerCase()}${el.className ? `.${String(el.className).trim().split(/\s+/).join(".")}` : ""}`;
+
+      const found: string[] = [];
+
+      for (const grid of document.querySelectorAll("body *")) {
+        const style = getComputedStyle(grid);
+        if (style.display !== "grid" && style.display !== "inline-grid") continue;
+
+        const gap = Math.max(px(style.columnGap), px(style.rowGap));
+        if (gap === 0) continue;
+
+        const bordered = [...grid.children].filter((child) => {
+          const cs = getComputedStyle(child);
+          if (cs.display === "contents" || cs.display === "none") return false;
+          if (CONTROL.test(child.tagName)) return false;
+          if (CORNERS.some((corner) => px(cs[corner]) > 0)) return false;
+          return SIDES.some(
+            (side) =>
+              px(cs[`border${side}Width` as const]) > 0 &&
+              cs[`border${side}Style` as const] !== "none" &&
+              !invisible(cs[`border${side}Color` as const]),
+          );
+        });
+
+        if (bordered.length === 0) continue;
+
+        const row =
+          grid.clientWidth - px(style.paddingLeft) - px(style.paddingRight);
+        const fills =
+          bordered.length === 1 &&
+          Math.abs(bordered[0].getBoundingClientRect().width - row) <= 1;
+
+        if (!fills) {
+          found.push(
+            `${name(grid)} gap ${gap}px — bordered: ${bordered.map(name).join(", ")}`,
+          );
+        }
+      }
+
+      return found;
+    });
+
+  /**
+   * Section dividers are drawn on the container's own edges, so a section rule
+   * and the rules inside it are the same width and can meet.
+   */
+  const misalignedSectionRules = (page: Page) =>
+    page.evaluate(() => {
+      const px = (value: string) => parseFloat(value) || 0;
+      const wrong: string[] = [];
+
+      for (const box of document.querySelectorAll(
+        "section.section, footer.container-rule",
+      )) {
+        const container = box.querySelector(".container");
+        if (!container) continue;
+
+        const cs = getComputedStyle(container);
+        const inner =
+          container.clientWidth - px(cs.paddingLeft) - px(cs.paddingRight);
+        const rule = px(getComputedStyle(box, "::before").width);
+
+        if (Math.abs(rule - inner) > 1) {
+          wrong.push(
+            `${box.tagName.toLowerCase()} rule ${Math.round(rule)}px vs container ${Math.round(inner)}px`,
+          );
+        }
+      }
+
+      return wrong;
+    });
+
+  for (const viewport of VIEWPORTS) {
+    test.describe(viewport.name, () => {
+      test.use({ viewport: { width: viewport.width, height: viewport.height } });
+
+      for (const route of ROUTES) {
+        test(`${route} has no rule floating beside a grid gap`, async ({ page }) => {
+          await page.goto(route);
+          expect(await gapsBesideRules(page)).toEqual([]);
+        });
+      }
+
+      test("every section rule spans exactly the container", async ({ page }) => {
+        for (const route of ROUTES) {
+          await page.goto(route);
+          expect(await misalignedSectionRules(page), route).toEqual([]);
+        }
+      });
+    });
+  }
+});

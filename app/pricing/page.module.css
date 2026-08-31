@@ -1,5 +1,6 @@
+/* No bottom rule: the section that follows draws its own top rule on the
+   same line, and the two together rendered as a doubled 2px rule. */
 .hero {
-  border-bottom: 1px solid var(--rule);
   padding-block: var(--section-major-desktop);
 }
 

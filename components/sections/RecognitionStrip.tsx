@@ -1,6 +1,7 @@
 import { Container, Section } from "@/components/foundation";
 import { recognitionClosing } from "@/lib/content/homepage";
 import { recognition } from "@/lib/content/site-content";
+import { cx } from "@/lib/cx";
 
 import styles from "./RecognitionStrip.module.css";
 
@@ -15,7 +16,7 @@ export function RecognitionStrip() {
   return (
     <Section dense>
       <Container>
-        <ul className={styles.cells}>
+        <ul className={cx("rule-grid", styles.cells)}>
           {recognition.map((label) => (
             <li key={label} className={styles.cell}>
               {label}

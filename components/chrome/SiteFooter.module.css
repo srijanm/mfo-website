@@ -1,8 +1,8 @@
-/* §26. Paper background, top rule, five ruled columns. No oversized decorative
-   wordmark. */
+/* §26. Paper background, top rule, five columns. No oversized decorative
+   wordmark. The top rule comes from `.container-rule`, so it spans the
+   container like every other rule rather than running the full bleed. */
 
 .footer {
-  border-top: 1px solid var(--rule);
   background: var(--paper);
   padding-block: var(--section-dense-desktop) 40px;
 }

@@ -1,34 +1,27 @@
-/* H02, §14. Four equal cells divided by vertical rules, then a full-width
+/* H02, §14. Four equal cells on the bounded rule grid, then a full-width
    closing row. No icons — the labels carry it. */
 
 .cells {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--rule);
+  --rule-grid-pad-block: 28px;
+  --rule-grid-pad-inline: 24px;
 }
 
-/* The divider is a border on each cell after the first rather than a separate
-   element, so the four cells stay exactly equal. */
+@media (min-width: 1024px) {
+  .cells {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 .cell {
-  padding: 28px 24px 32px 0;
   font-size: var(--fs-lead);
   line-height: 1.32;
   letter-spacing: -.018em;
 }
 
-.cell + .cell {
-  padding-left: 24px;
-  border-left: 1px solid var(--rule);
-}
-
-/* The rule and the reading measure are separated: a border on the same element
-   as max-width would stop the line short of the container edge. */
+/* The strip closes itself, so the closing row carries no rule of its own —
+   a second one 32px below the first would read as two unrelated lines. */
 .closing {
   padding-top: 32px;
-  border-top: 1px solid var(--rule);
 }
 
 .closingText {
@@ -39,22 +32,9 @@
   letter-spacing: -.018em;
 }
 
-/* §5: vertical rules come out on smaller screens and the horizontal rhythm
-   carries the grouping instead — one ruled row per item. */
 @media (max-width: 1023px) {
   .cells {
-    grid-template-columns: minmax(0, 1fr);
-    border-top: 0;
-  }
-
-  .cell {
-    padding: 20px 0;
-    border-top: 1px solid var(--rule);
-  }
-
-  .cell + .cell {
-    padding-left: 0;
-    border-left: 0;
+    --rule-grid-pad-block: 20px;
   }
 
   .closing {
