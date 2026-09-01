@@ -183,22 +183,26 @@ body {
    --------------------------------------------------------------------------- */
 
 .rule-grid {
-  --rule-grid-pad-block: 24px;
-  --rule-grid-pad-inline: 20px;
-
   display: grid;
   gap: 0;
   align-items: stretch;
-  margin: 0;
+  /* No margin reset here: declared on `.rule-grid` it tied with, and beat, the
+     margin every caller set on its own element, so blocks that meant to stand
+     72px clear of the heading above them sat flush against it. List callers
+     reset their own margin. */
   padding: 0;
   list-style: none;
   border-top: 1px solid var(--rule);
   border-bottom: 1px solid var(--rule);
 }
 
+/* The defaults are var() fallbacks rather than declarations on `.rule-grid`.
+   Declared there, a caller setting the same property on its own `.rule-grid`
+   element tied on specificity and lost to this sheet, so every caller's padding
+   was silently ignored and every ruled block rendered at the default. */
 .rule-grid > * {
   border-left: 1px solid var(--rule);
-  padding: var(--rule-grid-pad-block) var(--rule-grid-pad-inline);
+  padding: var(--rule-grid-pad-block, 24px) var(--rule-grid-pad-inline, 20px);
 }
 
 .rule-grid > :first-child {
@@ -208,6 +212,13 @@ body {
 
 .rule-grid > :last-child {
   padding-right: 0;
+}
+
+/* A block that continues into the one directly beneath it: that block's top
+   rule is the single rule between them, so this one draws no bottom of its own
+   and its dividers still terminate on a horizontal at both ends. */
+.rule-grid--continues {
+  border-bottom: 0;
 }
 
 /* A cell whose own content carries the padding. Used where rules inside the

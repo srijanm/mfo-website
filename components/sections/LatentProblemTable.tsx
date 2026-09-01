@@ -1,7 +1,9 @@
-import { Container, Section } from "@/components/foundation";
+import { Container, Grid, Section } from "@/components/foundation";
+import { EMPTY_VALUE } from "@/components/objects";
 import {
   latentProblem,
   latentProblemColumnsReady,
+  type LatentProblemColumns,
 } from "@/lib/content/homepage";
 import { factValue } from "@/lib/content/reviewed";
 import { cx } from "@/lib/cx";
@@ -11,59 +13,92 @@ import styles from "./LatentProblemTable.module.css";
 /**
  * H03 — the latent problem.
  *
- * The spec asks for a three-column table: what started, why it matters later,
- * and what the customer notices. Writing those columns means writing tax
- * content, and the copy doc supplies only the approved single-sentence
- * examples. Rather than invent two thirds of a tax table, the section renders
- * the approved statements as ruled rows and switches to the full table the
- * moment `columns` is populated and reviewed.
+ * §15 specifies a three-column ruled table: what started, why it matters later,
+ * and what the customer notices. That table is built below and is driven
+ * entirely by `latentProblem.examples[].columns`.
  *
- * Proposition left, examples right, on one bounded 5/7 rule grid — the ruled
- * rows carry the right seven columns either way, so the section holds the grid
- * whether or not the expansion exists yet.
+ * It is gated on `latentProblemColumnsReady()` because the copy doc supplies
+ * one approved sentence per example and nothing for any of the three columns.
+ * Rendering it today would print twelve empty cells and drop four lines of
+ * approved copy from the page, so until the columns are written the section
+ * renders those sentences instead. Populate `columns` on every example in
+ * lib/content/homepage.ts and the specified table appears with no other change.
  */
 export function LatentProblemTable() {
   const { columnHeadings, examples } = latentProblem;
   const showColumns = latentProblemColumnsReady();
 
+  const headings: [keyof LatentProblemColumns, string][] = [
+    ["started", columnHeadings.started],
+    ["mattersLater", columnHeadings.mattersLater],
+    ["notices", columnHeadings.notices],
+  ];
+
   return (
     <Section labelledBy="latent-problem">
       <Container>
-        <div className={cx("rule-grid", "rule-grid--5-7", styles.split)}>
-          <div className={styles.proposition}>
-            <h2 id="latent-problem" className={`display-2 ${styles.headline}`}>
-              {latentProblem.headline}
-            </h2>
-            <p className={styles.follow}>{latentProblem.follow}</p>
-          </div>
+        {showColumns ? (
+          <>
+            <Grid>
+              <div className={styles.proposition}>
+                <h2 id="latent-problem" className={`display-2 ${styles.headline}`}>
+                  {latentProblem.headline}
+                </h2>
+                <p className={styles.follow}>{latentProblem.follow}</p>
+                <p className={styles.intro}>{latentProblem.intro}</p>
+              </div>
+            </Grid>
 
-          <div className="rule-grid-flush">
-            <p className={styles.intro}>{latentProblem.intro}</p>
-
-            {showColumns ? (
-              <>
+            <div className={cx("rule-grid", styles.table)}>
+              <div className="rule-grid-flush">
+                {/* Headers once, above the first row. */}
                 <div className={styles.headRow}>
-                  <p className={styles.heading}>{columnHeadings.started}</p>
-                  <p className={styles.heading}>{columnHeadings.mattersLater}</p>
-                  <p className={styles.heading}>{columnHeadings.notices}</p>
+                  {headings.map(([key, label]) => (
+                    <p key={key} className={styles.heading}>
+                      {label}
+                    </p>
+                  ))}
                 </div>
+
                 {examples.map((example) => (
                   <div key={example.id} className={styles.row}>
-                    <p className={styles.cell}>{example.columns?.started}</p>
-                    <p className={styles.cell}>{example.columns?.mattersLater}</p>
-                    <p className={styles.cell}>{example.columns?.notices}</p>
+                    {headings.map(([key, label]) => {
+                      const value = example.columns?.[key];
+                      return (
+                        <p
+                          key={key}
+                          className={cx(styles.cell, !value && styles.cellEmpty)}
+                        >
+                          <span className={styles.cellLabel}>{label}</span>
+                          {value || EMPTY_VALUE}
+                        </p>
+                      );
+                    })}
                   </div>
                 ))}
-              </>
-            ) : (
-              examples.map((example) => (
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className={cx("rule-grid", "rule-grid--5-7", styles.split)}>
+            <div className={styles.splitCopy}>
+              <h2 id="latent-problem" className={`display-2 ${styles.headline}`}>
+                {latentProblem.headline}
+              </h2>
+              <p className={styles.follow}>{latentProblem.follow}</p>
+            </div>
+
+            <div className="rule-grid-flush">
+              <p className={styles.splitIntro}>{latentProblem.intro}</p>
+
+              {examples.map((example) => (
                 <div key={example.id} className={styles.summaryRow}>
                   <p className={styles.summaryText}>{factValue(example.summary)}</p>
                 </div>
-              ))
-            )}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </Container>
     </Section>
   );

@@ -1,6 +1,14 @@
 /* H01, MASTER_BUILD_SPEC.md §13.
    Left aligned, never centred. The header already carries a 1px bottom rule,
-   so the hero takes no top rule of its own. */
+   so the hero takes no top rule of its own.
+
+   One 12-column composition, laid out top-down. It previously distributed its
+   three blocks with `align-content: space-between` over a viewport-height grid,
+   which opened a 236px dead zone under the headline and pushed the calls to
+   action to the bottom edge — below the fold, and below the reveal observer's
+   trigger line, so on any viewport shorter than about 850px they never became
+   visible at all. Spacing is now ordinary and the height is slack below the
+   composition rather than inside it. */
 
 .hero {
   /* §9 puts the bar at 64px; the rule below it adds the 65th pixel, so this is
@@ -17,14 +25,10 @@
   padding-block: 64px 72px;
 }
 
-/* Headline sits at the top, the copy and the payment object at the bottom, so
-   the object lands lower right as the spec describes. */
 .grid {
   flex: 1;
-  align-content: space-between;
-  /* Scales with viewport height so the composition still lands inside the fold
-     on a short laptop screen instead of pushing the actions past it. */
-  row-gap: clamp(32px, 4vh, 72px);
+  align-content: start;
+  row-gap: 48px;
 }
 
 .headline {
@@ -32,9 +36,11 @@
   text-wrap: balance;
 }
 
+/* Copy and object are the second row of the composition. Both start at the top
+   of that row, so the object's top edge sits on the subhead's first line. */
 .copy {
   grid-column: 1 / span 5;
-  align-self: end;
+  align-self: start;
 }
 
 .subhead {
@@ -46,6 +52,7 @@
   color: var(--ink-2);
 }
 
+/* Directly under the subhead, at ordinary spacing. */
 .actions {
   display: flex;
   align-items: center;
@@ -56,15 +63,13 @@
 
 .object {
   grid-column: 8 / -1;
-  align-self: end;
+  align-self: start;
   justify-self: end;
   width: 100%;
 }
 
-/* On a short viewport the headline and the record cannot both sit above the
-   fold — that is inherent to the composition, not a spacing bug. The target
-   height is dropped and the padding tightened rather than shrinking the type or
-   the record. The primary action is also in the sticky header throughout. */
+/* On a short viewport the target height is dropped and the padding tightened
+   rather than shrinking the type or the record. */
 @media (max-height: 820px) {
   .hero {
     min-height: 0;
@@ -72,6 +77,10 @@
 
   .inner {
     padding-block: 56px 64px;
+  }
+
+  .grid {
+    row-gap: 40px;
   }
 }
 
@@ -85,7 +94,7 @@
   }
 
   .grid {
-    row-gap: 48px;
+    row-gap: 40px;
   }
 
   /* Below desktop the three blocks stack in reading order: copy, then the
@@ -108,7 +117,7 @@
   }
 
   .grid {
-    row-gap: 36px;
+    row-gap: 32px;
   }
 
   .subhead {
