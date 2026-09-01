@@ -42,7 +42,7 @@ export function RecordSurface({ title, amount, groups, note, className }: Record
   );
 
   return (
-    <figure className={cx(styles.surface, className)}>
+    <figure className={cx(styles.surface, Boolean(note) && styles.hasNote, className)}>
       <figcaption className={styles.title}>{title}</figcaption>
       <hr aria-hidden="true" className={styles.titleRule} />
 

@@ -16,14 +16,17 @@ export function RecognitionStrip() {
   return (
     <Section dense>
       <Container>
-        <ul className={cx("rule-grid", styles.cells)}>
+        <ul className={cx("rule-grid", "rule-grid--continues", styles.cells)}>
           {recognition.map((label) => (
             <li key={label} className={styles.cell}>
               {label}
             </li>
           ))}
         </ul>
-        <div className={styles.closing}>
+        {/* The closing row is the second row of the same bounded structure: the
+            cells above draw no bottom rule, so the rule at the top of this row
+            is the one that separates them, and this row closes the block. */}
+        <div className={cx("rule-grid", styles.closing)}>
           <p className={styles.closingText}>{recognitionClosing}</p>
         </div>
       </Container>

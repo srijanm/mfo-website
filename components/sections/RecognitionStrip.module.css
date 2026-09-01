@@ -1,9 +1,16 @@
-/* H02, §14. Four equal cells on the bounded rule grid, then a full-width
-   closing row. No icons — the labels carry it. */
+/* H02, §14. Four equal cells on the bounded rule grid, then the closing row
+   beneath them inside the same bounded structure.
+
+   The strip used to end at the cells' bottom rule with the closing sentence
+   floating 32px below it, attached to nothing. The cells now draw no bottom of
+   their own: the closing row's top rule is the single rule between the two, and
+   the closing row closes the block. The four dividers therefore terminate on a
+   horizontal at both ends. */
 
 .cells {
-  --rule-grid-pad-block: 28px;
-  --rule-grid-pad-inline: 24px;
+  --rule-grid-pad-block: 40px;
+  margin: 0;
+  --rule-grid-pad-inline: 28px;
 }
 
 @media (min-width: 1024px) {
@@ -12,16 +19,17 @@
   }
 }
 
+/* Cells are stretched to a common height by the primitive, so the four labels
+   already start on one line; this keeps them there by giving every cell the
+   same leading regardless of how many lines it runs to. */
 .cell {
   font-size: var(--fs-lead);
   line-height: 1.32;
   letter-spacing: -.018em;
 }
 
-/* The strip closes itself, so the closing row carries no rule of its own —
-   a second one 32px below the first would read as two unrelated lines. */
 .closing {
-  padding-top: 32px;
+  --rule-grid-pad-block: 32px;
 }
 
 .closingText {
@@ -34,11 +42,11 @@
 
 @media (max-width: 1023px) {
   .cells {
-    --rule-grid-pad-block: 20px;
+    --rule-grid-pad-block: 24px;
   }
 
   .closing {
-    padding-top: 28px;
+    --rule-grid-pad-block: 28px;
   }
 
   .closingText {

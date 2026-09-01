@@ -14,16 +14,24 @@
   }
 }
 
+/* The inset lives on the content, not on the surface, so the object's internal
+   rules run its full width the way the anatomy in §11 draws them. Padding on
+   the surface held every rule 21px short of both edges. */
 .surface {
+  --record-inset: 20px;
+
+  /* A figure carries a UA margin. Left in, it pushed the object 16px below the
+     top of its grid row, so its top edge missed the line it is aligned to. */
+  margin: 0;
   background: var(--white);
   border: 1px solid var(--rule);
   border-radius: var(--radius-object);
-  padding: 20px;
   max-width: 420px;
 }
 
 .title {
   margin: 0;
+  padding: var(--record-inset) var(--record-inset) 0;
   font-size: var(--fs-small);
   font-weight: 500;
   letter-spacing: .06em;
@@ -31,6 +39,7 @@
   color: var(--muted);
 }
 
+/* Full width, edge to edge. */
 .titleRule {
   border: 0;
   margin: 12px 0 0;
@@ -39,6 +48,7 @@
 
 .amount {
   margin: 16px 0 0;
+  padding-inline: var(--record-inset);
   font-size: var(--fs-h3);
   font-weight: 400;
   letter-spacing: -.028em;
@@ -49,6 +59,7 @@
    all values align down a single edge — the way they do in the anatomy. */
 .rows {
   margin: 20px 0 0;
+  padding: 0 var(--record-inset) var(--record-inset);
   display: grid;
   grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr);
   gap: 8px 16px;
@@ -66,6 +77,10 @@
   padding-top: 12px;
 }
 
+.hasNote .rows {
+  padding-bottom: 20px;
+}
+
 .label {
   margin: 0;
   color: var(--muted);
@@ -76,9 +91,11 @@
   color: var(--ink);
 }
 
+/* The rule above the note is full width for the same reason; the note's own
+   text keeps the inset. */
 .note {
-  margin: 20px 0 0;
-  padding-top: 16px;
+  margin: 0;
+  padding: 16px var(--record-inset) var(--record-inset);
   border-top: 1px solid var(--rule);
   font-size: var(--fs-small);
   color: var(--ink-2);

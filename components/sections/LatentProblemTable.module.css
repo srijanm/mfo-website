@@ -1,15 +1,22 @@
-/* H03, §15. A bounded 5/7 rule grid: the proposition holds the left five
-   columns, and the ruled examples hold the right seven, so the section occupies
-   the grid instead of leaving four columns of empty paper beside the table.
-   No warning red — the section states a consequence once and moves on. */
+/* H03, §15. Large proposition on top, 3-column ruled table below.
+   No warning red — the section states a consequence once and moves on.
 
-.split {
-  --rule-grid-pad-block: 0px;
-  --rule-grid-pad-inline: 40px;
-}
+   Two renderings, chosen by whether the three-column content exists:
+
+   - `.table` is the specified table: What started / Why it matters later /
+     What the customer notices, headers once in small muted text, one bounded
+     ruled block. It is what the section is; it renders the moment
+     `columns` is populated on every example.
+   - `.split` is what shows until then. The copy doc supplies one approved
+     sentence per example and nothing for the three columns, so rendering the
+     table today would print twelve empty cells and drop four lines of approved
+     copy. The proposition takes the left five columns and the sentences the
+     right seven instead. */
+
+/* ---------------------------------------------- the specified table */
 
 .proposition {
-  padding-block: 28px 0;
+  grid-column: 1 / span 8;
 }
 
 .headline {
@@ -26,10 +33,8 @@
   color: var(--muted);
 }
 
-/* The lede opens the right column, above the rule that opens the examples. */
 .intro {
-  margin: 0;
-  padding: 28px 0 28px 40px;
+  margin: 32px 0 0;
   max-width: 58ch;
   font-size: var(--fs-lead);
   line-height: 1.44;
@@ -37,18 +42,45 @@
   color: var(--ink-2);
 }
 
+.table {
+  margin-top: 64px;
+}
+
 .headRow,
 .row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--grid-gap);
-  padding: 20px 0 20px 40px;
-  border-top: 1px solid var(--rule);
 }
 
-.headRow {
-  padding-block: 0 12px;
-  border-top: 0;
+/* Cell borders, never a gap beside them: the dividers run the height of the
+   block and terminate on its top and bottom rules. */
+.headRow > *,
+.row > * {
+  padding: 22px 28px;
+}
+
+.headRow > * + *,
+.row > * + * {
+  border-left: 1px solid var(--rule);
+}
+
+.headRow > :first-child,
+.row > :first-child {
+  padding-left: 0;
+}
+
+.headRow > :last-child,
+.row > :last-child {
+  padding-right: 0;
+}
+
+/* The headings sit once, inside the block below its opening rule. */
+.headRow > * {
+  padding-block: 16px;
+}
+
+.row {
+  border-top: 1px solid var(--rule);
 }
 
 .heading {
@@ -64,8 +96,56 @@
   line-height: 1.45;
 }
 
-/* Until the three-column expansion is written and reviewed, the approved
-   single-sentence examples render as ruled rows on their own. */
+/* A cell with nothing in it yet carries the same empty marker the information
+   objects use — §11 — rather than collapsing the row. */
+.cellEmpty {
+  color: var(--muted);
+}
+
+/* Stacked, each value needs the heading the head row carried; on desktop that
+   label stays in the accessibility tree but off screen. */
+.cellLabel {
+  display: block;
+  margin-bottom: 6px;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+@media (min-width: 1024px) {
+  .cellLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ------------------------------------- the interim single-column form */
+
+.split {
+  --rule-grid-pad-block: 0px;
+  --rule-grid-pad-inline: 40px;
+}
+
+.splitCopy {
+  padding-block: 28px 0;
+}
+
+.splitIntro {
+  margin: 0;
+  padding: 28px 0 28px 40px;
+  max-width: 58ch;
+  font-size: var(--fs-lead);
+  line-height: 1.44;
+  letter-spacing: -.018em;
+  color: var(--ink-2);
+}
+
 .summaryRow {
   padding: 20px 0 20px 40px;
   border-top: 1px solid var(--rule);
@@ -80,24 +160,12 @@
 }
 
 @media (max-width: 1023px) {
-  /* §5: the divider comes out below desktop and the block stacks. */
-  .split {
-    --rule-grid-pad-block: 28px;
-  }
-
   .proposition {
-    padding-block: 0 28px;
+    grid-column: 1 / -1;
   }
 
-  .intro,
-  .headRow,
-  .row,
-  .summaryRow {
-    padding-left: 0;
-  }
-
-  .intro {
-    padding-top: 0;
+  .table {
+    margin-top: 48px;
   }
 
   .headRow {
@@ -106,7 +174,40 @@
 
   .row {
     grid-template-columns: minmax(0, 1fr);
-    gap: 4px;
+  }
+
+  .row > * {
+    padding: 6px 0;
+  }
+
+  .row > * + * {
+    border-left: 0;
+  }
+
+  .row > :first-child {
+    padding-top: 20px;
+  }
+
+  .row > :last-child {
+    padding-bottom: 20px;
+  }
+
+  /* §5: the divider comes out below desktop and the block stacks. */
+  .split {
+    --rule-grid-pad-block: 28px;
+  }
+
+  .splitCopy {
+    padding-block: 0 28px;
+  }
+
+  .splitIntro,
+  .summaryRow {
+    padding-left: 0;
+  }
+
+  .splitIntro {
+    padding-top: 0;
   }
 
   .summaryText {
