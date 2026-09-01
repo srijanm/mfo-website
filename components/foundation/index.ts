@@ -6,4 +6,3 @@ export { Rule } from "./Rule";
 export { Section } from "./Section";
 export { TextLink } from "./TextLink";
 export { ThresholdNode } from "./ThresholdNode";
-export { VerticalRule } from "./VerticalRule";

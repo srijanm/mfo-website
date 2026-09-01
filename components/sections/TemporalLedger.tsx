@@ -1,6 +1,7 @@
-import { Container, Grid, Section, ThresholdNode, VerticalRule } from "@/components/foundation";
+import { Container, Section, ThresholdNode } from "@/components/foundation";
 import { temporalLedger } from "@/lib/content/homepage";
 import { factValue } from "@/lib/content/reviewed";
+import { cx } from "@/lib/cx";
 
 import styles from "./TemporalLedger.module.css";
 
@@ -17,6 +18,9 @@ import styles from "./TemporalLedger.module.css";
  *
  * Dates come from content and are null until reviewed, so nothing here is
  * numeric today and the rows read correctly either way.
+ *
+ * The desktop split is a bounded 4/8 rule grid, so its vertical rule starts and
+ * ends on a horizontal rule instead of floating in the middle of the section.
  */
 export function TemporalLedger() {
   const { entries } = temporalLedger;
@@ -24,7 +28,7 @@ export function TemporalLedger() {
   return (
     <Section labelledBy="temporal-ledger">
       <Container>
-        <Grid>
+        <div className={cx("rule-grid", "rule-grid--4-8", styles.split)}>
           <div className={styles.copy}>
             <h2 id="temporal-ledger" className={styles.headline}>
               {temporalLedger.headline}
@@ -32,11 +36,7 @@ export function TemporalLedger() {
             <p className={styles.body}>{temporalLedger.body}</p>
           </div>
 
-          <div className={styles.rules}>
-            <VerticalRule />
-          </div>
-
-          <div className={styles.ledger}>
+          <div>
             <p className={styles.year}>{temporalLedger.yearLabel}</p>
 
             <ol className={styles.rows}>
@@ -76,7 +76,7 @@ export function TemporalLedger() {
               </li>
             </ol>
           </div>
-        </Grid>
+        </div>
       </Container>
     </Section>
   );

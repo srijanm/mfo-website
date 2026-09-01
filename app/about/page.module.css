@@ -1,5 +1,6 @@
+/* No bottom rule: the section that follows draws its own top rule on the
+   same line, and the two together rendered as a doubled 2px rule. */
 .hero {
-  border-bottom: 1px solid var(--rule);
   padding-block: var(--section-major-desktop);
 }
 
@@ -25,11 +26,16 @@
   color: var(--ink-2);
 }
 
+/* Title and content are two cells of one bounded 4/8 rule grid, so the line
+   above them is a single rule across the container rather than two rules held
+   20px apart by the column gap. */
+.split {
+  --rule-grid-pad-block: 28px;
+  --rule-grid-pad-inline: 40px;
+}
+
 .sectionTitle {
-  grid-column: 1 / span 4;
   margin: 0;
-  padding-top: 28px;
-  border-top: 1px solid var(--rule);
   font-size: var(--fs-h3);
   font-weight: 400;
   line-height: 1.12;
@@ -37,21 +43,11 @@
 }
 
 .sectionBody {
-  grid-column: 5 / -1;
   margin: 0;
-  padding-top: 28px;
-  border-top: 1px solid var(--rule);
   max-width: 60ch;
   font-size: var(--fs-lead);
   line-height: 1.44;
   letter-spacing: -.018em;
-}
-
-/* People. Real portraits only; the grid renders once members exist. */
-.people {
-  grid-column: 5 / -1;
-  padding-top: 28px;
-  border-top: 1px solid var(--rule);
 }
 
 .pending {
@@ -102,21 +98,8 @@
     padding-block: var(--section-major-tablet);
   }
 
-  .copy,
-  .sectionTitle,
-  .sectionBody,
-  .people {
+  .copy {
     grid-column: 1 / -1;
-  }
-
-  .sectionTitle {
-    margin-bottom: 24px;
-  }
-
-  .sectionBody,
-  .people {
-    border-top: 0;
-    padding-top: 0;
   }
 }
 

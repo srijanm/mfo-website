@@ -1,11 +1,10 @@
 /* H13, §25. The one full acid field on the page.
-   Ink on acid, and the section's own rule uses the on-acid value so it does not
-   disappear into the field. */
+   Ink on acid. The field itself is full-bleed; its rule is not — it comes from
+   the shared `.section` rule, drawn at container width in the on-acid value so
+   it does not disappear into the field. */
 
 .section {
   background: var(--acid);
-  border-top: 1px solid var(--rule-on-acid);
-  padding-block: var(--section-major-desktop);
 }
 
 .inner {
@@ -37,20 +36,12 @@
 }
 
 @media (max-width: 1023px) {
-  .section {
-    padding-block: var(--section-major-tablet);
-  }
-
   .inner {
     grid-column: 1 / -1;
   }
 }
 
 @media (max-width: 767px) {
-  .section {
-    padding-block: var(--section-major-mobile);
-  }
-
   .support {
     font-size: var(--fs-body);
   }

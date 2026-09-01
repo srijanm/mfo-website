@@ -1,5 +1,6 @@
 import { Container, Grid, Section } from "@/components/foundation";
 import { operatingModel } from "@/lib/content/homepage";
+import { cx } from "@/lib/cx";
 
 import styles from "./OperatingModel.module.css";
 
@@ -18,7 +19,7 @@ export function OperatingModel() {
             {operatingModel.headline}
           </h2>
 
-          <ul className={styles.pillars}>
+          <ul className={cx("rule-grid", styles.pillars)}>
             {operatingModel.pillars.map((pillar) => (
               <li key={pillar.id} className={styles.pillar}>
                 <h3 className={styles.title}>{pillar.title}</h3>

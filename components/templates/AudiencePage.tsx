@@ -7,6 +7,7 @@ import {
   TemporalLedger,
 } from "@/components/sections";
 import { FaqSection, FinalCtaSection, PricingSection } from "@/components/shared";
+import { cx } from "@/lib/cx";
 import type { Audience, AudienceBlock } from "@/lib/content/audiences";
 import { faqByIds, finalCta } from "@/lib/content/homepage";
 import { pricingPage } from "@/lib/content/pricing";
@@ -39,18 +40,20 @@ export function AudiencePage({ audience }: AudiencePageProps) {
         return audience.checklist ? (
           <Section key={block} labelledBy="checklist">
             <Container>
-              <Grid>
+              <div
+                className={cx("rule-grid", "rule-grid--4-8", styles.checklistSplit)}
+              >
                 <h2 id="checklist" className={styles.checklistTitle}>
                   {audience.checklist.title}
                 </h2>
-                <ul className={styles.checklist}>
+                <ul className={cx("rule-grid-flush", styles.checklist)}>
                   {audience.checklist.items.map((item) => (
                     <li key={item} className={styles.checklistItem}>
                       {item}
                     </li>
                   ))}
                 </ul>
-              </Grid>
+              </div>
             </Container>
           </Section>
         ) : null;

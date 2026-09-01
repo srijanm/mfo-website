@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { Container, Grid, Section } from "@/components/foundation";
+import { cx } from "@/lib/cx";
 import { TrustLedger } from "@/components/sections";
 import { FinalCtaSection } from "@/components/shared";
 import { about } from "@/lib/content/about";
@@ -50,11 +51,11 @@ export default function AboutPage() {
       {/* Named professionals and credentials */}
       <Section labelledBy="people">
         <Container>
-          <Grid>
+          <div className={cx("rule-grid", "rule-grid--4-8", styles.split)}>
             <h2 id="people" className={styles.sectionTitle}>
               {about.people.title}
             </h2>
-            <div className={styles.people}>
+            <div>
               {members && members.length > 0 ? (
                 <ul className={styles.members}>
                   {members.map((member) => (
@@ -83,31 +84,31 @@ export default function AboutPage() {
                 <p className={styles.pending}>{about.people.pending}</p>
               )}
             </div>
-          </Grid>
+          </div>
         </Container>
       </Section>
 
       {/* How technology is used */}
       <Section labelledBy="technology">
         <Container>
-          <Grid>
+          <div className={cx("rule-grid", "rule-grid--4-8", styles.split)}>
             <h2 id="technology" className={styles.sectionTitle}>
               {about.technology.title}
             </h2>
             <p className={styles.sectionBody}>{about.technology.body}</p>
-          </Grid>
+          </div>
         </Container>
       </Section>
 
       {/* When the answer is not yet */}
       <Section labelledBy="not-yet">
         <Container>
-          <Grid>
+          <div className={cx("rule-grid", "rule-grid--4-8", styles.split)}>
             <h2 id="not-yet" className={styles.sectionTitle}>
               {about.notYet.title}
             </h2>
             <p className={styles.sectionBody}>{about.notYet.body}</p>
-          </Grid>
+          </div>
         </Container>
       </Section>
 

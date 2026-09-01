@@ -41,6 +41,13 @@
   --grid-gap-tablet: 16px;
   --grid-gap-mobile: 12px;
 
+  /* The gutter and gap of the current breakpoint. The three values above stay
+     because Grid.module.css addresses a specific breakpoint inside its own
+     queries; these two are what everything else reads, so a rule never has to
+     restate which breakpoint it is on. */
+  --gutter: var(--gutter-desktop);
+  --grid-gap: var(--grid-gap-desktop);
+
   /* Section spacing */
   --section-major-desktop: 120px;
   --section-dense-desktop: 72px;
@@ -87,12 +94,46 @@ body {
 .container {
   width: min(100%, var(--page-max));
   margin-inline: auto;
-  padding-inline: var(--gutter-desktop);
+  padding-inline: var(--gutter);
+}
+
+/* ---------------------------------------------------------------------------
+   One coordinate system.
+
+   The section box is full-bleed; the rule that divides one section from the
+   next is not. Drawn as a border it ran 0 -> viewport while every other rule on
+   the site sat inside the container, so a section rule could never line up with
+   anything below it. It is a pseudo-element positioned on the container's own
+   content edges instead, which is the single width every horizontal rule on the
+   site spans.
+   --------------------------------------------------------------------------- */
+
+/* Any full-bleed box that carries a container-width rule at its top edge. */
+.container-rule,
+.section {
+  position: relative;
+}
+
+.container-rule::before,
+.section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  /* The container's content-box left edge, expressed against the full-bleed
+     box: centred at the ceiling, flush to the gutter below it. */
+  left: max(var(--gutter), calc((100% - var(--page-max)) / 2 + var(--gutter)));
+  width: min(100% - 2 * var(--gutter), var(--page-max) - 2 * var(--gutter));
+  height: 1px;
+  background: var(--rule);
 }
 
 .section {
-  border-top: 1px solid var(--rule);
   padding-block: var(--section-major-desktop);
+}
+
+/* The final CTA draws the same rule in the on-acid value. */
+.section--on-acid::before {
+  background: var(--rule-on-acid);
 }
 
 .section--dense {
@@ -123,6 +164,100 @@ body {
 .rule-top { border-top: 1px solid var(--rule); }
 .rule-bottom { border-bottom: 1px solid var(--rule); }
 
+/* ---------------------------------------------------------------------------
+   Bounded rule grid.
+
+   The canonical ruled multi-column block. Three properties make it work:
+
+   1. `gap: 0`. A cell border with a gap beside it terminates in empty space,
+      which is what made ruled blocks read as unrelated fragments. Spacing lives
+      in cell padding instead.
+   2. Bounded top and bottom, so every column divider starts on a rule and ends
+      on a rule rather than in air.
+   3. `border-left` only, never `border-right`, and never both sides of two
+      adjacent cells: doubled 1px borders render unevenly at fractional zoom.
+
+   The first cell drops its left border and its left padding, and the last drops
+   its right padding, so the block stays flush with the container and its rules
+   are exactly as wide as every other rule on the page.
+   --------------------------------------------------------------------------- */
+
+.rule-grid {
+  --rule-grid-pad-block: 24px;
+  --rule-grid-pad-inline: 20px;
+
+  display: grid;
+  gap: 0;
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.rule-grid > * {
+  border-left: 1px solid var(--rule);
+  padding: var(--rule-grid-pad-block) var(--rule-grid-pad-inline);
+}
+
+.rule-grid > :first-child {
+  border-left: 0;
+  padding-left: 0;
+}
+
+.rule-grid > :last-child {
+  padding-right: 0;
+}
+
+/* A cell whose own content carries the padding. Used where rules inside the
+   cell have to run its full width and terminate exactly on the divider: the
+   cell is flush, and each row inside it insets its text with padding of its
+   own, so the row's border still starts on the divider. */
+.rule-grid > .rule-grid-flush {
+  padding: 0;
+}
+
+/* Split templates.
+
+   A zero-gap grid cannot inherit the 12-column track sizes directly, so the
+   left track is sized to put the divider exactly on a 12-column gutter centre:
+   for an n-column left half of a 12-column grid of width W and gap g, that is
+   (nW + (n - 6)g) / 12. The dividers in a split therefore stand on the same
+   lines as every 12-column layout on the site.
+
+   Declared inside a min-width query so the stacked rules below can win without
+   fighting the caller's specificity. */
+@media (min-width: 1024px) {
+  .rule-grid--4-8 {
+    grid-template-columns: calc((100% * 4 - 2 * var(--grid-gap)) / 12) minmax(0, 1fr);
+  }
+
+  .rule-grid--5-7 {
+    grid-template-columns: calc((100% * 5 - 1 * var(--grid-gap)) / 12) minmax(0, 1fr);
+  }
+}
+
+/* Callers declare their column template inside a min-width query and this
+   declares the stacked one inside a max-width query, so the two are never both
+   in play and neither has to out-specify the other. */
+@media (max-width: 1023px) {
+  /* §5: vertical rules come out below desktop and the horizontal rhythm carries
+     the grouping instead — one ruled row per cell. */
+  .rule-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rule-grid > * {
+    border-left: 0;
+    padding-inline: 0;
+  }
+
+  .rule-grid > * + * {
+    border-top: 1px solid var(--rule);
+  }
+}
+
 .button-primary {
   min-height: 48px;
   display: inline-flex;
@@ -152,19 +287,21 @@ body {
   outline-offset: 3px;
 }
 
-@media (min-width: 1024px) {
-  .vertical-rule {
-    border-left: 1px solid var(--rule);
-  }
-}
-
 @media (max-width: 1023px) {
-  .container { padding-inline: var(--gutter-tablet); }
+  :root {
+    --gutter: var(--gutter-tablet);
+    --grid-gap: var(--grid-gap-tablet);
+  }
+
   .section { padding-block: var(--section-major-tablet); }
 }
 
 @media (max-width: 767px) {
-  .container { padding-inline: var(--gutter-mobile); }
+  :root {
+    --gutter: var(--gutter-mobile);
+    --grid-gap: var(--grid-gap-mobile);
+  }
+
   .section { padding-block: var(--section-major-mobile); }
   .section--dense { padding-block: var(--section-dense-mobile); }
 }

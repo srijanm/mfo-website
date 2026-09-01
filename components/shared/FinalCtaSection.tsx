@@ -1,4 +1,5 @@
 import { Button, Container, Grid } from "@/components/foundation";
+import { cx } from "@/lib/cx";
 import type { FinalCtaContent } from "@/lib/content/homepage";
 
 import styles from "./FinalCtaSection.module.css";
@@ -14,12 +15,17 @@ type FinalCtaSectionProps = {
  * The button reverses to ink on paper text so it still reads as the dominant
  * action against the field.
  *
- * This is a plain section rather than the Section primitive, because that
- * primitive paints a paper-toned rule which would vanish against acid.
+ * It uses the shared `.section` box rather than the Section primitive, because
+ * the primitive draws its rule on reveal and paints it in the paper-toned
+ * value, which would vanish against acid. `.section--on-acid` swaps the rule
+ * colour; the width and position are the same as every other section rule.
  */
 export function FinalCtaSection({ content }: FinalCtaSectionProps) {
   return (
-    <section className={styles.section} aria-labelledby="final-cta">
+    <section
+      className={cx("section", "section--on-acid", styles.section)}
+      aria-labelledby="final-cta"
+    >
       <Container>
         <Grid>
           <div className={styles.inner}>

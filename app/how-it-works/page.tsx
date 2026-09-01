@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { Container, Grid, Section, ThresholdNode } from "@/components/foundation";
+import { cx } from "@/lib/cx";
 import { FilingRecord } from "@/components/objects";
 import { IncomeAxis, TemporalLedger } from "@/components/sections";
 import { FinalCtaSection, PricingSection } from "@/components/shared";
@@ -44,22 +45,20 @@ export default function HowItWorksPage() {
       {/* 1 — Start */}
       <Section labelledBy="start">
         <Container>
-          <Grid>
+          <div className={cx("rule-grid", styles.split, styles.exchangeSplit)}>
             <h2 id="start" className={styles.sectionTitle}>
               {howItWorks.start.title}
             </h2>
-            <div className={styles.exchange}>
-              <p className={styles.exchangeCell}>{howItWorks.start.you}</p>
-              <p className={styles.exchangeCell}>{howItWorks.start.us}</p>
-            </div>
-          </Grid>
+            <p className={styles.exchangeCell}>{howItWorks.start.you}</p>
+            <p className={styles.exchangeCell}>{howItWorks.start.us}</p>
+          </div>
         </Container>
       </Section>
 
       {/* 2 — Set up */}
       <Section labelledBy="set-up">
         <Container>
-          <Grid>
+          <div className={cx("rule-grid", "rule-grid--4-8", styles.split)}>
             <h2 id="set-up" className={styles.sectionTitle}>
               {howItWorks.setUp.title}
             </h2>
@@ -81,7 +80,7 @@ export default function HowItWorksPage() {
                 </li>
               ))}
             </ol>
-          </Grid>
+          </div>
         </Container>
       </Section>
 
@@ -91,15 +90,15 @@ export default function HowItWorksPage() {
       {/* 4 — Before filing */}
       <Section labelledBy="before-filing">
         <Container>
-          <Grid>
+          <div className={cx("rule-grid", "rule-grid--4-8", styles.split)}>
             <h2 id="before-filing" className={styles.sectionTitle}>
               {howItWorks.beforeFiling.title}
             </h2>
-            <div className={styles.filing}>
+            <div>
               <p className={styles.filingLead}>{howItWorks.beforeFiling.lead}</p>
               <FilingRecord status={howItWorks.beforeFiling.status} />
             </div>
-          </Grid>
+          </div>
         </Container>
       </Section>
 

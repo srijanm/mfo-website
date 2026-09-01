@@ -1,8 +1,15 @@
-/* H07, §19. A vertical ledger, never a monthly calendar grid. Desktop is copy
-   across 4 columns, a 1px vertical rule, then the ledger across 7. */
+/* H07, §19. A vertical ledger, never a monthly calendar grid. Desktop is a
+   bounded 4/8 rule grid: copy on the left, ledger on the right, and the 1px
+   vertical rule §5 asks for is the right cell's left border, so it runs from
+   the block's top rule to its bottom rule rather than floating free. */
+
+.split {
+  --rule-grid-pad-block: 28px;
+  --rule-grid-pad-inline: 40px;
+}
 
 .copy {
-  grid-column: 1 / span 4;
+  padding-block: 28px 0;
 }
 
 .headline {
@@ -20,17 +27,6 @@
   font-size: var(--fs-body);
   line-height: 1.52;
   color: var(--ink-2);
-}
-
-.rules {
-  grid-column: 5 / span 1;
-  justify-self: center;
-  /* The rule stretches to its parent's height, which needs a flex parent. */
-  display: flex;
-}
-
-.ledger {
-  grid-column: 6 / -1;
 }
 
 /* Structural label for the object, in the same voice as a record title. */
@@ -115,17 +111,9 @@
 }
 
 @media (max-width: 1023px) {
-  .copy,
-  .ledger {
-    grid-column: 1 / -1;
-  }
-
-  /* §5: the vertical rule is removed below desktop rather than squeezed. */
-  .rules {
-    display: none;
-  }
-
-  .ledger {
-    margin-top: 48px;
+  /* §5: the divider comes out below desktop and the block stacks into two ruled
+     rows instead. */
+  .copy {
+    padding-block: 0 28px;
   }
 }

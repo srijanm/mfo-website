@@ -28,22 +28,17 @@
 }
 
 .tiers {
+  --rule-grid-pad-block: 32px;
+  --rule-grid-pad-inline: 32px;
+
   grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 64px 0 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--rule);
 }
 
-.tier {
-  padding: 32px 32px 32px 0;
-}
-
-.tier + .tier {
-  padding-left: 32px;
-  border-left: 1px solid var(--rule);
+@media (min-width: 1024px) {
+  .tiers {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .price {
@@ -79,10 +74,11 @@
   margin-top: 24px;
 }
 
+/* The tier block closes itself, so the closing line carries no rule: a second
+   rule one row-gap below the first would read as a stray line. */
 .closing {
   grid-column: 1 / -1;
-  padding-top: 28px;
-  border-top: 1px solid var(--rule);
+  padding-top: 8px;
 }
 
 .closingText {
@@ -101,19 +97,9 @@
 
   /* §5: vertical rules come out and the plans stack against horizontal ones. */
   .tiers {
-    grid-template-columns: minmax(0, 1fr);
+    --rule-grid-pad-block: 28px;
+
     margin-top: 48px;
-    border-top: 0;
-  }
-
-  .tier {
-    padding: 28px 0;
-    border-top: 1px solid var(--rule);
-  }
-
-  .tier + .tier {
-    padding-left: 0;
-    border-left: 0;
   }
 
   .scopeLine {

@@ -1,6 +1,7 @@
 import { Container, Grid, Section, TextLink } from "@/components/foundation";
 import { formatAnnualPrice, type PricingContent } from "@/lib/content/pricing";
 import { approvedPlanScope } from "@/lib/content/pricing-scope";
+import { cx } from "@/lib/cx";
 
 import { PlanComparisonMatrix } from "./PlanComparisonMatrix";
 import styles from "./PricingSection.module.css";
@@ -37,7 +38,7 @@ export function PricingSection({ content, id = "pricing" }: PricingSectionProps)
           ) : null}
           {content.intro ? <p className={styles.intro}>{content.intro}</p> : null}
 
-          <ul className={styles.tiers}>
+          <ul className={cx("rule-grid", styles.tiers)}>
             {content.points.map((amount) => (
               <li key={amount} className={styles.tier}>
                 <p className={`${styles.price} data-number`}>
