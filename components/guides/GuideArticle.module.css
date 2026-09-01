@@ -5,17 +5,40 @@
   padding-block: var(--section-major-desktop) var(--section-major-tablet);
 }
 
+/* A bounded 8/4 rule grid: the article holds the left eight columns at its
+   spec reading measure, and the contents rail holds the right four, so the page
+   occupies the grid rather than trailing off after 760px. */
+.layout {
+  --rule-grid-pad-block: 0px;
+  --rule-grid-pad-inline: 40px;
+}
+
 .article {
+  /* Reading measure, 720-780px per the spec. Untouched by the split. */
   max-width: 760px;
+}
+
+.rail {
+  padding-block: 4px;
+}
+
+@media (min-width: 1024px) {
+  .rail > * {
+    position: sticky;
+    top: calc(var(--nav-h-total, 64px) + 32px);
+  }
 }
 
 /* The placeholder notice. Deliberately the first thing in the document and
    deliberately not styled as a warning — §4 keeps red functional. It reads as
-   a ruled statement of fact about the page. */
+   a ruled statement of fact about the page.
+
+   It opens on the block's own top rule rather than drawing one of its own: a
+   second rule directly beneath the first stacked into a heavier line, and §5
+   permits 1px only. */
 .placeholder {
   margin-bottom: 48px;
-  padding: 20px 0;
-  border-top: 2px solid var(--ink);
+  padding: 0 0 20px;
   border-bottom: 1px solid var(--rule);
 }
 
@@ -61,11 +84,10 @@
   color: var(--muted);
 }
 
+/* In the rail the contents open the column, so they carry no rule of their own
+   above them — the block's own top rule already did that. */
 .toc {
-  margin-top: 40px;
-  padding: 20px 0;
-  border-top: 1px solid var(--rule);
-  border-bottom: 1px solid var(--rule);
+  padding-bottom: 20px;
 }
 
 .tocLabel {

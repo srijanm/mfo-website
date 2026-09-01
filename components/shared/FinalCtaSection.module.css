@@ -7,8 +7,16 @@
   background: var(--acid);
 }
 
-.inner {
-  grid-column: 1 / span 9;
+/* The statement takes the left seven columns and the qualification and the
+   action take the right five, so the acid field is a composition across the
+   grid rather than a block of type against four columns of empty paper. */
+.statement {
+  grid-column: 1 / span 7;
+}
+
+.close {
+  grid-column: 8 / -1;
+  align-self: end;
 }
 
 .headline {
@@ -21,9 +29,9 @@
   color: var(--ink);
 }
 
+/* The five-column cell is the measure — no second cap on top of it. */
 .support {
-  margin: 24px 0 0;
-  max-width: 46ch;
+  margin: 0;
   font-size: var(--fs-lead);
   line-height: 1.44;
   letter-spacing: -.018em;
@@ -36,8 +44,17 @@
 }
 
 @media (max-width: 1023px) {
-  .inner {
+  .statement,
+  .close {
     grid-column: 1 / -1;
+  }
+
+  .close {
+    margin-top: 28px;
+  }
+
+  .support {
+    max-width: 46ch;
   }
 }
 

@@ -5,11 +5,19 @@ import { useId, useRef, useState } from "react";
 
 import { Button, TextLink, ThresholdNode } from "@/components/foundation";
 import { detailsStep, getStarted, intakeSteps } from "@/lib/content/get-started";
+import { cx } from "@/lib/cx";
 import { HONEYPOT_FIELD, type FieldErrors, type LeadPayload } from "@/lib/leads/types";
 
 import styles from "./LeadForm.module.css";
 
 const TOTAL_STEPS = intakeSteps.length + 1;
+
+/**
+ * The four questions, in order, for the progress ledger. These are the approved
+ * question strings themselves — the ledger names the steps rather than counting
+ * them, so nothing is invented to label it.
+ */
+const STEP_QUESTIONS = [...intakeSteps.map((s) => s.question), detailsStep.question];
 
 type Answers = {
   paidBy: string;
@@ -156,17 +164,38 @@ export function LeadForm() {
   const errorId = (field: string) => `${fieldId}-${field}-error`;
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit} noValidate>
-      <div className={styles.progress}>
-        <span className={styles.progressLabel}>
-          {getStarted.progressLabel(step + 1, TOTAL_STEPS)}
-        </span>
-        <span aria-hidden="true" style={{ display: "flex", alignItems: "center" }}>
-          {Array.from({ length: TOTAL_STEPS }, (_, index) => (
-            <ThresholdNode key={index} active={index <= step} lineBefore={index > 0} />
-          ))}
-        </span>
-      </div>
+    <form
+      className={cx("rule-grid", "rule-grid--4-8", styles.form)}
+      onSubmit={handleSubmit}
+      noValidate
+    >
+      {/* Visible progress, as the spec requires, and the left four columns of
+          the grid. Hidden from assistive tech: the step label below carries the
+          same position as text, and the current question is already the h2. */}
+      <ol aria-hidden="true" className={styles.ledger}>
+        {STEP_QUESTIONS.map((question, index) => (
+          <li
+            key={question}
+            className={cx(styles.ledgerStep, index === step && styles.ledgerStepNow)}
+          >
+            <span className={styles.ledgerRail}>
+              <ThresholdNode
+                className={styles.ledgerNode}
+                orientation="vertical"
+                active={index <= step}
+                lineBefore={index > 0}
+                lineAfter={index < TOTAL_STEPS - 1}
+              />
+            </span>
+            <span className={styles.ledgerLabel}>{question}</span>
+          </li>
+        ))}
+      </ol>
+
+      <div className={cx("rule-grid-flush", styles.main)}>
+      <span className={styles.progressLabel}>
+        {getStarted.progressLabel(step + 1, TOTAL_STEPS)}
+      </span>
 
       <h2 className={styles.question} ref={headingRef} tabIndex={-1}>
         {currentChoice ? currentChoice.question : detailsStep.question}
@@ -298,6 +327,7 @@ export function LeadForm() {
         <TextLink href={getStarted.alternative.href}>
           {getStarted.alternative.label}
         </TextLink>
+      </div>
       </div>
     </form>
   );

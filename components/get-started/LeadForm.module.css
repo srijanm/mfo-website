@@ -2,16 +2,59 @@
    visible progress, a back button. Nothing animates. Acid appears only on the
    selected choice and the primary action. */
 
+/* The intake is a bounded 4/8 rule grid: the step ledger holds the left four
+   columns and the current question the right eight, so the page occupies the
+   grid instead of a single narrow column with five empty beside it. The
+   question column is flush, so its ruled choices run its full width and
+   terminate on the divider. */
 .form {
-  grid-column: 1 / span 7;
+  --rule-grid-pad-block: 32px;
+  --rule-grid-pad-inline: 40px;
+
+  grid-column: 1 / -1;
 }
 
-.progress {
+.main {
+  padding: 32px 0 32px 40px;
+}
+
+.ledger {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ledgerStep {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr);
+  column-gap: 20px;
+}
+
+.ledgerRail {
   display: flex;
+  justify-content: center;
+}
+
+/* Lets the connecting segment grow to the height of its row, so the ledger
+   reads as one continuous rail rather than four detached dots. */
+.ledgerNode {
+  flex: 1;
   align-items: center;
-  gap: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--rule);
+  --threshold-gap: 0px;
+}
+
+.ledgerLabel {
+  padding: 10px 0;
+  font-size: var(--fs-ui);
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+/* The step you are on is the one named in ink. State is never carried by
+   colour alone: the same position is in the step label as text. */
+.ledgerStepNow .ledgerLabel {
+  color: var(--ink);
+  font-weight: 500;
 }
 
 .progressLabel {
@@ -217,8 +260,10 @@
 }
 
 @media (max-width: 1023px) {
-  .form {
-    grid-column: 1 / -1;
+  /* §5: the divider comes out and the ledger becomes a ruled row above the
+     question rather than a squeezed column beside it. */
+  .main {
+    padding: 32px 0;
   }
 }
 

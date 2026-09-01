@@ -4,8 +4,15 @@
   padding-block: var(--section-major-desktop);
 }
 
-.copy {
-  grid-column: 1 / span 8;
+/* Proposition left, lead right, so the hero holds the grid instead of the left
+   two thirds of it. Both keep their own measure. */
+.heroTitle {
+  grid-column: 1 / span 7;
+}
+
+.heroLead {
+  grid-column: 8 / -1;
+  align-self: end;
 }
 
 .title {
@@ -18,8 +25,7 @@
 }
 
 .lead {
-  margin: 28px 0 0;
-  max-width: 54ch;
+  margin: 0;
   font-size: var(--fs-lead);
   line-height: 1.44;
   letter-spacing: -.018em;
@@ -31,8 +37,14 @@
     padding-block: var(--section-major-tablet);
   }
 
-  .copy {
+  .heroTitle,
+  .heroLead {
     grid-column: 1 / -1;
+  }
+
+  .heroLead {
+    margin-top: 28px;
+    max-width: 54ch;
   }
 }
 

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 
 import { Container, TextLink } from "@/components/foundation";
+import { cx } from "@/lib/cx";
 import { Callout } from "@/components/guides/Callout";
 import {
   guideBySlug,
@@ -71,7 +72,8 @@ export default async function GuidePage({ params }: PageProps) {
 
   return (
     <Container className={styles.page}>
-      <article className={styles.article}>
+      <div className={cx("rule-grid", "rule-grid--8-4", styles.layout)}>
+        <article className={styles.article}>
         {/* First in the document, so it cannot be scrolled past or missed. */}
         {guide.status === "placeholder" ? (
           <div className={styles.placeholder}>
@@ -98,19 +100,6 @@ export default async function GuidePage({ params }: PageProps) {
           </div>
         ) : null}
 
-        {showToc ? (
-          <nav className={styles.toc} aria-label={guidesIndex.tocLabel}>
-            <p className={styles.tocLabel}>{guidesIndex.tocLabel}</p>
-            <ul className={styles.tocList}>
-              {headings.map((heading) => (
-                <li key={heading.id}>
-                  <Link href={`#${heading.id}`}>{heading.text}</Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        ) : null}
-
         <div className={styles.body}>
           <MDXRemote source={guide.body} components={mdxComponents} />
         </div>
@@ -118,7 +107,26 @@ export default async function GuidePage({ params }: PageProps) {
         <div className={styles.back}>
           <TextLink href="/guides">All guides</TextLink>
         </div>
-      </article>
+        </article>
+
+        {/* The rail carries the right four columns. It follows the article in
+            the document, so the placeholder notice and the H1 are still the
+            first things read. */}
+        <div className={styles.rail}>
+          {showToc ? (
+            <nav className={styles.toc} aria-label={guidesIndex.tocLabel}>
+              <p className={styles.tocLabel}>{guidesIndex.tocLabel}</p>
+              <ul className={styles.tocList}>
+                {headings.map((heading) => (
+                  <li key={heading.id}>
+                    <Link href={`#${heading.id}`}>{heading.text}</Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
+        </div>
+      </div>
     </Container>
   );
 }
