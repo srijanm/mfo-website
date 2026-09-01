@@ -54,10 +54,17 @@
   color: var(--muted);
 }
 
+/* The rule and the reading measure are separated. On one element the
+   max-width stopped the rule 722px short of the container edge, so it ended in
+   empty space instead of running the width every other rule on the page does. */
 .pending {
   margin: 48px 0 0;
   padding-top: 28px;
   border-top: 1px solid var(--rule);
+}
+
+.pendingText {
+  margin: 0;
   max-width: 58ch;
   font-size: var(--fs-body);
   line-height: 1.52;

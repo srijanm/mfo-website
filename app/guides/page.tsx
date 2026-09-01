@@ -54,7 +54,9 @@ export default function GuidesPage() {
           ))}
         </ul>
       ) : (
-        <p className={styles.pending}>{guidesIndex.pending}</p>
+        <div className={styles.pending}>
+          <p className={styles.pendingText}>{guidesIndex.pending}</p>
+        </div>
       )}
     </Container>
   );

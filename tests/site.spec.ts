@@ -897,9 +897,9 @@ test.describe("income axis", () => {
          transition is a transient value and makes this flaky. */
       const activeIndex = () =>
         page.evaluate(() => {
-          const nodes = [...document.querySelectorAll('[class*="axisNode"]')];
-          return nodes.findIndex((node) =>
-            /axisNodeActive/.test(String(node.className)),
+          const stops = [...document.querySelectorAll('[class*="NodeAxis_stop"]')];
+          return stops.findIndex((stop) =>
+            /dotActive/.test(String(stop.querySelector('span[class*="dot"]')?.className ?? "")),
           );
         });
 
@@ -926,10 +926,7 @@ test.describe("income axis", () => {
       await page.waitForTimeout(700);
 
       const motion = await axisSection(page).evaluate((el) => {
-        const active = [...el.querySelectorAll('[class*="axisNode"]')].find((node) =>
-          /axisNodeActive/.test(String(node.className)),
-        )!;
-        const dot = getComputedStyle(active.querySelector('span[class*="dot"]')!);
+        const dot = getComputedStyle(el.querySelector('span[class*="dotActive"]')!);
         const looping = [...el.querySelectorAll("*")].filter(
           (node) => getComputedStyle(node).animationIterationCount === "infinite",
         ).length;
