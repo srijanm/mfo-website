@@ -1,4 +1,5 @@
 import { Container, Grid, Section } from "@/components/foundation";
+import { Plate } from "@/components/plates";
 import { EMPTY_VALUE } from "@/components/objects";
 import {
   latentProblem,
@@ -82,6 +83,7 @@ export function LatentProblemTable() {
         ) : (
           <div className={cx("rule-grid", "rule-grid--5-7", styles.split)}>
             <div className={styles.splitCopy}>
+              <Plate kind="latentProblem" className={styles.plate} />
               <h2 id="latent-problem" className={`display-2 ${styles.headline}`}>
                 {latentProblem.headline}
               </h2>

@@ -139,3 +139,10 @@
     background: var(--acid);
   }
 }
+
+/* The section mark. Placed as a grid child, it spans the row so it cannot
+   claim a column and shift the ruled block below it out of alignment. */
+.plate {
+  grid-column: 1 / -1;
+  margin-bottom: 28px;
+}

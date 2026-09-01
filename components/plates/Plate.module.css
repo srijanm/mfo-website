@@ -11,6 +11,16 @@
   flex: none;
   width: 88px;
   height: 88px;
+}
+
+/* The frame is drawn inside the plate rather than being a border on its layout
+   box. A border here would make the plate a bordered child of whatever grid it
+   is dropped into, and the rule-system guardrail is right to object to that:
+   the frame is decoration inside a mark, not a rule in the page's structure. */
+.plate::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   border: 1px solid var(--rule);
 }
 
@@ -52,28 +62,29 @@
   height: 1px;
   background: var(--rule-strong);
 }
-
+/* Shape only. Position and fill are set per node below, so nothing here can
+   out-specify them — two :nth-child()s in one selector beat one, which is what
+   kept the third node on the line the first time round. */
 .latentProblem .part:nth-child(n + 2):nth-child(-n + 5) {
   display: block;
-  top: 38%;
   width: 9px;
   height: 9px;
   border: 1px solid var(--ink);
   border-radius: 50%;
-  background: var(--paper);
   transform: translate(-50%, -50%);
 }
 
-.latentProblem .part:nth-child(2) { left: 12%; }
-.latentProblem .part:nth-child(3) { left: 37%; }
+.latentProblem .part:nth-child(2) { left: 12%; top: 38%; background: var(--paper); }
+.latentProblem .part:nth-child(3) { left: 37%; top: 38%; background: var(--paper); }
 
+/* The one that drops away from the line, and the only one filled. */
 .latentProblem .part:nth-child(4) {
   left: 63%;
   top: calc(38% + 20px);
   background: var(--acid);
 }
 
-.latentProblem .part:nth-child(5) { left: 88%; }
+.latentProblem .part:nth-child(5) { left: 88%; top: 38%; background: var(--paper); }
 
 .latentProblem .part:nth-child(6) {
   display: block;
@@ -163,18 +174,18 @@
   transform-origin: 50% 0;
 }
 
-.calendar .part:nth-child(2) { transform: rotate(0deg) translateY(20px); }
-.calendar .part:nth-child(3) { transform: rotate(30deg) translateY(20px); }
-.calendar .part:nth-child(4) { transform: rotate(60deg) translateY(20px); }
-.calendar .part:nth-child(5) { transform: rotate(90deg) translateY(20px); }
-.calendar .part:nth-child(6) { transform: rotate(120deg) translateY(20px); }
-.calendar .part:nth-child(7) { transform: rotate(150deg) translateY(20px); }
-.calendar .part:nth-child(8) { transform: rotate(180deg) translateY(20px); }
-.calendar .part:nth-child(9) { transform: rotate(210deg) translateY(20px); }
-.calendar .part:nth-child(10) { transform: rotate(240deg) translateY(20px); }
-.calendar .part:nth-child(11) { transform: rotate(270deg) translateY(20px); }
-.calendar .part:nth-child(12) { transform: rotate(300deg) translateY(20px); }
-.calendar .part:nth-child(13) { transform: rotate(330deg) translateY(20px); }
+.calendar .part:nth-child(2) { transform: rotate(180deg) translateY(20px); }
+.calendar .part:nth-child(3) { transform: rotate(210deg) translateY(20px); }
+.calendar .part:nth-child(4) { transform: rotate(240deg) translateY(20px); }
+.calendar .part:nth-child(5) { transform: rotate(270deg) translateY(20px); }
+.calendar .part:nth-child(6) { transform: rotate(300deg) translateY(20px); }
+.calendar .part:nth-child(7) { transform: rotate(330deg) translateY(20px); }
+.calendar .part:nth-child(8) { transform: rotate(0deg) translateY(20px); }
+.calendar .part:nth-child(9) { transform: rotate(30deg) translateY(20px); }
+.calendar .part:nth-child(10) { transform: rotate(60deg) translateY(20px); }
+.calendar .part:nth-child(11) { transform: rotate(90deg) translateY(20px); }
+.calendar .part:nth-child(12) { transform: rotate(120deg) translateY(20px); }
+.calendar .part:nth-child(13) { transform: rotate(150deg) translateY(20px); }
 
 .calendar .part:nth-child(n + 2):nth-child(-n + 5) {
   width: 2px;

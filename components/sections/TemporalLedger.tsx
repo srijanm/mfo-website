@@ -1,4 +1,5 @@
 import { Container, Section, ThresholdNode } from "@/components/foundation";
+import { Plate } from "@/components/plates";
 import { temporalLedger } from "@/lib/content/homepage";
 import { factValue } from "@/lib/content/reviewed";
 import { cx } from "@/lib/cx";
@@ -30,6 +31,7 @@ export function TemporalLedger() {
       <Container>
         <div className={cx("rule-grid", "rule-grid--4-8", styles.split)}>
           <div className={styles.copy}>
+            <Plate kind="calendar" className={styles.plate} />
             <h2 id="temporal-ledger" className={styles.headline}>
               {temporalLedger.headline}
             </h2>
