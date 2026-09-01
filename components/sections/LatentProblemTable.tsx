@@ -1,4 +1,9 @@
-import { Container, Grid, Section } from "@/components/foundation";
+"use client";
+
+import type { CSSProperties } from "react";
+
+import { Container, Grid, Section, ThresholdNode } from "@/components/foundation";
+import { useScrollProgress } from "@/components/motion";
 import { Plate } from "@/components/plates";
 import { EMPTY_VALUE } from "@/components/objects";
 import {
@@ -28,6 +33,11 @@ import styles from "./LatentProblemTable.module.css";
 export function LatentProblemTable() {
   const { columnHeadings, examples } = latentProblem;
   const showColumns = latentProblemColumnsReady();
+
+  /* Which example the reader is level with. With no observer — no JavaScript,
+     or a browser without one — this stays at 0 and the rail below renders in
+     its resting state: present, hollow, unfilled. */
+  const { ref: sentinelsRef, active } = useScrollProgress(examples.length);
 
   const headings: [keyof LatentProblemColumns, string][] = [
     ["started", columnHeadings.started],
@@ -93,11 +103,41 @@ export function LatentProblemTable() {
             <div className="rule-grid-flush">
               <p className={styles.splitIntro}>{latentProblem.intro}</p>
 
-              {examples.map((example) => (
-                <div key={example.id} className={styles.summaryRow}>
-                  <p className={styles.summaryText}>{factValue(example.summary)}</p>
+              {/* The rail. Decorative: every row it marks is the sentence
+                  beside it, and the two end markers are content. */}
+              <div className={styles.rail}>
+                <span aria-hidden="true" className={styles.railLine} />
+                <span
+                  aria-hidden="true"
+                  className={styles.railFill}
+                  style={
+                    {
+                      "--rail-progress": `${((active + 1) / examples.length) * 100}%`,
+                    } as CSSProperties
+                  }
+                />
+                <span className={styles.railStart}>{latentProblem.railStart}</span>
+                <span className={styles.railEnd}>{latentProblem.railEnd}</span>
+
+                {/* Empty blocks whose only job is to be intersected. */}
+                <div ref={sentinelsRef} aria-hidden="true" className={styles.sentinels}>
+                  {examples.map((example, index) => (
+                    <div key={example.id} data-index={index} />
+                  ))}
                 </div>
-              ))}
+
+                {examples.map((example, index) => (
+                  <div key={example.id} className={styles.summaryRow}>
+                    <ThresholdNode
+                      className={cx(
+                        styles.rowNode,
+                        index <= active && styles.rowNodePassed,
+                      )}
+                    />
+                    <p className={styles.summaryText}>{factValue(example.summary)}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}

@@ -8,6 +8,12 @@ import { additionalSupport, coreScope, defaultMilestones } from "./site-content"
 export const hero = {
   headline: "Half the work you do didn’t exist when your family’s CA started out.",
 
+  /* The one clause that carries acid, as a substring of the headline above.
+     A content decision, not a hard-coded index: change the headline and this
+     either still matches or the band simply does not appear. Exactly one
+     emphasis exists on the site — a second would stop it meaning anything. */
+  headlineEmphasis: "you do",
+
   subhead:
     "MyFinanceOfficer is a modern CA firm for freelancers, creators, consultants and professionals paid by Indian or overseas businesses. We set up and run the India-side tax and compliance, so you know what needs doing before you need to ask.",
 
@@ -74,6 +80,12 @@ export const latentProblem = {
   follow: "It goes wrong in your third, about something from your first.",
   intro:
     "The difficult part is not filing a return once you know what needs to be filed. It is knowing what should have happened before that.",
+
+  /* The two ends of the rail beside the examples. Ordinal, not calendar: they
+     mark the shape of the gap between when something starts and when it
+     surfaces, and neither is a due date. */
+  railStart: "Year one",
+  railEnd: "Year three",
 
   columnHeadings: {
     started: "What started",

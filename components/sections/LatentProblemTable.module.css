@@ -138,7 +138,7 @@
 
 .splitIntro {
   margin: 0;
-  padding: 28px 0 28px 40px;
+  padding: 28px 0 28px 100px;
   max-width: 58ch;
   font-size: var(--fs-lead);
   line-height: 1.44;
@@ -146,13 +146,81 @@
   color: var(--ink-2);
 }
 
+/* ------------------------------------------------------- the time rail
+   A line down the examples, with a node on each. What it says — that these
+   surface later than they start — is the section's own proposition, stated in
+   words directly above it. The line and nodes are decorative; the two end
+   markers are content and are ordinary text. */
+
+/* No padding here: the rows inside must keep their full width so their rules
+   still run to the divider. The inset goes on the text instead — a rule and a
+   reading measure never share an element. */
+.rail {
+  position: relative;
+}
+
+.railLine,
+.railFill {
+  position: absolute;
+  left: 60px;
+  width: 1px;
+}
+
+.railLine {
+  top: 30px;
+  bottom: 26px;
+  background: var(--rule);
+}
+
+/* The passed portion. It only exists where the reader's position is actually
+   known — behind both gates — so with no JavaScript or under reduced motion the
+   rail is present and unfilled, which is a correct resting state. */
+.railFill {
+  display: none;
+  top: 30px;
+  height: 0;
+  background: var(--acid);
+}
+
+.railStart,
+.railEnd {
+  position: absolute;
+  left: 0;
+  width: 52px;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--muted);
+}
+
+.railStart { top: 22px; }
+.railEnd { bottom: 18px; }
+
+.sentinels {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-auto-rows: 1fr;
+  pointer-events: none;
+}
+
+/* On the rail. The row spans the cell, so this is the rail's own offset. */
+.rowNode {
+  position: absolute;
+  left: 60px;
+  top: 26px;
+  transform: translateX(-50%);
+}
+
 .summaryRow {
-  padding: 20px 0 20px 40px;
+  position: relative;
+  padding: 20px 0;
   border-top: 1px solid var(--rule);
 }
 
 .summaryText {
   margin: 0;
+  padding-left: 100px;
   max-width: 62ch;
   font-size: var(--fs-lead);
   line-height: 1.42;
@@ -202,7 +270,7 @@
   }
 
   .splitIntro,
-  .summaryRow {
+  .summaryText {
     padding-left: 0;
   }
 
@@ -220,4 +288,19 @@
    column would move them. */
 .plate {
   margin-bottom: 28px;
+}
+
+/* The fill and the acid nodes exist only where the reader's position is known:
+   scripted, and where motion is welcome. */
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .railFill {
+    display: block;
+    height: var(--rail-progress, 0%);
+    transition: height var(--motion-slow) var(--ease-system);
+  }
+
+  :global(html.js) .rowNodePassed :global(span[class*="dot"]) {
+    background: var(--acid);
+    transition: background var(--motion-normal) var(--ease-system);
+  }
 }

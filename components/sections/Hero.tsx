@@ -3,6 +3,7 @@ import { MaskedText, Reveal } from "@/components/motion";
 import { IncomingPaymentRecord } from "@/components/objects";
 import { hero } from "@/lib/content/homepage";
 
+import { MeasureField } from "./MeasureField";
 import styles from "./Hero.module.css";
 
 /**
@@ -25,12 +26,14 @@ export function Hero() {
 
   return (
     <section className={styles.hero} aria-labelledby="hero-headline">
+      <MeasureField />
       <Container className={styles.inner}>
         <Grid className={styles.grid}>
           <MaskedText
             as="h1"
             id="hero-headline"
             text={hero.headline}
+            emphasis={hero.headlineEmphasis}
             className={`display-1 ${styles.headline}`}
           />
 

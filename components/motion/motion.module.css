@@ -113,3 +113,38 @@
     transform: none;
   }
 }
+
+/* ---------- The one acid clause ----------
+   A band behind a clause of the hero headline, released after the last word has
+   landed. Behind both gates: at rest there is no band at all, which is a valid
+   resting state — the clause is still the clause, and the headline reads the
+   same without it. Exactly one of these exists on the site. */
+
+.emphasis {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .emphasis::before {
+    content: "";
+    position: absolute;
+    left: -.06em;
+    right: -.06em;
+    bottom: .1em;
+    height: .38em;
+    background: var(--acid);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--motion-slow) var(--ease-reveal) 780ms;
+  }
+
+  :global(html.js) .masked.isVisible .emphasis::before {
+    transform: scaleX(1);
+  }
+
+  /* The words ride above the band. */
+  :global(html.js) .emphasis .word {
+    position: relative;
+    z-index: 1;
+  }
+}

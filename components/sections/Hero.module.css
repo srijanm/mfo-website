@@ -11,6 +11,10 @@
    composition rather than inside it. */
 
 .hero {
+  /* The measure field sits behind the container and is positioned against
+     this box. */
+  position: relative;
+
   /* §9 puts the bar at 64px; the rule below it adds the 65th pixel, so this is
      what actually fills the viewport without leaving a sliver of scroll. */
   --nav-total: 65px;
@@ -20,6 +24,7 @@
 }
 
 .inner {
+  position: relative;
   display: flex;
   width: 100%;
   padding-block: 64px 72px;
