@@ -1,4 +1,5 @@
 import { Container, Grid, Section } from "@/components/foundation";
+import { SheetStack } from "@/components/plates";
 import { operatingModel } from "@/lib/content/homepage";
 import { cx } from "@/lib/cx";
 
@@ -15,6 +16,8 @@ export function OperatingModel() {
     <Section labelledBy="operating-model">
       <Container>
         <Grid>
+          <SheetStack className={styles.stack} />
+
           <h2 id="operating-model" className={styles.headline}>
             {operatingModel.headline}
           </h2>

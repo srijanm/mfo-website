@@ -11,6 +11,13 @@
   letter-spacing: -.035em;
 }
 
+/* Cols 9-12, beside the headline, which had nothing in them. */
+.stack {
+  grid-column: 9 / -1;
+  grid-row: 1;
+  justify-self: end;
+}
+
 .pillars {
   --rule-grid-pad-block: 32px;
   --rule-grid-pad-inline: 32px;
@@ -20,7 +27,14 @@
 }
 
 @media (min-width: 1024px) {
-  .pillars {
+  /* Cols 9-12, beside the headline, which had nothing in them. */
+.stack {
+  grid-column: 9 / -1;
+  grid-row: 1;
+  justify-self: end;
+}
+
+.pillars {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
@@ -46,7 +60,14 @@
     grid-column: 1 / -1;
   }
 
-  .pillars {
+  /* Cols 9-12, beside the headline, which had nothing in them. */
+.stack {
+  grid-column: 9 / -1;
+  grid-row: 1;
+  justify-self: end;
+}
+
+.pillars {
     --rule-grid-pad-block: 28px;
 
     margin-top: 48px;

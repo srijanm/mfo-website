@@ -1,4 +1,5 @@
 import { Container, Grid, Section } from "@/components/foundation";
+import { Plate } from "@/components/plates";
 import { trustLedger } from "@/lib/content/homepage";
 
 import styles from "./TrustLedger.module.css";
@@ -16,6 +17,7 @@ export function TrustLedger() {
     <Section labelledBy="trust-ledger">
       <Container>
         <Grid>
+          <Plate kind="trust" className={styles.plate} />
           <h2 id="trust-ledger" className={styles.headline}>
             {trustLedger.headline}
           </h2>

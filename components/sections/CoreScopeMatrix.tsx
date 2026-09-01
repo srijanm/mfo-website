@@ -1,4 +1,5 @@
 import { Container, Grid, Section } from "@/components/foundation";
+import { Plate } from "@/components/plates";
 import { coreScopeSection } from "@/lib/content/homepage";
 
 import styles from "./CoreScopeMatrix.module.css";
@@ -21,6 +22,7 @@ export function CoreScopeMatrix() {
     <Section id="core-scope" labelledBy="core-scope-headline">
       <Container>
         <Grid>
+          <Plate kind="coreScope" className={styles.plate} />
           <h2 id="core-scope-headline" className={styles.headline}>
             {coreScopeSection.headline}
           </h2>

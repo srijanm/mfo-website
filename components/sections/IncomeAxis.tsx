@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { Container, Grid, NodeAxis, Section, ThresholdNode } from "@/components/foundation";
+import { Plate } from "@/components/plates";
 import { DeadlineRecord } from "@/components/objects";
 import { incomeAxis } from "@/lib/content/homepage";
 import { factValue } from "@/lib/content/reviewed";
@@ -70,6 +71,7 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
       <Container>
         <Grid>
           <div className={styles.intro}>
+            <Plate kind="incomeAxis" className={styles.plate} />
             <h2 id="income-axis" className={styles.headline}>
               {incomeAxis.headline}
             </h2>

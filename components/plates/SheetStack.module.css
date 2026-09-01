@@ -1,0 +1,84 @@
+/* Item 14. Three sheets, stepped, the front one carrying an approval.
+
+   Depth comes from the offset and from the front sheet's heavier rule, never
+   from a shadow: content shadows are not part of the system and the overlay
+   value is the only permitted one. */
+
+.stack {
+  position: relative;
+  display: block;
+  width: 268px;
+  height: 200px;
+}
+
+.sheet {
+  position: absolute;
+  width: 236px;
+  height: 168px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-object);
+  background: var(--white);
+}
+
+/* Painted in document order, so the third sheet is the one in front. */
+.sheet:nth-child(1) { left: 32px; top: 0; }
+.sheet:nth-child(2) { left: 16px; top: 16px; }
+
+.front {
+  left: 0;
+  top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 26px 22px;
+  border-color: var(--rule-strong);
+}
+
+/* Hairlines, not words. The sheet is a shape, not a form. */
+.line {
+  height: 1px;
+  background: var(--rule);
+}
+
+.front > .line:nth-child(1) { width: 78%; }
+.front > .line:nth-child(2) { width: 92%; }
+.front > .line:nth-child(3) { width: 61%; }
+
+.approval {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.approval .line {
+  flex: 1;
+  max-width: 92px;
+}
+
+.node {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: var(--acid);
+}
+
+/* The stack fans on a fine pointer, 4px per sheet. Nothing is carried by it. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .sheet {
+    transition: transform var(--motion-normal) var(--ease-system);
+  }
+
+  .stack:hover .sheet:nth-child(1) { transform: translate(8px, -8px); }
+  .stack:hover .sheet:nth-child(2) { transform: translate(4px, -4px); }
+}
+
+/* Below the desktop breakpoint the section stacks and there is no column to
+   put this beside; it comes out rather than pushing the copy down — §29. */
+@media (max-width: 1023px) {
+  .stack {
+    display: none;
+  }
+}
