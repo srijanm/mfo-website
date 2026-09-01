@@ -3,19 +3,9 @@
 import { primaryCta } from "./navigation";
 import { pricingPoints } from "./site-content";
 
-/**
- * Indian formatting, so 19999 renders with the grouping a reader expects.
- * Built once rather than per call.
- */
-const annualPriceFormat = new Intl.NumberFormat("en-IN", {
-  style: "currency",
-  currency: "INR",
-  maximumFractionDigits: 0,
-});
-
-export function formatAnnualPrice(amount: number): string {
-  return annualPriceFormat.format(amount);
-}
+/* Re-exported so the shared formatter has one definition and callers keep one
+   import path. Every price on the site goes through it. */
+export { formatAnnualPrice } from "./format";
 
 export type PricingContent = {
   /** Omitted where the page hero already carries the proposition. */

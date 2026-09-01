@@ -68,7 +68,7 @@ export type LatentProblemExample = {
 
 export const latentProblem = {
   headline: "Nothing goes wrong in your first year.",
-  follow: "It goes wrong later, about something from your first.",
+  follow: "It goes wrong in your third, about something from your first.",
   intro:
     "The difficult part is not filing a return once you know what needs to be filed. It is knowing what should have happened before that.",
 
@@ -81,25 +81,29 @@ export const latentProblem = {
   examples: [
     {
       id: "registration",
-      summary: unreviewed("A registration becomes relevant before anyone flags it."),
+      summary: unreviewed(
+        "A client asks for an invoice with a GST number on it. You don’t have one.",
+      ),
       columns: null,
     },
     {
       id: "advance-tax",
-      summary: unreviewed("Advance tax becomes a recurring surprise."),
+      summary: unreviewed(
+        "Your accountant asks what you have already paid this year. The answer is nothing, and that turns out to matter.",
+      ),
       columns: null,
     },
     {
       id: "tds-mismatch",
       summary: unreviewed(
-        "Tax deducted by a client does not match the records you can see.",
+        "A client says they deducted tax. It isn’t in your statement, and they’ve stopped replying.",
       ),
       columns: null,
     },
     {
       id: "documentation",
       summary: unreviewed(
-        "Export or foreign-income documentation is missing when someone eventually asks for it.",
+        "Your bank asks for a document about a payment from two years ago. Nobody mentioned it at the time.",
       ),
       columns: null,
     },
@@ -348,28 +352,31 @@ export const trustLedger = {
     {
       id: "draft-first",
       whatWeDo: "You see the draft first.",
-      whyItMatters: "Nothing should be filed just because you handed the work over.",
+      whyItMatters:
+        "You read it before it goes anywhere. If something looks wrong, it is still a draft.",
     },
     {
       id: "contact-details",
       whatWeDo: "Your contact details stay yours.",
-      whyItMatters: "Your phone number and email remain on your own portals.",
+      whyItMatters:
+        "The messages come to your phone, not to an office you have never been to.",
     },
     {
       id: "named-signatory",
       whatWeDo: "A named professional signs the return.",
-      whyItMatters: "You know who is responsible for the work.",
+      whyItMatters: "There is a person on the other end of it, and you know their name.",
     },
     {
       id: "support-upfront",
       whatWeDo: "Support is agreed upfront.",
-      whyItMatters: "The scope and fee are clear before you start.",
+      whyItMatters:
+        "You know what is covered before there is a problem, not while you are in one.",
     },
     {
       id: "not-yet",
       whatWeDo: "Sometimes the answer is “you don’t need that yet.”",
       whyItMatters:
-        "Good advice is not measured by how many registrations or services we can sell you.",
+        "We would rather tell you that now than sell you something you will not use.",
     },
   ],
 } as const;
