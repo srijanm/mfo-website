@@ -159,13 +159,24 @@
 }
 
 .field {
+  position: relative;
   display: grid;
   gap: 8px;
 }
 
 .label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: var(--fs-ui);
   font-weight: 500;
+}
+
+/* Sits beside the label and fills acid once the field holds something the form
+   has no complaint about. State is never colour alone: the same information is
+   the presence of the value itself, and an error is stated in words. */
+.fieldNode {
+  flex: none;
 }
 
 .optional {
@@ -274,5 +285,43 @@
 
   .actions {
     gap: 20px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Fields that answer back.
+
+   The acid rule is in addition to the focus outline, never instead of it: the
+   :focus-visible outline in globals.css is untouched and still does the
+   accessibility work. Behind the motion gate, because the rule scales in; the
+   colour changes below it hold with or without motion.
+   --------------------------------------------------------------------------- */
+
+.field:focus-within .label {
+  color: var(--ink);
+}
+
+.field:focus-within .input,
+.field:focus-within .textarea {
+  border-color: var(--ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .field::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--acid);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--motion-normal) var(--ease-system);
+    pointer-events: none;
+  }
+
+  :global(html.js) .field:focus-within::after {
+    transform: scaleX(1);
   }
 }

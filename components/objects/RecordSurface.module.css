@@ -23,6 +23,7 @@
   /* A figure carries a UA margin. Left in, it pushed the object 16px below the
      top of its grid row, so its top edge missed the line it is aligned to. */
   margin: 0;
+  position: relative;
   background: var(--white);
   border: 1px solid var(--rule);
   border-radius: var(--radius-object);
@@ -81,6 +82,17 @@
   padding-bottom: 20px;
 }
 
+/* The node marks a row whose answer is still open. It sits in the gutter
+   between the label and value columns rather than in the value's flow: every
+   value in the record aligns down one edge, and a node in the line would push
+   this one row off it. */
+.rowNode {
+  position: absolute;
+  left: -18px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 .label {
   margin: 0;
   color: var(--muted);
@@ -88,6 +100,7 @@
 
 .value {
   margin: 0;
+  position: relative;
   color: var(--ink);
 }
 
@@ -95,6 +108,7 @@
    text keeps the inset. */
 .note {
   margin: 0;
+  position: relative;
   padding: 16px var(--record-inset) var(--record-inset);
   border-top: 1px solid var(--rule);
   font-size: var(--fs-small);
@@ -133,4 +147,68 @@
   .value {
     margin-bottom: 10px;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   The record composes itself — one pass, on first paint, never again.
+
+   Everything below sits behind BOTH gates, so with JavaScript off or under
+   reduced motion none of it exists: the scanline is absent, the note's rule is
+   an ordinary border, and the open row's node is hollow. Each of those is a
+   correct resting state rather than a missing one.
+   --------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .surface {
+    overflow: hidden;
+  }
+
+  /* A single acid scanline down the object's leading edge as it assembles. */
+  :global(html.js) .surface::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -64px;
+    width: 2px;
+    height: 64px;
+    background: var(--acid);
+    animation: scanDown var(--motion-slow) var(--ease-system) both;
+  }
+
+  /* The note's rule draws from the left, the way every section rule does. */
+  :global(html.js) .hasNote .note {
+    border-top-color: transparent;
+  }
+
+  :global(html.js) .hasNote .note::before {
+    content: "";
+    position: absolute;
+    inset: -1px 0 auto 0;
+    height: 1px;
+    background: var(--rule);
+    transform: scaleX(0);
+    transform-origin: left center;
+    animation: drawNoteRule var(--motion-rule) var(--ease-reveal) 400ms both;
+  }
+
+  /* The one open question resolves last, after the rows have settled. */
+  :global(html.js) .rowNode :global(span[class*="dot"]) {
+    animation: fillOpenNode var(--motion-normal) var(--ease-system) 760ms both;
+  }
+}
+
+/* One pass each: no iteration count above 1, and nothing re-triggers. */
+@keyframes scanDown {
+  from { top: -64px; }
+  to { top: 100%; }
+}
+
+@keyframes drawNoteRule {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes fillOpenNode {
+  from { background: transparent; }
+  to { background: var(--acid); }
 }

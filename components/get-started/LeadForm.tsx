@@ -163,6 +163,12 @@ export function LeadForm() {
 
   const errorId = (field: string) => `${fieldId}-${field}-error`;
 
+  /* Resolved means: the person has put something in and nothing has come back
+     about it. Read from the answers and errors the form already holds, so the
+     node never claims more than the form knows. */
+  const isResolved = (field: keyof Answers) =>
+    answers[field].trim().length > 0 && !errors[field];
+
   return (
     <form
       className={cx("rule-grid", "rule-grid--4-8", styles.form)}
@@ -237,6 +243,10 @@ export function LeadForm() {
             <div key={field} className={styles.field}>
               <label className={styles.label} htmlFor={`${fieldId}-${field}`}>
                 {detailsStep.fields[field].label}
+                <ThresholdNode
+                  className={styles.fieldNode}
+                  active={isResolved(field)}
+                />
               </label>
               <input
                 id={`${fieldId}-${field}`}

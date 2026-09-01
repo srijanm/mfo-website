@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import type { AmountFormatterName } from "@/lib/content/format";
+
 import { RecordSurface, type RecordRow } from "./RecordSurface";
 
 const DEFAULT_TITLE = "Incoming payment";
@@ -8,6 +10,9 @@ type IncomingPaymentRecordProps = {
   title?: string;
   /** Formatted by the caller, including its currency symbol. */
   amount: string;
+  /** Optional: the same figure as a number plus a formatter, so it counts up. */
+  amountValue?: number;
+  amountFormat?: AmountFormatterName;
   from?: string | null;
   received?: string | null;
   into?: string | null;
@@ -32,6 +37,8 @@ type IncomingPaymentRecordProps = {
 export function IncomingPaymentRecord({
   title = DEFAULT_TITLE,
   amount,
+  amountValue,
+  amountFormat,
   from = null,
   received = null,
   into = null,
@@ -50,13 +57,17 @@ export function IncomingPaymentRecord({
 
   const indiaSide: RecordRow[] = [
     { label: "Indian payroll", value: indianPayroll },
-    { label: "India-side setup", value: indiaSideSetup },
+    /* The one open question in the object. The node says an answer is needed,
+       which is exactly what the row already says in words. */
+    { label: "India-side setup", value: indiaSideSetup, state: "unresolved" },
   ];
 
   return (
     <RecordSurface
       title={title}
       amount={amount}
+      amountValue={amountValue}
+      amountFormat={amountFormat}
       groups={[source, indiaSide]}
       note={note}
       className={className}

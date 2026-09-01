@@ -95,6 +95,22 @@ const FOREIGN_CURRENCY = /\$\s*\d|\bUSD\b/;
 const PAYMENT_AMOUNT_FIELD = /^\s*(?:\/\*.*\*\/\s*)?amount:\s*"/;
 
 /**
+ * The one other permitted shape: the currency declaration of the formatter that
+ * renders the incoming payment object's own figure while it counts up. It is
+ * allowed in lib/content/format.ts and nowhere else, so a second foreign
+ * formatter cannot appear anywhere on the site without failing this check.
+ */
+const PAYMENT_CURRENCY_FILE = "lib/content/format.ts";
+const PAYMENT_CURRENCY_FIELD = /^\s*currency:\s*"USD",?\s*$/;
+
+/**
+ * Nothing on this site loops. Motion is one pass, on first sight, and then it
+ * stops — CLAUDE.md's motion rules and every item in the flair spec depend on
+ * it, so an infinite iteration count fails the build.
+ */
+const INFINITE_ANIMATION = /animation-iteration-count\s*:\s*infinite|animation\s*:[^;}\n]*\binfinite\b/i;
+
+/**
  * A placeholder guide is written to show the shape of the library, not to
  * answer anything. It must be impossible to mistake for reviewed guidance, so
  * it may not state a tax fact of any kind: no thresholds, no dates, no rates,
@@ -331,7 +347,11 @@ function checkFile(file) {
   // --- foreign currency outside the incoming payment object ---
   for (const match of text.matchAll(new RegExp(FOREIGN_CURRENCY, "g"))) {
     const { line, text: lineText } = at(match.index);
-    const permitted = inContentDir && PAYMENT_AMOUNT_FIELD.test(lineText);
+    const permitted =
+      inContentDir &&
+      (PAYMENT_AMOUNT_FIELD.test(lineText) ||
+        (relative.split(path.sep).join("/") === PAYMENT_CURRENCY_FILE &&
+          PAYMENT_CURRENCY_FIELD.test(lineText)));
     if (permitted) continue;
 
     report(
@@ -344,6 +364,19 @@ function checkFile(file) {
       lineText,
     );
   }
+
+  // --- looping animation ---
+  lines.forEach((lineText, index) => {
+    if (!INFINITE_ANIMATION.test(lineText)) return;
+    report(
+      file,
+      index + 1,
+      "looping-animation",
+      "Motion on this site is one pass. Nothing loops, so an infinite " +
+        "iteration count is never correct.",
+      lineText,
+    );
+  });
 
   // --- banned phrases ---
   lines.forEach((lineText, index) => {
