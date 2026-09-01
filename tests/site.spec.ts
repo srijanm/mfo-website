@@ -902,7 +902,7 @@ test.describe("income axis", () => {
          transition is a transient value and makes this flaky. */
       const activeIndex = () =>
         page.evaluate(() => {
-          const stops = [...document.querySelectorAll('[class*="NodeAxis_stop"]')];
+          const stops = [...document.querySelectorAll('[class*="StepAxis_stop"]')];
           return stops.findIndex((stop) =>
             /dotActive/.test(String(stop.querySelector('span[class*="dot"]')?.className ?? "")),
           );

@@ -118,9 +118,9 @@
   }
 }
 
-/* The section mark. It sits above the heading rather than in a column of its
-   own: the ruled blocks below set the column lines, and giving the mark a
-   column would move them. */
-.plate {
-  margin-bottom: 28px;
+/* The section mark. The ring is this section's mark rather than an 88px plate:
+   two circular marks in one section is one too many, and the ring says the same
+   thing with more of it. */
+.ring {
+  margin-bottom: 32px;
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { Container, Grid, NodeAxis, Section, ThresholdNode } from "@/components/foundation";
+import { Container, Grid, Section, StepAxis, ThresholdNode } from "@/components/foundation";
 import { Plate } from "@/components/plates";
 import { DeadlineRecord } from "@/components/objects";
 import { incomeAxis } from "@/lib/content/homepage";
@@ -152,7 +152,7 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
               sticky panel. Decorative: every label it marks is in the list. */}
           {sticky ? (
             <Container>
-              <NodeAxis
+              <StepAxis
                 className={styles.axis}
                 stops={milestones.map((milestone) => ({
                   id: milestone.id,

@@ -1,0 +1,77 @@
+/* Item 13. A year as a ring.
+
+   The arc is the ticks themselves recoloured. There is no gradient here and no
+   SVG: sixty discrete marks, and the passed ones are acid. */
+
+.ring {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.tick {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 7px;
+  background: var(--rule);
+  transform: translate(-50%, -50%) rotate(var(--tick-angle)) translateY(-81px);
+}
+
+/* Every fifth mark is long. */
+.tickLong {
+  height: 14px;
+  background: var(--rule-strong);
+  transform: translate(-50%, -50%) rotate(var(--tick-angle)) translateY(-77px);
+}
+
+/* The passed arc. A whole number of stages, so it ends on a node. */
+.tickPassed {
+  background: var(--acid);
+  width: 2px;
+}
+
+.stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(var(--stage-angle)) translateY(-64px);
+}
+
+.stageNode {
+  flex: none;
+}
+
+.caption {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 120px;
+  margin-left: -60px;
+  margin-top: -.7em;
+  text-align: center;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+/* Pointing at a stage swaps the caption for that stage's name. Only one
+   caption is ever in the document, so there is never text sitting at opacity 0
+   waiting to be revealed. */
+.captionStage {
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .caption {
+    transition: color var(--motion-fast) var(--ease-system);
+  }
+}
+
+@media (max-width: 1023px) {
+  .ring {
+    display: none;
+  }
+}
