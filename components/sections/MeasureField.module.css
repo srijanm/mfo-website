@@ -1,0 +1,124 @@
+/* Item 02. The hero's measure field.
+
+   No gradients: the baselines are discrete 1px spans and the fade is ten solid
+   strips of paper at stepped opacity. No literal colours: everything is --ink
+   or --paper. Nothing here is in the accessibility tree and nothing here
+   receives a pointer event. */
+
+.field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* The layer that drifts. It is exactly the field's box, not a larger one: the
+   column widths below are percentages of their containing block, and insetting
+   this made that block wider than the page, so the grid came out at a 115px
+   pitch against the page's own 116.33px and stopped registering. */
+.drift {
+  position: absolute;
+  inset: 0;
+  transform: translate(var(--field-x, 0px), var(--field-y, 0px));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .drift {
+    transition: transform 400ms var(--ease-system);
+  }
+}
+
+/* The page's own grid.
+
+   Not a CSS grid: a gapless 12-column grid puts its lines at a 114.67px pitch,
+   while the page's 12 columns with a 20px gap sit at 116.33px, so a grid here
+   would drift a full column out of register by the right-hand edge. Each line
+   is placed at the exact left edge of its column instead — the same arithmetic
+   the layout itself uses — so the field registers with every rule on the page.
+
+   Placed rather than laid out also means no gapped grid with bordered cells,
+   which is the shape the rule-system guardrail exists to reject. */
+.columns {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: max(var(--gutter), calc((100% - var(--page-max)) / 2 + var(--gutter)));
+  width: min(100% - 2 * var(--gutter), var(--page-max) - 2 * var(--gutter));
+  opacity: .075;
+}
+
+.column {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--ink);
+}
+.column:nth-child(1) { left: calc(((100% - 11 * var(--grid-gap)) / 12 + var(--grid-gap)) * 0); }
+.column:nth-child(2) { left: calc(((100% - 11 * var(--grid-gap)) / 12 + var(--grid-gap)) * 1); }
+.column:nth-child(3) { left: calc(((100% - 11 * var(--grid-gap)) / 12 + var(--grid-gap)) * 2); }
+.column:nth-child(4) { left: calc(((100% - 11 * var(--grid-gap)) / 12 + var(--grid-gap)) * 3); }
+.column:nth-child(5) { left: calc(((100% - 11 * var(--grid-gap)) / 12 + var(--grid-gap)) * 4); }
+.column:nth-child(6) { left: calc(((100% - 11 * var(--grid-gap)) / 12 + var(--grid-gap)) * 5); }
+.column:nth-child(7) { left: calc(((100% - 11 * var(--grid-gap)) / 12 + var(--grid-gap)) * 6); }
+.column:nth-child(8) { left: calc(((100% - 11 * var(--grid-gap)) / 12 + var(--grid-gap)) * 7); }
+.column:nth-child(9) { left: calc(((100% - 11 * var(--grid-gap)) / 12 + var(--grid-gap)) * 8); }
+.column:nth-child(10) { left: calc(((100% - 11 * var(--grid-gap)) / 12 + var(--grid-gap)) * 9); }
+.column:nth-child(11) { left: calc(((100% - 11 * var(--grid-gap)) / 12 + var(--grid-gap)) * 10); }
+.column:nth-child(12) { left: calc(((100% - 11 * var(--grid-gap)) / 12 + var(--grid-gap)) * 11); }
+
+.baselines {
+  position: absolute;
+  inset: 0;
+  opacity: .075;
+}
+
+.baseline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--ink);
+}
+
+.baseline:nth-child(1) { top: 48px; }
+.baseline:nth-child(2) { top: 96px; }
+.baseline:nth-child(3) { top: 144px; }
+.baseline:nth-child(4) { top: 192px; }
+.baseline:nth-child(5) { top: 240px; }
+.baseline:nth-child(6) { top: 288px; }
+.baseline:nth-child(7) { top: 336px; }
+.baseline:nth-child(8) { top: 384px; }
+.baseline:nth-child(9) { top: 432px; }
+
+/* Ten solid strips, stepped. At 7.5% field contrast the steps are invisible,
+   and unlike a gradient this passes the guardrails. */
+.fade {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}
+
+.strip {
+  flex: 1;
+  background: var(--paper);
+}
+
+.strip:nth-child(1) { opacity: 1; }
+.strip:nth-child(2) { opacity: 1; }
+.strip:nth-child(3) { opacity: .92; }
+.strip:nth-child(4) { opacity: .8; }
+.strip:nth-child(5) { opacity: .66; }
+.strip:nth-child(6) { opacity: .52; }
+.strip:nth-child(7) { opacity: .38; }
+.strip:nth-child(8) { opacity: .24; }
+.strip:nth-child(9) { opacity: .12; }
+.strip:nth-child(10) { opacity: 0; }
+
+/* The field is a desktop composition. Below that the hero stacks and a grid
+   behind stacked copy is noise. */
+@media (max-width: 1023px) {
+  .field {
+    display: none;
+  }
+}
