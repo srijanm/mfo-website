@@ -42,11 +42,19 @@ export function CountUp({ children, to, format, className }: CountUpProps) {
     const start = performance.now();
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / 900);
-      el.textContent = formatValue(to * (1 - Math.pow(1 - t, 3)));
-      if (t < 1) requestAnimationFrame(tick);
+      if (t < 1) {
+        el.textContent = formatValue(to * (1 - Math.pow(1 - t, 3)));
+        requestAnimationFrame(tick);
+        return;
+      }
+      /* Land on the content string itself rather than on whatever the formatter
+         produces for the final value. The two agree today, but the resting DOM
+         must equal the content exactly however the string is later written —
+         that equality is what the no-JS parity test checks. */
+      el.textContent = children;
     };
     requestAnimationFrame(tick);
-  }, [revealed, to, formatValue, ref]);
+  }, [revealed, to, formatValue, children, ref]);
 
   return (
     <span ref={ref} className={className}>

@@ -108,6 +108,11 @@ test.describe("JavaScript disabled", () => {
       const scripted = await browser.newContext({ javaScriptEnabled: true });
       const scriptedPage = await scripted.newPage();
       await scriptedPage.goto(`${test.info().project.use.baseURL}${route}`);
+      /* Sampled once the entrance has finished. A counting figure shows an
+         intermediate value while it runs, which is a transient difference
+         rather than missing content — it lands on exactly the string the
+         server rendered. Anything still different after this is a real gap. */
+      await scriptedPage.waitForTimeout(1400);
       const withJs = await documentText(scriptedPage);
       await scripted.close();
 
