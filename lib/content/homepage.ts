@@ -174,6 +174,15 @@ export type IncomeAxisMilestone = {
   whatChanges: ReviewedFact | null;
   /** What MyFinanceOfficer does about it. */
   mfo: string;
+  /**
+   * The state of the obligation object shown beside this milestone. It is a
+   * value from the approved status union and nothing else: no threshold, no
+   * date, no tax conclusion. The object names the milestone the reader is
+   * already looking at and states that MFO is watching it — §17 allows a
+   * reviewed content file to add numbers later, and the layout must not start
+   * depending on one.
+   */
+  tracking: LedgerStatus;
 };
 
 export const incomeAxis = {
@@ -196,6 +205,7 @@ export const incomeAxis = {
       question: milestone.question,
       whatChanges: null,
       mfo: milestone.mfo,
+      tracking: milestone.tracking,
     }),
   ),
 } as const;

@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { Container, Grid, Section, ThresholdNode } from "@/components/foundation";
+import { Container, Grid, NodeAxis, Section, ThresholdNode } from "@/components/foundation";
+import { DeadlineRecord } from "@/components/objects";
 import { incomeAxis } from "@/lib/content/homepage";
 import { factValue } from "@/lib/content/reviewed";
 import { cx } from "@/lib/cx";
@@ -127,6 +128,19 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
                       </div>
                     </dl>
                   </div>
+
+                  {/* The right half of the sticky composition. It names the
+                      milestone and states that MyFinanceOfficer is watching it.
+                      No date, no threshold, no tax conclusion: the status is a
+                      value from the approved union and the date row renders the
+                      empty marker until a CA supplies one. */}
+                  <div className={styles.record}>
+                    <DeadlineRecord
+                      what={milestone.label}
+                      when={null}
+                      status={milestone.tracking}
+                    />
+                  </div>
                 </li>
               ))}
             </ol>
@@ -136,22 +150,14 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
               sticky panel. Decorative: every label it marks is in the list. */}
           {sticky ? (
             <Container>
-              <div aria-hidden="true" className={styles.axis}>
-                {milestones.map((milestone, index) => (
-                  <ThresholdNode
-                    key={milestone.id}
-                    className={cx(
-                      styles.axisNode,
-                      index === active && styles.axisNodeActive,
-                    )}
-                    label={milestone.label}
-                    active={index === active}
-                    lineBefore={index > 0}
-                    lineBeforeActive={index <= active}
-                    lineAfter={index === milestones.length - 1}
-                  />
-                ))}
-              </div>
+              <NodeAxis
+                className={styles.axis}
+                stops={milestones.map((milestone) => ({
+                  id: milestone.id,
+                  label: milestone.label,
+                }))}
+                activeIndex={active}
+              />
             </Container>
           ) : null}
         </div>

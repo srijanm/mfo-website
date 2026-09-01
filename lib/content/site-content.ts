@@ -80,35 +80,48 @@ export const additionalSupport = [
   },
 ] as const;
 
+/**
+ * The five public milestones from §17. `tracking` is the state of the
+ * obligation object shown beside each one on the Income Axis: a value from the
+ * approved status union in homepage.ts and nothing else. Every milestone is
+ * something MyFinanceOfficer watches, so every one of them reads "MFO tracks";
+ * the value lives here so a content owner can vary it without touching a
+ * component, and so no status word is ever written into JSX.
+ */
 export const defaultMilestones = [
   {
     id: "first-income",
     label: "First income",
     question: "Do I need to set anything up now?",
     mfo: "We tell you what matters now, what does not, and what would make that answer change.",
+    tracking: "MFO tracks",
   },
   {
     id: "first-year",
     label: "First year",
     question: "What am I supposed to keep track of?",
     mfo: "We set up the year properly and put the relevant dates on our calendar rather than yours.",
+    tracking: "MFO tracks",
   },
   {
     id: "registration",
     label: "Registration becomes relevant",
     question: "Has something changed because of how much or where I earn?",
     mfo: "We flag the change before it becomes a late discovery.",
+    tracking: "MFO tracks",
   },
   {
     id: "growth",
     label: "Income and obligations grow",
     question: "Am I still using the right structure and filing approach?",
     mfo: "We revisit the setup as the facts change rather than repeating last year's answer automatically.",
+    tracking: "MFO tracks",
   },
   {
     id: "structure-review",
     label: "Structure needs reviewing",
     question: "Do I need a different entity or a more involved setup now?",
     mfo: "We give you the actual answer, including when the answer is still “not yet.”",
+    tracking: "MFO tracks",
   },
 ] as const;

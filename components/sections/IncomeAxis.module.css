@@ -200,10 +200,15 @@
   /* Detail crossfade with 10px of copy travel — motion-tokens distance.copy.
      The outgoing panel fades on the shorter duration so the two do not both
      sit at half opacity in the middle of the exchange. */
+  /* Label and detail on the left five columns at a proper measure; the
+     obligation object on the right six. Previously the whole milestone sat in
+     one narrow column with about 925px of empty panel beside it. */
   :global(html.js) .sticky .milestone {
     grid-area: 1 / 1;
-    grid-template-columns: minmax(0, 1fr);
-    column-gap: 0;
+    grid-template-columns:
+      calc((100% * 5 - 1 * var(--grid-gap)) / 12)
+      minmax(0, 1fr);
+    column-gap: var(--grid-gap);
     opacity: 0;
     transform: translateY(10px);
     pointer-events: none;
@@ -228,42 +233,58 @@
 
   :global(html.js) .sticky .body {
     padding-bottom: 0;
-    max-width: 40ch;
+    max-width: none;
   }
 
+  /* Cols 7-12: the object is the right half of the composition. */
+  :global(html.js) .sticky .record {
+    display: block;
+    grid-column: 2;
+    align-self: center;
+    width: 100%;
+  }
+
+  /* The object fills the six columns it was given rather than sitting at the
+     420px it takes in a hero, where it would leave half the cell empty. */
+  :global(html.js) .sticky .record > :global(figure) {
+    max-width: none;
+  }
+
+  /* The H2 step, not display: a milestone label is a sub-heading inside the
+     section, and at display scale it was louder than every proposition on the
+     page. */
   :global(html.js) .sticky .label {
-    font-size: var(--fs-display-2);
-    line-height: .97;
-    letter-spacing: -.04em;
-    max-width: 16ch;
+    font-size: var(--fs-h2);
+    line-height: 1.02;
+    letter-spacing: -.035em;
+    max-width: 18ch;
   }
 
   :global(html.js) .sticky .fields {
     margin-top: 32px;
-    grid-template-columns: auto minmax(0, 1fr);
-    max-width: 54ch;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px 0;
+    max-width: none;
+  }
+
+  :global(html.js) .sticky .fieldValue {
+    max-width: none;
   }
 
   /* The full-width line and node axis, lower portion of the panel. */
   :global(html.js) .sticky .axis {
-    display: flex;
-    align-items: center;
+    display: block;
     width: 100%;
+    margin-top: 32px;
     padding-top: 32px;
     border-top: 1px solid var(--rule);
   }
-
-  :global(html.js) .sticky .axisNode {
-    flex: 1;
-  }
-
-  :global(html.js) .sticky .axisNode:last-child {
-    flex: 0 1 auto;
-  }
 }
 
-/* Outside the sticky treatment the axis strip does not exist at all. */
-.axis {
+/* Outside the sticky treatment neither the axis strip nor the object exists:
+   the static vertical progression is the whole section there. */
+.axis,
+.record {
   display: none;
 }
 
@@ -278,20 +299,18 @@
 @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
   /* The acid progress line grows from the left rather than appearing. 320ms is
      motion-tokens incomeAxis.lineDuration. */
-  :global(html.js) .sticky .axisNode :global(span[class*="segment"]) {
-    transition:
-      background-color 320ms var(--ease-system),
-      height 320ms var(--ease-system);
+  :global(html.js) .sticky .axis :global(span[class*="filled"]) {
+    transition: width 320ms var(--ease-system);
   }
 
   /* Node fill, and the 1.18 scale from motion-tokens incomeAxis. */
-  :global(html.js) .sticky .axisNode :global(span[class*="dot"]) {
+  :global(html.js) .sticky .axis :global(span[class*="dot"]) {
     transition:
       background-color var(--motion-normal) var(--ease-system),
       transform var(--motion-normal) var(--ease-system);
   }
 
-  :global(html.js) .sticky .axisNodeActive :global(span[class*="dot"]) {
+  :global(html.js) .sticky .axis :global(span[class*="dotActive"]) {
     transform: scale(1.18);
     /* One pulse, once, on becoming active. Not a loop: the animation runs a
        single iteration and the element is never re-triggered while it stays
@@ -299,7 +318,7 @@
     animation: nodePulse 420ms var(--ease-system) 1;
   }
 
-  :global(html.js) .sticky .axisNode :global(span[class*="label"]) {
+  :global(html.js) .sticky .axis :global(span[class*="label"]) {
     transition: color var(--motion-normal) var(--ease-system);
   }
 }
