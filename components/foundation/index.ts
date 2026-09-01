@@ -4,6 +4,7 @@ export { Disclosure } from "./Disclosure";
 export { Grid, GridItem } from "./Grid";
 export { NodeAxis } from "./NodeAxis";
 export { Rule } from "./Rule";
+export { StepAxis } from "./StepAxis";
 export { Section } from "./Section";
 export { TextLink } from "./TextLink";
 export { ThresholdNode } from "./ThresholdNode";
