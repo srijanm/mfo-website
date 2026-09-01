@@ -4,13 +4,17 @@
   padding-block: var(--section-major-desktop);
 }
 
+/* There is no approved lead for this page — about.why is null — so the hero is
+   the statement alone. It takes the grid as a display line rather than being
+   held at a 22ch measure in the left nine columns with three empty beside it.
+   This widens a headline, not body copy: the reading measure is untouched. */
 .copy {
-  grid-column: 1 / span 9;
+  grid-column: 1 / -1;
 }
 
 .title {
   margin: 0;
-  max-width: 22ch;
+  max-width: 38ch;
   font-size: var(--fs-h1);
   font-weight: 400;
   line-height: 1;

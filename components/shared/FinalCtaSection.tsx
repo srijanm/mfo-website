@@ -28,10 +28,13 @@ export function FinalCtaSection({ content }: FinalCtaSectionProps) {
     >
       <Container>
         <Grid>
-          <div className={styles.inner}>
+          <div className={styles.statement}>
             <h2 id="final-cta" className={styles.headline}>
               {content.headline}
             </h2>
+          </div>
+
+          <div className={styles.close}>
             <p className={styles.support}>{content.support}</p>
             <div className={styles.action}>
               <Button href={content.cta.href} tone="ink">

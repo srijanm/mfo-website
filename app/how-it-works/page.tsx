@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
 import { Container, Grid, Section, ThresholdNode } from "@/components/foundation";
-import { cx } from "@/lib/cx";
 import { FilingRecord } from "@/components/objects";
 import { IncomeAxis, TemporalLedger } from "@/components/sections";
 import { FinalCtaSection, PricingSection } from "@/components/shared";
 import { finalCta } from "@/lib/content/homepage";
 import { howItWorks } from "@/lib/content/how-it-works";
+import { cx } from "@/lib/cx";
 import { pageMetadata } from "@/lib/metadata";
 import { pricingPage } from "@/lib/content/pricing";
 
@@ -32,12 +32,12 @@ export default function HowItWorksPage() {
       <section className={styles.hero} aria-labelledby="how-it-works">
         <Container>
           <Grid>
-            <div className={styles.heroCopy}>
+            <div className={styles.heroTitle}>
               <h1 id="how-it-works" className={styles.title}>
                 {howItWorks.headline}
               </h1>
-              <p className={styles.lead}>{howItWorks.lead}</p>
             </div>
+            <p className={cx(styles.heroLead, styles.lead)}>{howItWorks.lead}</p>
           </Grid>
         </Container>
       </section>
@@ -45,7 +45,7 @@ export default function HowItWorksPage() {
       {/* 1 — Start */}
       <Section labelledBy="start">
         <Container>
-          <div className={cx("rule-grid", styles.split, styles.exchangeSplit)}>
+          <div className={cx("rule-grid", styles.split, styles.threeUp)}>
             <h2 id="start" className={styles.sectionTitle}>
               {howItWorks.start.title}
             </h2>
@@ -90,14 +90,12 @@ export default function HowItWorksPage() {
       {/* 4 — Before filing */}
       <Section labelledBy="before-filing">
         <Container>
-          <div className={cx("rule-grid", "rule-grid--4-8", styles.split)}>
+          <div className={cx("rule-grid", styles.split, styles.threeUp)}>
             <h2 id="before-filing" className={styles.sectionTitle}>
               {howItWorks.beforeFiling.title}
             </h2>
-            <div>
-              <p className={styles.filingLead}>{howItWorks.beforeFiling.lead}</p>
-              <FilingRecord status={howItWorks.beforeFiling.status} />
-            </div>
+            <p className={styles.filingLead}>{howItWorks.beforeFiling.lead}</p>
+            <FilingRecord status={howItWorks.beforeFiling.status} />
           </div>
         </Container>
       </Section>

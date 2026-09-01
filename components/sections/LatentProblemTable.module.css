@@ -1,8 +1,15 @@
-/* H03, §15. Large proposition on top, ruled table below. No warning red —
-   the section states a consequence once and moves on. */
+/* H03, §15. A bounded 5/7 rule grid: the proposition holds the left five
+   columns, and the ruled examples hold the right seven, so the section occupies
+   the grid instead of leaving four columns of empty paper beside the table.
+   No warning red — the section states a consequence once and moves on. */
+
+.split {
+  --rule-grid-pad-block: 0px;
+  --rule-grid-pad-inline: 40px;
+}
 
 .proposition {
-  grid-column: 1 / span 8;
+  padding-block: 28px 0;
 }
 
 .headline {
@@ -19,8 +26,10 @@
   color: var(--muted);
 }
 
+/* The lede opens the right column, above the rule that opens the examples. */
 .intro {
-  margin: 32px 0 0;
+  margin: 0;
+  padding: 28px 0 28px 40px;
   max-width: 58ch;
   font-size: var(--fs-lead);
   line-height: 1.44;
@@ -28,22 +37,17 @@
   color: var(--ink-2);
 }
 
-.table {
-  grid-column: 1 / -1;
-  margin-top: 72px;
-}
-
 .headRow,
 .row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--grid-gap-desktop);
-  padding: 20px 0;
+  gap: var(--grid-gap);
+  padding: 20px 0 20px 40px;
   border-top: 1px solid var(--rule);
 }
 
 .headRow {
-  padding: 0 0 12px;
+  padding-block: 0 12px;
   border-top: 0;
 }
 
@@ -63,34 +67,39 @@
 /* Until the three-column expansion is written and reviewed, the approved
    single-sentence examples render as ruled rows on their own. */
 .summaryRow {
-  padding: 20px 0;
+  padding: 20px 0 20px 40px;
   border-top: 1px solid var(--rule);
-}
-
-.summaryRow:last-child {
-  border-bottom: 1px solid var(--rule);
 }
 
 .summaryText {
   margin: 0;
-  max-width: 68ch;
+  max-width: 62ch;
   font-size: var(--fs-lead);
   line-height: 1.42;
   letter-spacing: -.018em;
 }
 
 @media (max-width: 1023px) {
-  .proposition,
-  .table {
-    grid-column: 1 / -1;
+  /* §5: the divider comes out below desktop and the block stacks. */
+  .split {
+    --rule-grid-pad-block: 28px;
   }
 
-  .table {
-    margin-top: 48px;
+  .proposition {
+    padding-block: 0 28px;
   }
 
-  /* Stacked, each cell keeps its own label so the columns are still readable
-     without a header row above them — §29. */
+  .intro,
+  .headRow,
+  .row,
+  .summaryRow {
+    padding-left: 0;
+  }
+
+  .intro {
+    padding-top: 0;
+  }
+
   .headRow {
     display: none;
   }

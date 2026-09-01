@@ -5,6 +5,7 @@ import { AdditionalFinancialSupport, CoreScopeMatrix } from "@/components/sectio
 import { FaqSection, FinalCtaSection, PricingSection } from "@/components/shared";
 import { faqByIds, finalCta } from "@/lib/content/homepage";
 import { pricing, pricingPage } from "@/lib/content/pricing";
+import { cx } from "@/lib/cx";
 import { pageMetadata } from "@/lib/metadata";
 
 import styles from "./page.module.css";
@@ -36,12 +37,12 @@ export default function PricingPage() {
       <section className={styles.hero} aria-labelledby="pricing-hero">
         <Container>
           <Grid>
-            <div className={styles.copy}>
+            <div className={styles.heroTitle}>
               <h1 id="pricing-hero" className={styles.title}>
                 {pricingPage.headline}
               </h1>
-              <p className={styles.lead}>{pricingPage.lead}</p>
             </div>
+            <p className={cx(styles.heroLead, styles.lead)}>{pricingPage.lead}</p>
           </Grid>
         </Container>
       </section>

@@ -236,6 +236,14 @@ body {
   .rule-grid--5-7 {
     grid-template-columns: calc((100% * 5 - 1 * var(--grid-gap)) / 12) minmax(0, 1fr);
   }
+
+  .rule-grid--7-5 {
+    grid-template-columns: calc((100% * 7 + 1 * var(--grid-gap)) / 12) minmax(0, 1fr);
+  }
+
+  .rule-grid--8-4 {
+    grid-template-columns: calc((100% * 8 + 2 * var(--grid-gap)) / 12) minmax(0, 1fr);
+  }
 }
 
 /* Callers declare their column template inside a min-width query and this

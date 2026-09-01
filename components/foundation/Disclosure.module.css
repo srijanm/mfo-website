@@ -5,12 +5,12 @@
   border-top: 1px solid var(--rule);
 }
 
-/* The row rule spans the container like every other rule on the site; the
-   trigger sits on its own measure inside it, so the marker stays beside the
-   question rather than at the far edge of the page. */
+/* The row rule spans the container like every other rule on the site, and so
+   does the trigger: the state marker sits on the right grid edge, which is what
+   closes the row. The question keeps its own measure inside — the measure
+   belongs to the text, not to the row. */
 .trigger {
   display: flex;
-  max-width: var(--disclosure-measure, none);
   align-items: center;
   justify-content: space-between;
   gap: 20px;
@@ -31,6 +31,10 @@
 
 /* The marker is a state indicator, not decoration: it reads open or closed
    alongside aria-expanded, so state is never carried by colour alone. */
+.summary {
+  max-width: var(--disclosure-measure, none);
+}
+
 .marker {
   flex: none;
   width: 16px;

@@ -47,7 +47,7 @@ export function Disclosure({
           aria-controls={panelId}
           onClick={() => setOpen((wasOpen) => !wasOpen)}
         >
-          <span>{summary}</span>
+          <span className={styles.summary}>{summary}</span>
           <span aria-hidden="true" className={styles.marker} />
         </button>
       </Heading>
