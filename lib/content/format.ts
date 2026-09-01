@@ -18,3 +18,33 @@ const annualPriceFormat = new Intl.NumberFormat("en-IN", {
 export function formatAnnualPrice(amount: number): string {
   return annualPriceFormat.format(amount);
 }
+
+/**
+ * The incoming payment object's own figure. It is foreign currency by
+ * definition — money arriving from abroad — and is the one amount on the site
+ * that is not INR. Used only to format the intermediate frames while the figure
+ * counts up; the resting value is the string in lib/content/.
+ */
+const incomingPaymentFormat = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+export function formatIncomingPayment(value: number): string {
+  return incomingPaymentFormat.format(value);
+}
+
+/**
+ * Formatters addressable by name.
+ *
+ * A function cannot cross the server/client boundary, and the records that use
+ * a counting figure are rendered on the server, so callers name the formatter
+ * rather than passing it. The definition still lives here and nowhere else.
+ */
+export const amountFormatters = {
+  incomingPayment: formatIncomingPayment,
+} as const;
+
+export type AmountFormatterName = keyof typeof amountFormatters;

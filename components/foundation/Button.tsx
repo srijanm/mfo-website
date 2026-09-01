@@ -44,7 +44,7 @@ export function Button(props: ButtonProps) {
   if (props.href !== undefined) {
     return (
       <Link href={props.href} className={classes}>
-        {children}
+        <span className={styles.label}>{children}</span>
       </Link>
     );
   }
@@ -53,7 +53,7 @@ export function Button(props: ButtonProps) {
 
   return (
     <button type={type} disabled={disabled} onClick={onClick} className={classes}>
-      {children}
+      <span className={styles.label}>{children}</span>
     </button>
   );
 }

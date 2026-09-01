@@ -10,16 +10,74 @@
   color: var(--paper);
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .button.ink:hover {
-    background: var(--paper);
-    color: var(--ink);
-  }
-}
+
 
 .button:disabled {
   cursor: not-allowed;
   border-color: var(--rule-strong);
   background: transparent;
   color: var(--muted);
+}
+
+/* The label rides above the wipe. Positioned unconditionally, so it sits
+   correctly whether or not the wipe exists. */
+.label {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------------------------------------------------------------------------
+   The wipe.
+
+   Replaces the background cross-fade: the fill arrives from the left rather
+   than appearing everywhere at once. The pseudo-element is only created where
+   a fine pointer can reach it and motion is welcome; everywhere else the
+   button keeps the plain colour swap below, which is a complete state on its
+   own.
+   --------------------------------------------------------------------------- */
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
+  .button.ink:hover {
+    background: var(--paper);
+    color: var(--ink);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .button {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .button::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--motion-normal) var(--ease-system);
+  }
+
+  .button:hover::after {
+    transform: scaleX(1);
+  }
+
+  .button:hover .label {
+    color: var(--paper);
+  }
+
+  /* Reversed: on the acid field the wipe is paper and the label goes to ink. */
+  .button.ink::after {
+    background: var(--paper);
+  }
+
+  .button.ink:hover .label {
+    color: var(--ink);
+  }
+
+  /* A disabled control answers nothing. */
+  .button:disabled::after {
+    content: none;
+  }
 }

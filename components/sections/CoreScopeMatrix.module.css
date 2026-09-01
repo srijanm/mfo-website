@@ -42,6 +42,7 @@
 }
 
 .row {
+  position: relative;
   padding: 22px 0;
   border-top: 1px solid var(--rule);
 }
@@ -89,5 +90,52 @@
   .row {
     grid-template-columns: minmax(0, 1fr);
     gap: 6px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The matrix as an instrument.
+
+   Fine pointers only, and only where motion is welcome. Touch never reaches
+   this, and with reduced motion the rows are exactly as they were — no state is
+   carried by the hover, so nothing is lost by not having it. 2px of travel,
+   matching the record surface's own lift.
+   --------------------------------------------------------------------------- */
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .row {
+    transition:
+      background var(--motion-normal) var(--ease-system),
+      transform var(--motion-normal) var(--ease-system),
+      border-color var(--motion-normal) var(--ease-system);
+  }
+
+  .row:hover {
+    background: var(--white);
+    transform: translateY(-2px);
+    border-top-color: var(--rule-strong);
+  }
+
+  /* The gutter node. Hollow is the resting state and it is not drawn at all
+     until the row is pointed at, so it never reads as a permanent mark. */
+  .row::before {
+    content: "";
+    position: absolute;
+    left: -14px;
+    top: 26px;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--ink);
+    border-radius: 50%;
+    background: transparent;
+    opacity: 0;
+    transition:
+      opacity var(--motion-normal) var(--ease-system),
+      background var(--motion-normal) var(--ease-system);
+  }
+
+  .row:hover::before {
+    opacity: 1;
+    background: var(--acid);
   }
 }

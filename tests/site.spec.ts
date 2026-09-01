@@ -1241,3 +1241,75 @@ test.describe("rule system", () => {
     });
   }
 });
+
+/**
+ * Flair invariants.
+ *
+ * These guard the rules the decorative work is most likely to break: marks must
+ * be invisible to assistive tech, and nothing may have a hidden resting state
+ * that survives reduced motion.
+ */
+test.describe("flair", () => {
+  const FLAIR_ROUTES = ["/", "/how-it-works", "/pricing", "/who-its-for/foreign-income"];
+
+  test("every decorative mark is hidden from assistive tech", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const exposed: string[] = [];
+    for (const route of FLAIR_ROUTES) {
+      await page.goto(route);
+      const found = await page.evaluate(() =>
+        [...document.querySelectorAll('[class*="plate"], [class*="Plate"], [class*="Axis_axis"]')]
+          .filter((el) => el.closest('[aria-hidden="true"]') === null)
+          .map((el) => el.tagName + "." + String(el.className).slice(0, 30)),
+      );
+      for (const f of found) exposed.push(`${route}: ${f}`);
+    }
+    expect(exposed, "decorative geometry must carry aria-hidden").toEqual([]);
+  });
+
+  test("reduced motion still renders the record and its rows", async ({ browser }) => {
+    const ctx = await browser.newContext({
+      reducedMotion: "reduce",
+      viewport: { width: 1440, height: 900 },
+    });
+    const page = await ctx.newPage();
+    await page.goto("/");
+    await page.waitForTimeout(400);
+
+    const state = await page.evaluate(() => {
+      const figure = document.querySelector("main figure") as HTMLElement;
+      const rows = figure.querySelector("dl") as HTMLElement;
+      const amount = figure.querySelector("p") as HTMLElement;
+      const note = figure.querySelector("[class*=note]") as HTMLElement | null;
+      const opacity = (el: Element) => getComputedStyle(el).opacity;
+      return {
+        rowsOpacity: opacity(rows),
+        cellOpacities: [...rows.children].map((c) => opacity(c)),
+        amountText: amount.textContent?.trim() ?? "",
+        noteRule: note ? getComputedStyle(note).borderTopColor : "none",
+      };
+    });
+
+    expect(Number(state.rowsOpacity)).toBeGreaterThan(0);
+    for (const o of state.cellOpacities) expect(Number(o)).toBeGreaterThan(0);
+    // The figure is the formatted string at rest, never a zeroed counter.
+    expect(state.amountText).not.toBe("");
+    expect(state.amountText).not.toMatch(/^[^\d]*0[.,]?0*[^\d]*$/);
+    // The note's rule is a real border under reduced motion, not a transparent
+    // one waiting for an animation that will never run.
+    expect(state.noteRule).not.toBe("rgba(0, 0, 0, 0)");
+  });
+
+  test("with JavaScript off the record is complete", async ({ browser }) => {
+    const ctx = await browser.newContext({
+      javaScriptEnabled: false,
+      viewport: { width: 1440, height: 900 },
+    });
+    const page = await ctx.newPage();
+    await page.goto("/");
+    const text = await page.locator("main figure").first().textContent();
+    expect(text).toContain("Incoming payment");
+    expect(text).toContain("$5,000.00");
+    await ctx.close();
+  });
+});

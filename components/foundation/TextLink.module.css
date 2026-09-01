@@ -18,8 +18,42 @@
   line-height: 1;
 }
 
-@media (hover: hover) and (pointer: fine) {
+/* The underline is a rule that draws, not a text-decoration that appears, so
+   it matches every other line on the site. Where motion is not welcome the
+   ordinary underline does the same job. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
   .link:hover {
     text-decoration: underline;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .label {
+    position: relative;
+  }
+
+  .label::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 1px;
+    background: var(--ink);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--motion-normal) var(--ease-system);
+  }
+
+  .link:hover .label::after {
+    transform: scaleX(1);
+  }
+
+  .arrow {
+    transition: transform var(--motion-normal) var(--ease-system);
+  }
+
+  .link:hover .arrow {
+    transform: translateX(3px);
   }
 }

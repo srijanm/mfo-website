@@ -22,6 +22,9 @@ export const hero = {
    */
   paymentExample: {
     amount: "$5,000.00",
+    /* The same figure as a number, so it can count up to the string above.
+       The string is what renders at rest; this only formats the frames. */
+    amountValue: 5000,
     from: "Overseas company",
     received: "03 Sep 2026",
     into: "Indian bank account",

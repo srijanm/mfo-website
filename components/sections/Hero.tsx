@@ -47,6 +47,8 @@ export function Hero() {
           <div className={styles.object}>
             <IncomingPaymentRecord
               amount={paymentExample.amount}
+              amountValue={paymentExample.amountValue}
+              amountFormat="incomingPayment"
               from={paymentExample.from}
               received={paymentExample.received}
               into={paymentExample.into}

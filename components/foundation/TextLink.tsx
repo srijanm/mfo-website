@@ -16,7 +16,7 @@ type TextLinkProps = {
 export function TextLink({ href, arrow = true, className, children }: TextLinkProps) {
   return (
     <Link href={href} className={cx(styles.link, className)}>
-      {children}
+      <span className={styles.label}>{children}</span>
       {arrow ? (
         <span aria-hidden="true" className={styles.arrow}>
           →
