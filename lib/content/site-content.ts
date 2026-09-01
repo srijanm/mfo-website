@@ -93,35 +93,40 @@ export const defaultMilestones = [
     id: "first-income",
     label: "First income",
     question: "Do I need to set anything up now?",
-    mfo: "We tell you what matters now, what does not, and what would make that answer change.",
+    mfo:
+      "We look at how the money actually reaches you, and tell you what you can leave alone for now.",
     tracking: "MFO tracks",
   },
   {
     id: "first-year",
     label: "First year",
     question: "What am I supposed to keep track of?",
-    mfo: "We set up the year properly and put the relevant dates on our calendar rather than yours.",
+    mfo:
+      "Nothing goes on your fridge door. The dates that matter sit on our calendar, and we come to you.",
     tracking: "MFO tracks",
   },
   {
     id: "registration",
     label: "Registration becomes relevant",
     question: "Has something changed because of how much or where I earn?",
-    mfo: "We flag the change before it becomes a late discovery.",
+    mfo:
+      "You hear it from us first, in a message that explains what changed — not a form that assumes you already know.",
     tracking: "MFO tracks",
   },
   {
     id: "growth",
     label: "Income and obligations grow",
     question: "Am I still using the right structure and filing approach?",
-    mfo: "We revisit the setup as the facts change rather than repeating last year's answer automatically.",
+    mfo:
+      "We open your year again instead of copying last year’s file and changing the numbers.",
     tracking: "MFO tracks",
   },
   {
     id: "structure-review",
     label: "Structure needs reviewing",
     question: "Do I need a different entity or a more involved setup now?",
-    mfo: "We give you the actual answer, including when the answer is still “not yet.”",
+    mfo:
+      "Sometimes the answer is no, and we say so instead of selling you the bigger version.",
     tracking: "MFO tracks",
   },
 ] as const;

@@ -78,6 +78,23 @@ const TAX_WORD = /\b(tax|taxes|GST|TDS|compliance|filing|filings|returns?|rules?
 const RUPEE_AMOUNT = /(?:₹|\bRs\.?\s*|\bINR\s+)\s*\d[\d,]*/;
 
 /**
+ * Foreign currency. Every price on the site is INR and renders through the
+ * shared formatter in lib/content/format.ts. The one permitted dollar figure is
+ * the illustrative amount inside the incoming payment object — money arriving
+ * from abroad, which is the whole point of that object.
+ *
+ * `$` followed by a digit, so template interpolation (`${...}`) and regex
+ * backreferences (`$1` inside a replacement string) do not trip it.
+ */
+const FOREIGN_CURRENCY = /\$\s*\d|\bUSD\b/;
+
+/**
+ * The one shape a dollar amount may take: the `amount` field of an incoming
+ * payment, declared in lib/content/. Anywhere else, in any file, it fails.
+ */
+const PAYMENT_AMOUNT_FIELD = /^\s*(?:\/\*.*\*\/\s*)?amount:\s*"/;
+
+/**
  * A placeholder guide is written to show the shape of the library, not to
  * answer anything. It must be impossible to mistake for reviewed guidance, so
  * it may not state a tax fact of any kind: no thresholds, no dates, no rates,
@@ -309,6 +326,23 @@ function checkFile(file) {
         lineText,
       );
     }
+  }
+
+  // --- foreign currency outside the incoming payment object ---
+  for (const match of text.matchAll(new RegExp(FOREIGN_CURRENCY, "g"))) {
+    const { line, text: lineText } = at(match.index);
+    const permitted = inContentDir && PAYMENT_AMOUNT_FIELD.test(lineText);
+    if (permitted) continue;
+
+    report(
+      file,
+      line,
+      "foreign-currency",
+      `"${match[0].trim()}" — every price is INR through lib/content/format.ts. ` +
+        "The only permitted dollar amount is the incoming payment object's own " +
+        "`amount` field in lib/content/.",
+      lineText,
+    );
   }
 
   // --- banned phrases ---

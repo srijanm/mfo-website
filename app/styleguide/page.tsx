@@ -17,6 +17,7 @@ import {
   IncomingPaymentRecord,
 } from "@/components/objects";
 import { reviewed, unreviewed } from "@/lib/content/reviewed";
+import { specimens as SAMPLE } from "@/lib/content/specimens";
 import { defaultMilestones } from "@/lib/content/site-content";
 import { cx } from "@/lib/cx";
 import { absoluteUrl } from "@/lib/site-url";
@@ -30,32 +31,6 @@ export const metadata: Metadata = {
   alternates: { canonical: absoluteUrl("/styleguide") },
 };
 
-/* Sample values exist only to exercise the components. Nothing here is site
-   content, and nothing here is a tax fact presented as reviewed. */
-const SAMPLE = {
-  payment: {
-    amount: "$5,000.00",
-    from: "Overseas company",
-    received: "03 Sep 2026",
-    into: "Indian bank account",
-    frequency: "Monthly",
-    indianPayroll: "Not handled here",
-    indiaSideSetup: "Needs its own answer",
-    note: "A payslip from abroad does not mean there is an Indian employer handling the India-side tax and compliance for you.",
-  },
-  filingInProgress: {
-    status: "Draft",
-    prepared: "18 Jul",
-    sentToYou: "19 Jul",
-  },
-  filingComplete: {
-    status: "Filed",
-    prepared: "18 Jul",
-    sentToYou: "19 Jul",
-    approved: "21 Jul",
-    filed: "22 Jul",
-  },
-} as const;
 
 const PALETTE = [
   { name: "Paper", token: "--paper", value: "#F6F7F2" },
