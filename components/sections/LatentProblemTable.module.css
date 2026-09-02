@@ -86,7 +86,8 @@
 .heading {
   margin: 0;
   font-size: var(--fs-small);
-  font-weight: 500;
+  /* Data label: --fs-small, --muted, weight 400 — CLAUDE.md typography. */
+  font-weight: 400;
   color: var(--muted);
 }
 
@@ -108,7 +109,8 @@
   display: block;
   margin-bottom: 6px;
   font-size: var(--fs-small);
-  font-weight: 500;
+  /* Data label: --fs-small, --muted, weight 400 — CLAUDE.md typography. */
+  font-weight: 400;
   color: var(--muted);
 }
 
@@ -136,9 +138,13 @@
   padding-block: 28px 0;
 }
 
+/* The section intro, not a row. It sits at the cell's own inset rather than the
+   rail's, so it is visibly outside the row structure below it, and the first
+   row's rule is the rule beneath it. --fs-lead, --ink-2, above the first
+   rule — CLAUDE.md typography. */
 .splitIntro {
   margin: 0;
-  padding: 28px 0 28px 100px;
+  padding: 8px 0 32px 40px;
   max-width: 58ch;
   font-size: var(--fs-lead);
   line-height: 1.44;
@@ -218,13 +224,15 @@
   border-top: 1px solid var(--rule);
 }
 
+/* The scenarios are the content the intro introduces, so they sit a step below
+   it: body rather than lead. At the same size as the intro nothing read as
+   subordinate and the section was five equal paragraphs. */
 .summaryText {
   margin: 0;
   padding-left: 100px;
-  max-width: 62ch;
-  font-size: var(--fs-lead);
-  line-height: 1.42;
-  letter-spacing: -.018em;
+  max-width: 66ch;
+  font-size: var(--fs-body);
+  line-height: 1.5;
 }
 
 @media (max-width: 1023px) {
@@ -278,9 +286,7 @@
     padding-top: 0;
   }
 
-  .summaryText {
-    font-size: var(--fs-body);
-  }
+
 }
 
 /* The section mark. It sits above the heading rather than in a column of its
