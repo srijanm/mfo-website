@@ -41,7 +41,7 @@ export function PricingSection({ content, id = "pricing" }: PricingSectionProps)
 
           <ul className={cx("rule-grid", styles.tiers)}>
             {content.points.map((amount) => (
-              <li key={amount} className={styles.tier}>
+              <li key={amount}>
                 <p className={`${styles.price} data-number`}>
                   {formatAnnualPrice(amount)}{" "}
                   <span className={styles.perYear}>{content.perYear}</span>

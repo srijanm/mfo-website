@@ -223,6 +223,13 @@ export function LeadForm() {
                   name={currentChoice.id}
                   value={option}
                   checked={answers[currentChoice.id] === option}
+                  /* The group's error is announced through the fieldset's
+                     aria-describedby, but that only describes it. The invalid
+                     state has to be programmatically determinable too, the way
+                     it already is on the text fields below — and a bare
+                     fieldset has no radiogroup role to carry it, so it goes on
+                     the controls. */
+                  aria-invalid={errors[currentChoice.id] ? true : undefined}
                   onChange={() => setAnswer(currentChoice.id, option)}
                 />
                 <span aria-hidden="true" className={styles.marker} />

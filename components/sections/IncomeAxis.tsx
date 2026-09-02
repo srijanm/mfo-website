@@ -99,7 +99,7 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
         {sticky ? (
           <div ref={sentinelsRef} aria-hidden="true" className={styles.sentinels}>
             {milestones.map((milestone, index) => (
-              <div key={milestone.id} data-index={index} className={styles.sentinel} />
+              <div key={milestone.id} data-index={index} />
             ))}
           </div>
         ) : null}

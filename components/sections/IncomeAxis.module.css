@@ -204,7 +204,10 @@
   }
 
   /* Empty blocks whose only job is to be intersected. They carry no content,
-     so nothing is duplicated and nothing is read twice. */
+     so nothing is duplicated and nothing is read twice.
+
+     The strip is a grid of equal rows, which is what gives each sentinel its
+     height — they carry no class of their own and need none. */
   :global(html.js) .sticky .sentinels {
     position: absolute;
     inset: 0;

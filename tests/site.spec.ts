@@ -340,6 +340,16 @@ test.describe("get-started intake", () => {
     const describedBy = await page.locator("fieldset").getAttribute("aria-describedby");
     expect(describedBy).toBeTruthy();
     expect(await page.locator(`#${describedBy}`).innerText()).toBe(await error.innerText());
+
+    /* And the invalid state is programmatically determinable, not only
+       described — the same treatment the text fields on the last step get. A
+       bare fieldset carries no radiogroup role, so it goes on the controls. */
+    const radios = page.locator('fieldset input[type="radio"]');
+    const count = await radios.count();
+    expect(count).toBeGreaterThan(0);
+    for (let i = 0; i < count; i++) {
+      await expect(radios.nth(i)).toHaveAttribute("aria-invalid", "true");
+    }
   });
 
   test("persists nothing client-side", async ({ page }) => {
@@ -1621,5 +1631,204 @@ test.describe("motion system", () => {
     });
     expect(Math.abs(lifted.y), "§28 caps the lift at 2px").toBeLessThanOrEqual(2);
     expect(lifted.x).toBe(0);
+  });
+});
+
+/**
+ * The QA checklist items that were only ever verified by hand. Each of these
+ * is a line in docs/QA_CHECKLIST.md, measured rather than asserted.
+ */
+test.describe("QA checklist", () => {
+  const ROUTES = [
+    "/", "/pricing", "/how-it-works", "/who-its-for", "/who-its-for/foreign-income",
+    "/who-its-for/creators", "/who-its-for/freelancers-consultants",
+    "/who-its-for/independent-professionals", "/about", "/contact", "/guides",
+    "/get-started", "/privacy", "/terms", "/guides/how-we-decide-what-you-need",
+  ];
+
+  test("one h1, no skipped heading level, and a skip link that resolves", async ({ page }) => {
+    const problems: string[] = [];
+    for (const route of ROUTES) {
+      await page.goto(route);
+      const r = await page.evaluate(() => {
+        const levels = [...document.querySelectorAll("h1,h2,h3,h4,h5,h6")]
+          .filter((h) => getComputedStyle(h).display !== "none")
+          .map((h) => ({ level: Number(h.tagName[1]), text: (h.textContent ?? "").trim().slice(0, 30) }));
+        const jumps: string[] = [];
+        for (let i = 1; i < levels.length; i++) {
+          if (levels[i].level > levels[i - 1].level + 1) {
+            jumps.push(`h${levels[i - 1].level} to h${levels[i].level} at "${levels[i].text}"`);
+          }
+        }
+        const skip = document.querySelector('a[href^="#"]');
+        const href = skip?.getAttribute("href") ?? null;
+        return {
+          h1: levels.filter((h) => h.level === 1).length,
+          first: levels[0]?.level ?? 0,
+          jumps,
+          href,
+          resolves: href ? document.querySelector(href) !== null : false,
+        };
+      });
+      if (r.h1 !== 1) problems.push(`${route}: ${r.h1} h1 elements`);
+      if (r.first !== 1) problems.push(`${route}: first heading is h${r.first}`);
+      if (r.jumps.length) problems.push(`${route}: ${r.jumps.join("; ")}`);
+      if (!r.resolves) problems.push(`${route}: skip link ${r.href} resolves to nothing`);
+    }
+    expect(problems).toEqual([]);
+  });
+
+  test("no horizontal scroll at 200% zoom", async ({ page }) => {
+    /* 200% zoom of a 1280px window is a 640px CSS viewport — WCAG 1.4.10. */
+    await page.setViewportSize({ width: 640, height: 512 });
+    const overflowing: string[] = [];
+    for (const route of ROUTES) {
+      await page.goto(route);
+      await page.waitForTimeout(120);
+      const over = await page.evaluate(() => ({
+        doc: document.documentElement.scrollWidth,
+        client: document.documentElement.clientWidth,
+      }));
+      if (over.doc > over.client + 1) {
+        overflowing.push(`${route}: ${over.doc} > ${over.client}`);
+      }
+    }
+    expect(overflowing).toEqual([]);
+  });
+
+  test("every tab stop is reachable and shows a focus ring", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+
+    const stops: string[] = [];
+    const unringed: string[] = [];
+    let first = "";
+    for (let i = 0; i < 120; i++) {
+      await page.keyboard.press("Tab");
+      const focused = await page.evaluate(() => {
+        const el = document.activeElement as HTMLElement | null;
+        if (!el || el === document.body) return null;
+        const cs = getComputedStyle(el);
+        const r = el.getBoundingClientRect();
+        return {
+          key: `${el.tagName.toLowerCase()}#${el.id || ""}:${(el.textContent ?? "").trim().slice(0, 24)}`,
+          ring: cs.outlineStyle !== "none" || cs.boxShadow !== "none",
+          sized: r.width > 0 && r.height > 0,
+        };
+      });
+      if (!focused) break;
+      if (i === 0) first = focused.key;
+      else if (focused.key === first) break;
+      stops.push(focused.key);
+      if (!focused.ring || !focused.sized) unringed.push(focused.key);
+    }
+
+    expect(stops.length, "the homepage should have a real tab order").toBeGreaterThan(20);
+    expect(unringed, "every focusable element needs a visible focus indicator").toEqual([]);
+  });
+
+  test("pricing stacks and its vertical rules go when cramped", async ({ page }) => {
+    const read = async (width: number) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/pricing");
+      await page.waitForTimeout(200);
+      return page.evaluate(() => {
+        const list = document.querySelector('ul[class*="tiers"]')!;
+        const tiers = [...list.children];
+        const boxes = tiers.map((t) => t.getBoundingClientRect());
+        return {
+          tiers: tiers.length,
+          rows: [...new Set(boxes.map((b) => Math.round(b.top)))].length,
+          columns: [...new Set(boxes.map((b) => Math.round(b.left)))].length,
+          verticalRules: tiers.filter(
+            (t) => parseFloat(getComputedStyle(t).borderLeftWidth) > 0,
+          ).length,
+          overflows: Math.round(list.scrollWidth) > Math.round(list.clientWidth),
+          prices: tiers.map((t) => (t.querySelector('[class*="price"]')?.textContent ?? "").trim()),
+        };
+      });
+    };
+
+    const desktop = await read(1440);
+    expect(desktop.tiers).toBe(3);
+    expect(desktop.rows, "three tiers side by side").toBe(1);
+    expect(desktop.columns).toBe(3);
+    expect(desktop.verticalRules, "two dividers between three columns").toBe(2);
+    expect(desktop.overflows).toBe(false);
+
+    const mobile = await read(375);
+    expect(mobile.rows, "stacked at phone width").toBe(3);
+    expect(mobile.columns).toBe(1);
+    expect(mobile.verticalRules, "a vertical rule in one column divides nothing").toBe(0);
+    expect(mobile.overflows).toBe(false);
+
+    /* The prices themselves, unchanged at either width. */
+    for (const prices of [desktop.prices, mobile.prices]) {
+      expect(prices.map((p) => p.split(" ")[0])).toEqual(["₹19,999", "₹24,999", "₹34,999"]);
+    }
+  });
+
+  test("nothing asks for animation frames once the page has settled", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    await page.evaluate(() => {
+      (window as { __frames?: number }).__frames = 0;
+      const real = window.requestAnimationFrame;
+      window.requestAnimationFrame = function (cb: FrameRequestCallback) {
+        (window as { __frames?: number }).__frames!++;
+        return real.call(window, cb);
+      };
+    });
+
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(1500);
+    const afterScroll = await page.evaluate(() => (window as { __frames?: number }).__frames);
+    await page.waitForTimeout(1500);
+    const afterIdle = await page.evaluate(() => (window as { __frames?: number }).__frames);
+
+    expect(afterIdle! - afterScroll!, "no section may hold a frame loop open").toBe(0);
+  });
+
+  test("every button-shaped call to action routes to /get-started", async ({ page }) => {
+    const strays: string[] = [];
+    for (const route of ROUTES) {
+      await page.goto(route);
+      const ctas = await page.evaluate(() =>
+        [...document.querySelectorAll('a[class*="button"], a[class*="Button"]')].map((a) => ({
+          href: a.getAttribute("href"),
+          text: (a.textContent ?? "").trim().slice(0, 30),
+        })),
+      );
+      for (const cta of ctas) {
+        if (cta.href !== "/get-started") strays.push(`${route}: "${cta.text}" -> ${cta.href}`);
+      }
+    }
+    expect(strays).toEqual([]);
+  });
+
+  test("no WebGL anywhere, and no three.js in the bundle", async ({ page }) => {
+    const requests: string[] = [];
+    page.on("request", (r) => requests.push(r.url()));
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(1200);
+
+    expect(requests.filter((u) => /three|webgl/i.test(u))).toEqual([]);
+    expect(await page.evaluate(() => document.querySelectorAll("canvas").length)).toBe(0);
+  });
+
+  test("every image, svg and frame declares its dimensions", async ({ page }) => {
+    const missing: string[] = [];
+    for (const route of ROUTES) {
+      await page.goto(route);
+      const bare = await page.evaluate(() =>
+        [...document.querySelectorAll("img, video, svg, iframe")]
+          .filter((el) => !el.getAttribute("width") || !el.getAttribute("height"))
+          .map((el) => el.tagName),
+      );
+      for (const b of bare) missing.push(`${route}: <${b.toLowerCase()}> without width/height`);
+    }
+    expect(missing, "a media element without dimensions is a layout shift").toEqual([]);
   });
 });

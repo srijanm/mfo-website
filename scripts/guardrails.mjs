@@ -644,12 +644,60 @@ function checkGuide(file) {
   });
 }
 
+/**
+ * A `styles.thing` whose stylesheet defines no `.thing`.
+ *
+ * CSS Modules resolve an unknown key to `undefined`, so React renders
+ * `className={undefined}` and the element silently ships unstyled. Nothing
+ * warns: not TypeScript, not the bundler, not the browser. Three of these were
+ * live in this codebase and one of them was on the pricing tiers.
+ *
+ * Cross-file, so it runs over the pairs rather than inside checkFile.
+ */
+function checkModuleClasses(file) {
+  if (path.extname(file) !== ".tsx") return;
+
+  const text = readFileSync(file, "utf8");
+  const lines = text.split("\n");
+
+  for (const importMatch of text.matchAll(
+    /import\s+(\w+)\s+from\s+"(\.[^"]+\.module\.css)"/g,
+  )) {
+    const [, binding, specifier] = importMatch;
+    const stylesheet = path.join(path.dirname(file), specifier);
+
+    let css;
+    try {
+      css = readFileSync(stylesheet, "utf8");
+    } catch {
+      continue;
+    }
+
+    const defined = new Set([...css.matchAll(/\.([A-Za-z_][\w-]*)/g)].map((m) => m[1]));
+
+    for (const use of text.matchAll(new RegExp(`\\b${binding}\\.([A-Za-z_]\\w*)`, "g"))) {
+      if (defined.has(use[1])) continue;
+      const line = lineNumberAt(text, use.index);
+      report(
+        file,
+        line,
+        "undefined-module-class",
+        `${binding}.${use[1]} is not defined in ${specifier}. CSS Modules resolve an ` +
+          "unknown key to undefined, so this ships as className={undefined} and the " +
+          "element renders unstyled with no warning from anywhere.",
+        lineTextAt(lines, line),
+      );
+    }
+  }
+}
+
 async function main() {
   const files = (
     await Promise.all(SCAN_DIRS.map((dir) => collectFiles(path.join(ROOT, dir))))
   ).flat();
 
   files.forEach(checkFile);
+  files.forEach(checkModuleClasses);
 
   const guideFiles = (await collectFiles(path.join(ROOT, GUIDES_DIR))).filter((file) =>
     file.endsWith(".mdx"),
