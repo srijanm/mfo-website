@@ -425,8 +425,15 @@ function checkFile(file) {
     }
   }
 
-  // --- more than one ink or acid block declared in a single file ---
-  for (const surface of ["surface-ink", "surface-acid"]) {
+  /* --- more than one ink or acid block declared in a single file ---
+     The styleguide is exempt, for the same reason it is exempt from the
+     runtime check: it renders every primitive on all four surfaces, several
+     times over, which is the point of it. The rule is about how a composed
+     page is built, and a specimen sheet is not one. */
+  const isSpecimenSheet =
+    relative.split(path.sep).join("/") === "app/styleguide/page.tsx";
+
+  for (const surface of isSpecimenSheet ? [] : ["surface-ink", "surface-acid"]) {
     const uses = [...text.matchAll(new RegExp(`["'\\s]${surface}["'\\s]`, "g"))];
     if (uses.length <= 1) continue;
     const { line, text: lineText } = at(uses[1].index);
