@@ -166,3 +166,8 @@
     border-top-color: var(--rule-strong);
   }
 }
+
+/* Sits under the copy, in the space the left cell already had. */
+.grids {
+  margin-top: 44px;
+}

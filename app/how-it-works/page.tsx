@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 
 import { Container, Grid, Section, ThresholdNode } from "@/components/foundation";
 import { FilingRecord } from "@/components/objects";
+import { RoutePlate } from "@/components/plates";
 import { IncomeAxis, TemporalLedger } from "@/components/sections";
 import { FinalCtaSection, PricingSection } from "@/components/shared";
 import { finalCta } from "@/lib/content/homepage";
 import { howItWorks } from "@/lib/content/how-it-works";
+import { coreScope } from "@/lib/content/site-content";
 import { cx } from "@/lib/cx";
 import { pageMetadata } from "@/lib/metadata";
 import { pricingPage } from "@/lib/content/pricing";
@@ -38,6 +40,19 @@ export default function HowItWorksPage() {
               </h1>
             </div>
             <p className={cx(styles.heroLead, styles.lead)}>{howItWorks.lead}</p>
+
+            {/* Where money arriving from outside actually has to go. The three
+                destinations are the core scope's own first three rows, and only
+                the one this page opens on is filled. */}
+            <RoutePlate
+              className={styles.route}
+              crossingLabel={howItWorks.indiaSideLabel}
+              destinations={coreScope.slice(0, 3).map((area) => ({
+                id: area.id,
+                label: area.title,
+              }))}
+              activeId={coreScope[0].id}
+            />
           </Grid>
         </Container>
       </section>
