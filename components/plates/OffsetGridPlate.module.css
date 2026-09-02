@@ -1,0 +1,103 @@
+/* Item 11. Two grids, half a cell apart.
+
+   Percentages throughout, so it scales with its column instead of overflowing
+   it. Every colour is a token; there is no gradient and no radius except on the
+   circular nodes, which the ceiling exempts. */
+
+.plate {
+  display: block;
+}
+
+.grids {
+  position: relative;
+  display: block;
+  width: 100%;
+  /* Ten by six cells, so the box is in that proportion. */
+  aspect-ratio: 10 / 6;
+}
+
+.line {
+  position: absolute;
+  background: var(--rule);
+}
+
+.vertical {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.horizontal {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+/* The offset grid is the heavier of the two, so which is which is legible. */
+.offset {
+  background: var(--rule-strong);
+}
+
+/* Inset by half a cell so the offset grid does not overhang the base one. */
+.vertical.offset {
+  top: 8.333%;
+  bottom: 8.333%;
+}
+
+.horizontal.offset {
+  left: 5%;
+  right: 5%;
+}
+
+.meet {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: var(--acid);
+  transform: translate(-50%, -50%);
+}
+
+/* ---------------------------------------------------------------------------
+   Drawn column by column on entry, the nodes last. Behind both gates: with no
+   JavaScript or under reduced motion the whole grid is simply there, which is
+   what it looks like when it has finished anyway.
+   --------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .vertical {
+    transform: scaleY(0);
+    transform-origin: top center;
+    transition: transform var(--motion-normal) var(--ease-system);
+    transition-delay: calc(var(--draw-index) * 40ms);
+  }
+
+  :global(html.js) .horizontal {
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--motion-normal) var(--ease-system);
+    transition-delay: calc(var(--draw-index) * 40ms);
+  }
+
+  :global(html.js) .meet {
+    opacity: 0;
+    transition: opacity var(--motion-normal) var(--ease-system) 560ms;
+  }
+
+  :global(html.js) .drawn .vertical,
+  :global(html.js) .drawn .horizontal {
+    transform: none;
+  }
+
+  :global(html.js) .drawn .meet {
+    opacity: 1;
+  }
+}
+
+/* Too wide to read on a phone, and the section says it without this. */
+@media (max-width: 1023px) {
+  .plate {
+    display: none;
+  }
+}

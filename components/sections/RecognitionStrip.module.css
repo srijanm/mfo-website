@@ -60,3 +60,8 @@
 .plate {
   margin-bottom: 28px;
 }
+
+/* The field sits under the closing line it illustrates. */
+.field {
+  margin-top: 48px;
+}

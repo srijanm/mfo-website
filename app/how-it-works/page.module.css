@@ -16,6 +16,12 @@
   align-self: end;
 }
 
+/* Its own row beneath the hero copy, across the grid. */
+.route {
+  grid-column: 1 / -1;
+  margin-top: 64px;
+}
+
 .title {
   margin: 0;
   max-width: 18ch;

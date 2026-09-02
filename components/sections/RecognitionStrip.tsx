@@ -1,5 +1,5 @@
 import { Container, Section } from "@/components/foundation";
-import { Plate } from "@/components/plates";
+import { EventField, Plate } from "@/components/plates";
 import { recognitionClosing } from "@/lib/content/homepage";
 import { recognition } from "@/lib/content/site-content";
 import { cx } from "@/lib/cx";
@@ -31,6 +31,11 @@ export function RecognitionStrip() {
         <div className={cx("rule-grid", styles.closing)}>
           <p className={styles.closingText}>{recognitionClosing}</p>
         </div>
+
+        {/* The closing line, drawn. Two illustrative years side by side: the
+            shape a salaried year has, and the shape one without that system
+            has. The caption says plainly that they are shapes. */}
+        <EventField className={styles.field} />
       </Container>
     </Section>
   );

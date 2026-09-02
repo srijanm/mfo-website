@@ -114,3 +114,8 @@
 .plate {
   margin-bottom: 28px;
 }
+
+/* Sits under the copy, in the space the left cell already had. */
+.grids {
+  margin-top: 44px;
+}
