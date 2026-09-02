@@ -138,6 +138,33 @@ export function latentProblemColumnsReady(): boolean {
  * on fit rather than attack: every row opens with what the alternative is
  * genuinely good at.
  */
+/**
+ * The five stages of a year, in order. Labels only — no dates, no months and
+ * nothing about what falls due when.
+ */
+export const coverageStages = [
+  { id: "setup", label: "Setup" },
+  { id: "running", label: "Running" },
+  { id: "checkpoint", label: "Checkpoint" },
+  { id: "drafting", label: "Drafting" },
+  { id: "filing", label: "Filing" },
+] as const;
+
+export type CoverageStageId = (typeof coverageStages)[number]["id"];
+
+export type StructuralAlternative = {
+  id: string;
+  name: string;
+  helps: string;
+  doesNotOwn: string;
+  /**
+   * Which stages this alternative genuinely owns. Null until a CA has reviewed
+   * the mapping; typed here rather than inferred so the field can hold one
+   * without the shape changing, and so `null` today does not narrow to `never`.
+   */
+  owns: readonly CoverageStageId[] | null;
+};
+
 export const structuralMismatch = {
   headline: "Your work changed. Most CA practices were built around a different kind of client.",
   body:
@@ -148,6 +175,15 @@ export const structuralMismatch = {
     doesNotOwn: "What it does not own",
   },
 
+  /**
+   * Which stages of the year an alternative genuinely owns.
+   *
+   * `null` until a CA has reviewed the mapping, and the component renders no
+   * strip while it is null — the same way pricing renders without
+   * `approvedPlanScope`. This ships dark on purpose: a coverage claim about
+   * someone else's service is exactly the kind of thing that must not be
+   * guessed at, and the section reads correctly without it.
+   */
   alternatives: [
     {
       id: "traditional-ca",
@@ -155,26 +191,30 @@ export const structuralMismatch = {
       helps: "Useful when the practice already knows your kind of work.",
       doesNotOwn:
         "The gap appears when the relationship is filing-led and nobody is running the year before the return.",
+      owns: null,
     },
     {
       id: "filing-software",
       name: "Filing software",
       helps: "Useful when you already know what needs to be filed.",
       doesNotOwn: "It cannot warn you about the question you did not know to ask.",
+      owns: null,
     },
     {
       id: "marketplace",
       name: "Service marketplace",
       helps: "Useful for individual tasks.",
       doesNotOwn: "Harder when responsibility is split across multiple handoffs.",
+      owns: null,
     },
     {
       id: "internet-advice",
       name: "Internet advice",
       helps: "Useful for orientation.",
       doesNotOwn: "Fast, contradictory and nobody is accountable for the answer.",
+      owns: null,
     },
-  ],
+  ] as StructuralAlternative[],
 } as const;
 
 /* ------------------------------------------------------------------ H05 */

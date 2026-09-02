@@ -1,6 +1,6 @@
 import { Container, Section } from "@/components/foundation";
 import { Plate } from "@/components/plates";
-import { structuralMismatch } from "@/lib/content/homepage";
+import { coverageStages, structuralMismatch } from "@/lib/content/homepage";
 import { cx } from "@/lib/cx";
 
 import styles from "./StructuralMismatch.module.css";
@@ -47,6 +47,23 @@ export function StructuralMismatch() {
                   <span className={styles.label}>{columnHeadings.doesNotOwn}</span>
                   <p className={styles.text}>{alternative.doesNotOwn}</p>
                 </div>
+
+                {/* The coverage strip renders only once a CA has reviewed which
+                    stages this alternative genuinely owns. Until then `owns` is
+                    null and the row is exactly what it was. */}
+                {alternative.owns ? (
+                  <span aria-hidden="true" className={styles.coverage}>
+                    {coverageStages.map((stage) => (
+                      <span
+                        key={stage.id}
+                        className={cx(
+                          styles.segment,
+                          alternative.owns?.includes(stage.id) && styles.segmentOwned,
+                        )}
+                      />
+                    ))}
+                  </span>
+                ) : null}
               </div>
             ))}
           </div>

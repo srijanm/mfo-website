@@ -81,3 +81,22 @@ export const legalEntity: { registeredName: string; registrationLine: string } |
 
 /** Year the site went live, for the footer notice. Not a date with tax meaning. */
 export const copyrightSince = 2026;
+
+/**
+ * The homepage's own index, for the page rail.
+ *
+ * Each id is a DOM id a section already carries, and each label is the name of
+ * the idea that section states in words. The rail renders only on pages that
+ * declare an index, so it never appears somewhere these ids do not exist.
+ */
+export const sectionIndex = [
+  { id: "latent-problem", label: "What goes wrong" },
+  { id: "structural-mismatch", label: "The mismatch" },
+  { id: "income-axis", label: "As things change" },
+  { id: "operating-model", label: "How we work" },
+  { id: "temporal-ledger", label: "The year" },
+  { id: "core-scope-headline", label: "What we run" },
+  { id: "trust-ledger", label: "Before we file" },
+  { id: "pricing", label: "Pricing" },
+  { id: "final-cta", label: "Get started" },
+] as const;

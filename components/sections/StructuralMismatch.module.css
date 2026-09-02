@@ -114,3 +114,55 @@
 .plate {
   margin-bottom: 28px;
 }
+
+/* ---------------------------------------------------------------------------
+   Item 04. Which stages of the year an alternative owns.
+
+   Unmounted until lib/content carries a reviewed mapping, so nothing below is
+   on the page today. Adjacent owned segments drop the border between them, so
+   a continuous run reads as one bar rather than as separate cells.
+   --------------------------------------------------------------------------- */
+
+.coverage {
+  display: flex;
+  grid-column: 2 / -1;
+  margin-top: 14px;
+}
+
+.segment {
+  flex: 1;
+  height: 8px;
+  border: 1px solid var(--rule-strong);
+}
+
+.segment + .segment {
+  border-left: 0;
+}
+
+.segmentOwned {
+  border-color: var(--ink);
+  background: var(--acid);
+}
+
+/* An owned run is one bar: the shared edge between two owned segments comes
+   out, and the segment after a run closes it. */
+.segmentOwned + .segmentOwned {
+  border-left: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   The row answers the pointer, the same 2px lift the scope matrix uses.
+   --------------------------------------------------------------------------- */
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .row {
+    transition:
+      background var(--motion-normal) var(--ease-system),
+      border-color var(--motion-normal) var(--ease-system);
+  }
+
+  .row:hover {
+    background: var(--white);
+    border-top-color: var(--rule-strong);
+  }
+}

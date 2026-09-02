@@ -15,13 +15,30 @@ import { useEffect, useRef, useState } from "react";
  * measured read is ever genuinely needed, re-run it inside
  * requestAnimationFrame, on resize, and in a ResizeObserver.
  */
-export function useScrollProgress(count: number) {
+export function useScrollProgress(count: number, ids?: readonly string[]) {
   const [active, setActive] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
+  const key = ids ? ids.join(",") : "";
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el || typeof IntersectionObserver === "undefined") return;
+    if (typeof IntersectionObserver === "undefined") return;
+
+    /* Either a sentinel strip hung on the ref, or real elements addressed by
+       id. The observer and its margins are the same either way. */
+    const targets = key
+      ? key
+          .split(",")
+          .map((id, index) => {
+            const node = document.getElementById(id);
+            if (node) node.dataset.index = String(index);
+            return node;
+          })
+          .filter((node): node is HTMLElement => node !== null)
+      : ref.current
+        ? [...(ref.current.children as HTMLCollectionOf<HTMLElement>)]
+        : [];
+
+    if (targets.length === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -34,9 +51,9 @@ export function useScrollProgress(count: number) {
       { rootMargin: "-50% 0px -50% 0px", threshold: 0 },
     );
 
-    for (const child of el.children) observer.observe(child);
+    for (const target of targets) observer.observe(target);
     return () => observer.disconnect();
-  }, [count]);
+  }, [count, key]);
 
   return { ref, active };
 }
