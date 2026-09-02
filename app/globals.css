@@ -147,10 +147,6 @@ body {
   padding-block: var(--section-major-desktop);
 }
 
-/* The final CTA draws the same rule in the on-acid value. */
-.section--on-acid::before {
-  background: var(--rule-on-acid);
-}
 
 .section--dense {
   padding-block: var(--section-dense-desktop);

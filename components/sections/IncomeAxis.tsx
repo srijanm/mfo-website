@@ -67,7 +67,15 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
   }, [sticky]);
 
   return (
-    <Section dense={compact} labelledBy="income-axis" className={cx(sticky && styles.sticky)}>
+    <Section
+      dense={compact}
+      labelledBy="income-axis"
+      /* The one dark section on the page. It spans the full viewport; the
+         content inside it stays on the container grid. Only the sticky
+         composition takes it — the compact reuse on other pages is an
+         ordinary paper section, and a page carries at most one ink block. */
+      className={cx(sticky && styles.sticky, sticky && "surface-ink")}
+    >
       <Container>
         <Grid>
           <div className={styles.intro}>
@@ -138,6 +146,7 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
                       empty marker until a CA supplies one. */}
                   <div className={styles.record}>
                     <DeadlineRecord
+                      className={styles.recordSurface}
                       what={milestone.label}
                       when={null}
                       status={milestone.tracking}

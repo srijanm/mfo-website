@@ -14,7 +14,8 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: var(--ink);
+  /* The surface's own text colour at 7.5%, so the guides read on ink too. */
+  background: currentColor;
   opacity: .075;
 }
 
@@ -69,7 +70,17 @@
 }
 
 .stopActive .label {
-  color: var(--ink);
+  color: inherit;
+}
+
+/* The active label is restated after the ink override, which would otherwise
+   out-specify .stopActive .label and flatten the active state. */
+:global(.surface-ink) .label {
+  color: var(--muted-on-ink);
+}
+
+:global(.surface-ink) .stopActive .label {
+  color: inherit;
 }
 
 /* A field marking rather than a live state: ink at low opacity, no acid. */

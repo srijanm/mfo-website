@@ -21,13 +21,14 @@ type FinalCtaSectionProps = {
  *
  * It uses the shared `.section` box rather than the Section primitive, because
  * the primitive draws its rule on reveal and paints it in the paper-toned
- * value, which would vanish against acid. `.section--on-acid` swaps the rule
- * colour; the width and position are the same as every other section rule.
+ * value, which would vanish against acid. `.surface-acid` supplies the
+ * background, the text colour and the rule colour together, so the section rule
+ * picks up the on-acid value without being told about it.
  */
 export function FinalCtaSection({ content }: FinalCtaSectionProps) {
   return (
     <section
-      className={cx("section", "section--dense", "section--on-acid", styles.section)}
+      className={cx("section", "section--dense", "surface-acid", styles.section)}
       aria-labelledby="final-cta"
     >
       <Container>

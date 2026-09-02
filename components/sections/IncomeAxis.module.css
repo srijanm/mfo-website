@@ -25,6 +25,12 @@
   color: var(--ink-2);
 }
 
+/* --ink-2 is the paper surface's secondary text and is 1.6:1 on ink. On the
+   dark chapter the secondary step is --muted-on-ink, at 6.9:1. */
+:global(.surface-ink) .lede {
+  color: var(--muted-on-ink);
+}
+
 .list {
   grid-column: 1 / -1;
   margin: 64px 0 0;
@@ -103,6 +109,10 @@
   font-size: var(--fs-small);
   font-weight: 500;
   color: var(--muted);
+}
+
+:global(.surface-ink) .fieldLabel {
+  color: var(--muted-on-ink);
 }
 
 .fieldValue {
@@ -286,6 +296,15 @@
 .axis,
 .record {
   display: none;
+}
+
+/* The one place depth is permitted on this page: an information object sitting
+   on top of a colour block. Scoped to the ink surface rather than applied by
+   class alone, so the same component on the compact paper reuse elsewhere stays
+   flat — objects on paper take no shadow. Radius comes from the object token,
+   which the amended scale puts at 8px. */
+:global(.surface-ink) .recordSurface {
+  box-shadow: var(--shadow-object);
 }
 
 /* ---------------------------------------------------------------------------
