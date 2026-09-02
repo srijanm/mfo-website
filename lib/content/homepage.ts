@@ -50,6 +50,17 @@ export const hero = {
 
 /* ------------------------------------------------------------------ H02 */
 
+/**
+ * PLACEHOLDER — NEEDS OWNER SIGN-OFF.
+ *
+ * docs/HOMEPAGE_COPY_AND_CONTENT.md §H02 supplies the four labels and the
+ * closing row and nothing to introduce them, so the strip was four labels
+ * appearing between the hero and the next section with nothing saying what the
+ * reader was looking at. This fills that hole. Replace it or delete it, but do
+ * not treat it as signed-off copy.
+ */
+export const recognitionLead = "However the money reaches you:";
+
 export const recognitionClosing =
   "Different jobs. Same problem: the income does not always fit neatly into the system a salaried employee gets automatically.";
 
