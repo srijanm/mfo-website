@@ -1,6 +1,11 @@
 // /how-it-works. Section names come from SECONDARY_PAGE_SPECS.md, not invented.
 
 export const howItWorks = {
+  /* The label on the one strong vertical in the routing plate. Structural, not
+     a claim: it names the side of the arrangement MFO is responsible for, which
+     is what the page says in words throughout. */
+  indiaSideLabel: "India side",
+
   headline: "You do the work. We run the tax and compliance around it.",
   lead: "MyFinanceOfficer is designed around an ongoing relationship, not a once-a-year return.",
 

@@ -1,5 +1,5 @@
 import { Container, Section } from "@/components/foundation";
-import { Plate } from "@/components/plates";
+import { OffsetGridPlate, Plate } from "@/components/plates";
 import { structuralMismatch } from "@/lib/content/homepage";
 import { cx } from "@/lib/cx";
 
@@ -31,6 +31,10 @@ export function StructuralMismatch() {
               {structuralMismatch.headline}
             </h2>
             <p className={styles.body}>{structuralMismatch.body}</p>
+
+            {/* The proposition, drawn: one grid and the same grid half a cell
+                over, agreeing in four places and nowhere else. */}
+            <OffsetGridPlate className={styles.grids} />
           </div>
 
           <div className="rule-grid-flush">
