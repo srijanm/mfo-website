@@ -3,14 +3,14 @@
    White is reserved for exactly this — §4. Radius is the 6px ceiling and there
    is no shadow. */
 
-/* Hover lift, fine pointers only, capped at 2px — §28. */
+/* Hover lift, fine pointers only, capped at the -2px §28 allows. */
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .surface {
-    transition: transform var(--motion-normal) var(--ease-system);
+    transition: transform var(--motion-fast) var(--ease-system);
   }
 
   .surface:hover {
-    transform: translateY(-2px);
+    transform: translateY(var(--lift-hover));
   }
 }
 
@@ -72,10 +72,25 @@
   display: contents;
 }
 
-/* The anatomy separates rows into groups with a blank line. */
-.groupStart dt,
-.groupStart dd {
-  padding-top: 12px;
+/* The anatomy separates one group of rows from the next with a rule across
+   the record's inner width. It is a child of the same grid, so it takes its
+   own step in the construction rather than arriving with the row below it. */
+.divider {
+  grid-column: 1 / -1;
+  padding: 6px 0;
+}
+
+.dividerRule {
+  display: block;
+  height: 1px;
+  background: var(--rule);
+}
+
+/* The amount arrives as a whole figure, on the row timing rather than the
+   headline timing: it is the first line of the object, not a headline. */
+.amount {
+  --reveal-duration: var(--motion-row);
+  --travel: var(--travel-row);
 }
 
 .hasNote .rows {
@@ -138,12 +153,6 @@
     gap: 2px 0;
   }
 
-  /* Stacked, the group gap belongs above the label. Left on the value it would
-     open a space between a label and the value it describes. */
-  .groupStart dd {
-    padding-top: 0;
-  }
-
   .value {
     margin-bottom: 10px;
   }
@@ -188,12 +197,13 @@
     background: var(--rule);
     transform: scaleX(0);
     transform-origin: left center;
-    animation: drawNoteRule var(--motion-rule) var(--ease-reveal) 400ms both;
+    animation: drawNoteRule var(--motion-slow) var(--ease-reveal) 380ms both;
   }
 
-  /* The one open question resolves last, after the rows have settled. */
+  /* The one open question resolves last, after the rows have settled — and
+     lands at 800ms, which is where §28 closes the hero's budget. */
   :global(html.js) .rowNode :global(span[class*="dot"]) {
-    animation: fillOpenNode var(--motion-normal) var(--ease-system) 760ms both;
+    animation: fillOpenNode var(--motion-node) var(--ease-system) 620ms both;
   }
 }
 

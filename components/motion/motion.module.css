@@ -8,16 +8,22 @@
    And without JavaScript no observer ever runs, so nothing would receive the
    class that reveals it. Outside those two conditions, none of these rules
    apply at all and the content is simply present.
+
+   Transform and opacity only. Nothing here animates a layout property, a
+   colour, or a background, and nothing repeats: every reveal is driven by a
+   one-shot IntersectionObserver that disconnects itself, so scrolling back
+   replays nothing and there is no frame loop anywhere in this file.
    ===================================================================== */
 
-/* Durations and easings come from the canonical token sheet. Only the two
-   stagger steps and the travel distance are declared here, because the token
-   sheet does not carry them. */
+/* Durations, easings, steps and travel distances all come from the canonical
+   token sheet in globals.css, which carries §28 and docs/motion-tokens.ts. */
+
 /* ---------- Fade and rise ---------- */
 
 .fade {
   --reveal-delay: 0ms;
-  --travel: 12px;
+  --travel: var(--travel-standard);
+  --reveal-duration: var(--motion-headline);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -25,14 +31,17 @@
     opacity: 0;
     transform: translateY(var(--travel));
     transition:
-      opacity var(--motion-headline) var(--ease-reveal) var(--reveal-delay),
-      transform var(--motion-headline) var(--ease-reveal) var(--reveal-delay);
+      opacity var(--reveal-duration) var(--ease-reveal) var(--reveal-delay),
+      transform var(--reveal-duration) var(--ease-reveal) var(--reveal-delay);
     will-change: opacity, transform;
   }
 
   :global(html.js) .fade.isVisible {
     opacity: 1;
     transform: none;
+    /* The entrance is over. Releasing the hint stops the compositor holding a
+       layer for an element that will never move again. */
+    will-change: auto;
   }
 }
 
@@ -55,36 +64,82 @@
 }
 
 /* ---------- Sequential rows ----------
-   Children resolve one after another. No typing effect: a row arrives whole. */
+   Children resolve one after another, 50ms apart, each taking 200ms and 5px of
+   travel — §28 puts a row at 180-220ms and motion-tokens puts its travel at
+   5px. No typing effect: a row arrives whole. */
+
+.rows,
+.cells {
+  --reveal-delay: 0ms;
+}
 
 @media (prefers-reduced-motion: no-preference) {
   :global(html.js) .rows > * {
-    --stagger-row: 50ms;
     opacity: 0;
-    transform: translateY(5px);
+    transform: translateY(var(--travel-row));
   }
 
   :global(html.js) .rows.isVisible > * {
-    --stagger-row: 50ms;
     opacity: 1;
     transform: none;
     transition:
-      opacity var(--motion-slow) var(--ease-system),
-      transform var(--motion-slow) var(--ease-system);
+      opacity var(--motion-row) var(--ease-system),
+      transform var(--motion-row) var(--ease-system);
   }
 
-  :global(html.js) .rows.isVisible > *:nth-child(1) { transition-delay: 0ms; }
-  :global(html.js) .rows.isVisible > *:nth-child(2) { transition-delay: calc(var(--stagger-row) * 1); }
-  :global(html.js) .rows.isVisible > *:nth-child(3) { transition-delay: calc(var(--stagger-row) * 2); }
-  :global(html.js) .rows.isVisible > *:nth-child(4) { transition-delay: calc(var(--stagger-row) * 3); }
-  :global(html.js) .rows.isVisible > *:nth-child(5) { transition-delay: calc(var(--stagger-row) * 4); }
-  :global(html.js) .rows.isVisible > *:nth-child(6) { transition-delay: calc(var(--stagger-row) * 5); }
-  :global(html.js) .rows.isVisible > *:nth-child(n + 7) { transition-delay: calc(var(--stagger-row) * 6); }
+  :global(html.js) .rows.isVisible > *:nth-child(1) { transition-delay: var(--reveal-delay); }
+  :global(html.js) .rows.isVisible > *:nth-child(2) { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 1); }
+  :global(html.js) .rows.isVisible > *:nth-child(3) { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 2); }
+  :global(html.js) .rows.isVisible > *:nth-child(4) { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 3); }
+  :global(html.js) .rows.isVisible > *:nth-child(5) { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 4); }
+  :global(html.js) .rows.isVisible > *:nth-child(6) { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 5); }
+  :global(html.js) .rows.isVisible > *:nth-child(7) { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 6); }
+  :global(html.js) .rows.isVisible > *:nth-child(8) { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 7); }
+  /* Past the eighth the step stops accumulating. A long list would otherwise
+     leave its tail waiting seconds after the reader has reached it. */
+  :global(html.js) .rows.isVisible > *:nth-child(n + 9) { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 8); }
 }
 
-/* ---------- Masked words ----------
+/* ---------- Sequential rows, one level down ----------
+   For a record whose rows are `display: contents` wrappers so that every cell
+   joins one shared grid and all the values align down a single edge.
+
+   Such a wrapper generates no box, and opacity and transform on an element
+   with no box do nothing at all. So the choreography moves onto the cells,
+   which do generate boxes — and both cells of a row take the row's step, so a
+   row still arrives whole rather than a label ahead of its value. */
+
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .cells > * > * {
+    opacity: 0;
+    transform: translateY(var(--travel-row));
+  }
+
+  :global(html.js) .cells.isVisible > * > * {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity var(--motion-row) var(--ease-system),
+      transform var(--motion-row) var(--ease-system);
+  }
+
+  :global(html.js) .cells.isVisible > *:nth-child(1) > * { transition-delay: var(--reveal-delay); }
+  :global(html.js) .cells.isVisible > *:nth-child(2) > * { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 1); }
+  :global(html.js) .cells.isVisible > *:nth-child(3) > * { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 2); }
+  :global(html.js) .cells.isVisible > *:nth-child(4) > * { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 3); }
+  :global(html.js) .cells.isVisible > *:nth-child(5) > * { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 4); }
+  :global(html.js) .cells.isVisible > *:nth-child(6) > * { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 5); }
+  :global(html.js) .cells.isVisible > *:nth-child(7) > * { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 6); }
+  :global(html.js) .cells.isVisible > *:nth-child(n + 8) > * { transition-delay: calc(var(--reveal-delay) + var(--stagger-row) * 7); }
+}
+
+/* ---------- Masked lines and words ----------
    Words are plain inline spans at rest, so layout is byte-identical to
-   unsplit text. Only while animating do they become inline-block masks. */
+   unsplit text. Only while animating do they become inline-block masks.
+
+   The step is per line, with the words inside a line following closely behind
+   one another — see MaskedText for why the line rather than the word carries
+   the 40ms. */
 
 .word {
   display: inline;
@@ -102,11 +157,13 @@
   }
 
   :global(html.js) .wordInner {
-    --stagger-word: 40ms;
     display: inline-block;
     transform: translateY(100%);
     transition: transform var(--motion-headline) var(--ease-reveal);
-    transition-delay: calc(var(--word-index, 0) * var(--stagger-word));
+    transition-delay: calc(
+      var(--word-line, 0) * var(--stagger-word) +
+      var(--word-in-line, 0) * var(--stagger-word-inline)
+    );
   }
 
   :global(html.js) .masked.isVisible .wordInner {
@@ -135,7 +192,8 @@
     background: var(--acid);
     transform: scaleX(0);
     transform-origin: left center;
-    transition: transform var(--motion-slow) var(--ease-reveal) 780ms;
+    /* Lands at 800ms with the hero's last element, not after it. */
+    transition: transform var(--motion-normal) var(--ease-reveal) 580ms;
   }
 
   :global(html.js) .masked.isVisible .emphasis::before {
@@ -146,5 +204,19 @@
   :global(html.js) .emphasis .word {
     position: relative;
     z-index: 1;
+  }
+}
+
+/* ---------- Hover lift ----------
+   §28: a fine pointer only, and at most -2px. Never on touch, where there is
+   no hover state to speak of, and never further than the token allows. */
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  :global(html.js) .lift {
+    transition: transform var(--motion-fast) var(--ease-system);
+  }
+
+  :global(html.js) .lift:hover {
+    transform: translateY(var(--lift-hover));
   }
 }

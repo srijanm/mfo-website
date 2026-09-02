@@ -12,8 +12,12 @@ import { useEffect, useRef, useState } from "react";
  *
  * If the observer is unavailable the element is revealed immediately, so a
  * missing API can never leave content invisible.
+ *
+ * Typed on Element rather than HTMLElement so an inline SVG can observe itself
+ * without a wrapper — a wrapper would either join the section's grid or, as
+ * `display: contents`, generate no box for the observer to intersect at all.
  */
-export function useRevealOnce<T extends HTMLElement>() {
+export function useRevealOnce<T extends Element>() {
   const ref = useRef<T>(null);
   const [revealed, setRevealed] = useState(false);
 

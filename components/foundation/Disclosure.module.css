@@ -51,14 +51,31 @@
   background: var(--ink);
 }
 
+/* The upright of the plus. Drawn as a horizontal bar turned a quarter turn,
+   so that opening it can turn back onto the bar beneath and leave a minus —
+   §28 asks for a rotation, and a rotation is the one way to get there without
+   animating width or height. */
 .marker::after {
-  inset: 0 50% auto auto;
-  width: 1px;
-  height: 100%;
+  inset: 50% 0 auto 0;
+  height: 1px;
+  transform: rotate(90deg);
 }
 
 .isOpen .marker::after {
-  display: none;
+  transform: rotate(0deg);
+  /* Coincident with the bar below it: two 1px rules on the same line read as
+     one, which is the minus. Faded out as well, so the marker is a single
+     stroke rather than a doubled one at any zoom.
+     resting-state-ok — the open state of a button, not a pending reveal. */
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marker::after {
+    transition:
+      transform var(--motion-normal) var(--ease-system),
+      opacity var(--motion-normal) var(--ease-system);
+  }
 }
 
 /* An open row is the one thing on the accordion that has changed state, which
@@ -76,23 +93,30 @@
   display: grid;
   grid-template-rows: 0fr;
   visibility: hidden;
+  /* resting-state-ok — a closed panel is closed for everyone, reduced motion
+     and no-JS included. This is a state a button toggles, not a resting state
+     waiting on an observer to release it. */
+  opacity: 0;
 }
 
 .panelWrapOpen {
   grid-template-rows: 1fr;
   visibility: visible;
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .panelWrap {
     transition:
-      grid-template-rows 220ms var(--ease-system),
-      visibility 0s linear 220ms;
+      grid-template-rows var(--motion-normal) var(--ease-system),
+      opacity var(--motion-normal) var(--ease-system),
+      visibility 0s linear var(--motion-normal);
   }
 
   .panelWrapOpen {
     transition:
-      grid-template-rows 220ms var(--ease-system),
+      grid-template-rows var(--motion-normal) var(--ease-system),
+      opacity var(--motion-normal) var(--ease-system),
       visibility 0s linear 0s;
   }
 }

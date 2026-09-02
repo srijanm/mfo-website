@@ -7,7 +7,7 @@ import { cx } from "@/lib/cx";
 import styles from "./motion.module.css";
 import { useRevealOnce } from "./useRevealOnce";
 
-type RevealVariant = "fade" | "rule" | "rows";
+type RevealVariant = "fade" | "rule" | "rows" | "cells";
 
 type RevealProps = {
   as?: ElementType;

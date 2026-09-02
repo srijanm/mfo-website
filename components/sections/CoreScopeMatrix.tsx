@@ -1,4 +1,5 @@
 import { Container, Grid, Section, TextLink } from "@/components/foundation";
+import { Reveal } from "@/components/motion";
 import { Plate } from "@/components/plates";
 import { coreScopeSection, hero } from "@/lib/content/homepage";
 
@@ -27,7 +28,7 @@ export function CoreScopeMatrix() {
             {coreScopeSection.headline}
           </h2>
 
-          <ul className={styles.matrix}>
+          <Reveal as="ul" variant="rows" className={styles.matrix}>
             <li className={styles.headRow} aria-hidden="true">
               <p className={styles.heading}>{columnHeadings.area}</p>
               <p className={styles.heading}>{columnHeadings.handled}</p>
@@ -39,7 +40,7 @@ export function CoreScopeMatrix() {
                 <p className={styles.handled}>{item.body}</p>
               </li>
             ))}
-          </ul>
+          </Reveal>
 
           {/* A way out of the section. Plain text link, no container — §10
               secondary action. The label is the approved secondary CTA. */}

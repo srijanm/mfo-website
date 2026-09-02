@@ -121,6 +121,8 @@
   width: 100%;
   height: 100%;
   margin: 0;
+  /* resting-state-ok — the control is transparent by design and permanently
+     so. It is not hidden waiting to be revealed; it is the hit area. */
   opacity: 0;
   font: inherit;
   cursor: pointer;

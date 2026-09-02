@@ -383,53 +383,16 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Pass 2: the transitions.
+   The axis's own motion — the acid fill, the node fill, the 1.18 scale and the
+   pulse ring — now lives with the axis, in NodeAxis.module.css, so every use of
+   the primitive behaves the same way and the timings are stated once.
 
-   Same three gates as the composition itself — desktop, scripted, and only
-   where reduced motion has not been asked for. Under reduced motion these
-   rules do not exist, and globals.css would flatten their durations anyway.
+   What is left here is the part that belongs to this section: the crossfade
+   between one milestone's detail and the next, which is above, and nothing
+   else. The chapter's background is not animated at all — §28 asks for a
+   full-viewport colour change to be instant, and globals.css holds every
+   surface class at `transition-property: none` so it cannot become otherwise.
    --------------------------------------------------------------------------- */
-
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  /* The acid progress line grows from the left rather than appearing. 320ms is
-     motion-tokens incomeAxis.lineDuration. */
-  :global(html.js) .sticky .axis :global(span[class*="filled"]) {
-    transition: width 320ms var(--ease-system);
-  }
-
-  /* Node fill, and the 1.18 scale from motion-tokens incomeAxis. */
-  :global(html.js) .sticky .axis :global(span[class*="dot"]) {
-    transition:
-      background-color var(--motion-normal) var(--ease-system),
-      transform var(--motion-normal) var(--ease-system);
-  }
-
-  :global(html.js) .sticky .axis :global(span[class*="dotActive"]) {
-    transform: scale(1.18);
-    /* One pulse, once, on becoming active. Not a loop: the animation runs a
-       single iteration and the element is never re-triggered while it stays
-       active. 420ms is motion-tokens duration.nodePulse. */
-    animation: nodePulse 420ms var(--ease-system) 1;
-  }
-
-  :global(html.js) .sticky .axis :global(span[class*="label"]) {
-    transition: color var(--motion-normal) var(--ease-system);
-  }
-}
-
-/* A single expansion and settle. No overshoot, no spring: the scale returns to
-   its resting 1.18 rather than past it. */
-@keyframes nodePulse {
-  0% {
-    transform: scale(1);
-  }
-  60% {
-    transform: scale(1.18);
-  }
-  100% {
-    transform: scale(1.18);
-  }
-}
 
 /* The section mark. It sits above the heading rather than in a column of its
    own: the ruled blocks below set the column lines, and giving the mark a

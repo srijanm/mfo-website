@@ -42,3 +42,33 @@
     display: none;
   }
 }
+
+/* ---------- Draw-on ----------
+   Behind both gates. Without JavaScript nothing ever adds .isDrawn, and under
+   reduced motion globals.css flattens the transition to nothing — so the dash
+   must not exist in either case, or the figure would sit permanently at zero
+   stroke, which is a blank box.
+
+   pathLength="1" on every shape is what makes one dash length cover all of
+   them, whatever their real perimeter. */
+
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .svg:not(.isDrawn) * {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  :global(html.js) .svg.isDrawn * {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset var(--motion-draw) var(--ease-system);
+  }
+
+  /* The acid element is the one thing that is changing, so it resolves last:
+     it holds until the ink strokes have finished and then arrives on its own.
+     700ms + 220ms, inside the 600-800ms budget for the figure plus its mark. */
+  :global(html.js) .svg.isDrawn :global(.acid) {
+    transition-delay: var(--motion-draw);
+    transition-duration: var(--motion-normal);
+  }
+}

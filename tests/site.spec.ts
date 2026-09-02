@@ -932,14 +932,22 @@ test.describe("income axis", () => {
 
       const motion = await axisSection(page).evaluate((el) => {
         const dot = getComputedStyle(el.querySelector('span[class*="dotActive"]')!);
+        /* The pulse is a ring on the stop, not a scale on the node: the node
+           is already holding its 1.18, and one element cannot carry two
+           transforms at once. */
+        const stop = el.querySelector('[class*="NodeAxis_stop"]:has(span[class*="dotActive"])')!;
+        const ring = getComputedStyle(stop, "::after");
         const looping = [...el.querySelectorAll("*")].filter(
-          (node) => getComputedStyle(node).animationIterationCount === "infinite",
+          (node) =>
+            getComputedStyle(node).animationIterationCount === "infinite" ||
+            getComputedStyle(node, "::after").animationIterationCount === "infinite",
         ).length;
         return {
           transform: dot.transform,
           fill: dot.backgroundColor,
-          pulseDuration: dot.animationDuration,
-          pulseCount: dot.animationIterationCount,
+          fillDuration: dot.transitionDuration,
+          pulseDuration: ring.animationDuration,
+          pulseCount: ring.animationIterationCount,
           looping,
         };
       });
@@ -948,6 +956,8 @@ test.describe("income axis", () => {
       expect(motion.transform).toBe("matrix(1.18, 0, 0, 1.18, 0, 0)");
       // Settled, so the fill has finished interpolating.
       expect(motion.fill).toBe("rgb(215, 255, 0)");
+      // The node takes its acid fill in 180ms — §28.
+      expect(motion.fillDuration.split(", ")[0]).toBe("0.18s");
       expect(motion.pulseDuration).toBe("0.42s");
       expect(motion.pulseCount).toBe("1");
       expect(motion.looping).toBe(0);
@@ -1419,5 +1429,197 @@ test.describe("surfaces", () => {
       for (const b of bad) failures.push(`${route}: ${b}`);
     }
     expect(failures).toEqual([]);
+  });
+});
+
+/**
+ * §28. The three things about this motion system that are expensive to get
+ * wrong: content that never arrives, a hero that runs past its budget, and
+ * anything that keeps going.
+ */
+test.describe("motion system", () => {
+  const ROUTES = ["/", "/pricing", "/how-it-works", "/who-its-for", "/about"];
+
+  /** Anything with text that is still transparent is content nobody can read. */
+  const FADED = `(() => {
+    const out = [];
+    for (const el of document.querySelectorAll("main *, header *, footer *")) {
+      const text = (el.textContent ?? "").trim();
+      if (!text || el.children.length > 0) continue;
+      const s = getComputedStyle(el);
+      if (s.display === "none" || s.visibility === "hidden") continue;
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) continue;
+      if (Number(s.opacity) < 0.95) out.push(text.slice(0, 40) + " @ " + s.opacity);
+    }
+    return out;
+  })()`;
+
+  /** A dash left on a stroke is a drawing that never finished. */
+  const UNDRAWN = `(() => {
+    const out = [];
+    for (const shape of document.querySelectorAll("svg path, svg circle, svg rect, svg line")) {
+      const offset = parseFloat(getComputedStyle(shape).strokeDashoffset || "0");
+      if (offset > 0.001) out.push(String(shape.getAttribute("class") ?? shape.tagName));
+    }
+    return out;
+  })()`;
+
+  test.describe("with reduced motion", () => {
+    test.use({ contextOptions: { reducedMotion: "reduce" } });
+
+    test("every section is fully present and fully drawn", async ({ page }) => {
+      for (const route of ROUTES) {
+        await page.goto(route);
+        /* Down and back, so anything that waits on an observer has had every
+           chance to be reached — and anything that hides on the way has been
+           given the chance to. */
+        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+        await page.waitForTimeout(300);
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.waitForTimeout(200);
+        expect(await page.evaluate(FADED), `${route} hides text under reduced motion`).toEqual([]);
+        expect(await page.evaluate(UNDRAWN), `${route} leaves a stroke undrawn`).toEqual([]);
+      }
+    });
+  });
+
+  test.describe("without JavaScript", () => {
+    test.use({ javaScriptEnabled: false });
+
+    test("every section is fully present and fully drawn", async ({ page }) => {
+      for (const route of ROUTES) {
+        await page.goto(route);
+        expect(await page.evaluate(FADED), `${route} hides text with no JavaScript`).toEqual([]);
+        expect(await page.evaluate(UNDRAWN), `${route} leaves a stroke undrawn`).toEqual([]);
+      }
+    });
+  });
+
+  test("the hero finishes inside 800ms and then stops", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+
+    const state = () =>
+      page.evaluate(() => {
+        const hero = document.querySelector("main > section")!;
+        const settled = (el: Element | null) =>
+          el !== null && Number(getComputedStyle(el).opacity) > 0.99;
+        const words = [...hero.querySelectorAll('[class*="wordInner"]')];
+        const band = hero.querySelector('[class*="emphasis"]');
+        const cells = [...hero.querySelectorAll("dl > * > *")];
+        return {
+          words: words.filter((w) => getComputedStyle(w).transform === "none").length,
+          wordsTotal: words.length,
+          band: band ? getComputedStyle(band, "::before").transform : "none",
+          subhead: settled(hero.querySelector('[class*="subhead"]')),
+          actions: settled(hero.querySelector('[class*="actions"]')),
+          amount: settled(hero.querySelector('[class*="amount"]')),
+          cells: cells.filter((c) => Number(getComputedStyle(c).opacity) > 0.99).length,
+          cellsTotal: cells.length,
+          running: document.getAnimations().filter((a) => a.playState === "running").length,
+        };
+      });
+
+    await page.goto("/", { waitUntil: "load" });
+
+    /* Mid-flight, so this cannot pass by the animation never having run. */
+    await page.waitForTimeout(280);
+    const during = await state();
+    expect(during.words, "the headline should still be arriving").toBeLessThan(during.wordsTotal);
+
+    /* §28 closes the hero at 800ms. Sampled a little after, to allow for the
+       frame the browser needs to commit the last transition. */
+    await page.waitForTimeout(600);
+    const done = await state();
+    expect(done.words).toBe(done.wordsTotal);
+    expect(done.cells).toBe(done.cellsTotal);
+    expect(done.band).toBe("matrix(1, 0, 0, 1, 0, 0)");
+    expect(done.subhead).toBe(true);
+    expect(done.actions).toBe(true);
+    expect(done.amount).toBe(true);
+    expect(done.running, "the hero must be finished at 800ms").toBe(0);
+
+    /* And then permanently: nothing in the hero starts again on its own. */
+    await page.waitForTimeout(900);
+    expect((await state()).running, "hero motion must not resume").toBe(0);
+  });
+
+  test("first entrance only — nothing replays on the way back up", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+
+    const drawn = () =>
+      page.evaluate(() => {
+        const sections = [...document.querySelectorAll("section.section")];
+        return {
+          total: sections.length,
+          drawn: sections.filter((s) => {
+            const t = getComputedStyle(s, "::before").transform;
+            return t === "none" || t.startsWith("matrix(1,");
+          }).length,
+        };
+      });
+
+    const height = await page.evaluate(() => document.body.scrollHeight);
+    for (let y = 0; y < height; y += 500) {
+      await page.evaluate((v) => window.scrollTo(0, v), y);
+      await page.waitForTimeout(80);
+    }
+    await page.waitForTimeout(1000);
+    const after = await drawn();
+    expect(after.drawn, "every rule should have drawn on the way down").toBe(after.total);
+
+    for (let y = height; y > 0; y -= 700) {
+      await page.evaluate((v) => window.scrollTo(0, v), y);
+      await page.waitForTimeout(50);
+    }
+    await page.waitForTimeout(400);
+    const back = await drawn();
+    expect(back.drawn, "a rule must never re-draw on scroll back").toBe(back.total);
+  });
+
+  test("nothing on the page loops", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(1200);
+
+    const looping = await page.evaluate(() =>
+      [...document.querySelectorAll("*")].filter((node) =>
+        ["", "::before", "::after"].some(
+          (part) =>
+            getComputedStyle(node, part || undefined).animationIterationCount === "infinite",
+        ),
+      ).length,
+    );
+    expect(looping, "motion on this site is one pass").toBe(0);
+  });
+
+  test("a full-viewport colour change is never animated", async ({ page }) => {
+    await page.goto("/");
+    const surfaces = await page.evaluate(() =>
+      [...document.querySelectorAll(".surface-ink, .surface-acid, .surface-paper, .surface-white")]
+        .map((el) => {
+          const cs = getComputedStyle(el);
+          return { property: cs.transitionProperty, duration: cs.transitionDuration };
+        })
+        .filter((s) => s.property !== "none" && s.duration !== "0s"),
+    );
+    expect(surfaces, "§28: an ink chapter arrives, it does not fade in").toEqual([]);
+  });
+
+  test("a hover lift never exceeds 2px, and only on a fine pointer", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    const record = page.locator("main figure").first();
+    await record.scrollIntoViewIfNeeded();
+    await record.hover();
+    await page.waitForTimeout(250);
+
+    const lifted = await record.evaluate((el) => {
+      const m = new DOMMatrix(getComputedStyle(el).transform);
+      return { y: m.m42, x: m.m41 };
+    });
+    expect(Math.abs(lifted.y), "§28 caps the lift at 2px").toBeLessThanOrEqual(2);
+    expect(lifted.x).toBe(0);
   });
 });
