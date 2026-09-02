@@ -1,6 +1,6 @@
-import { Container, Grid, Section } from "@/components/foundation";
+import { Container, Grid, Section, TextLink } from "@/components/foundation";
 import { Plate } from "@/components/plates";
-import { coreScopeSection } from "@/lib/content/homepage";
+import { coreScopeSection, hero } from "@/lib/content/homepage";
 
 import styles from "./CoreScopeMatrix.module.css";
 
@@ -19,7 +19,7 @@ export function CoreScopeMatrix() {
   const { columnHeadings, items } = coreScopeSection;
 
   return (
-    <Section id="core-scope" labelledBy="core-scope-headline">
+    <Section id="core-scope" dense labelledBy="core-scope-headline">
       <Container>
         <Grid>
           <Plate kind="coreScope" className={styles.plate} />
@@ -40,6 +40,12 @@ export function CoreScopeMatrix() {
               </li>
             ))}
           </ul>
+
+          {/* A way out of the section. Plain text link, no container — §10
+              secondary action. The label is the approved secondary CTA. */}
+          <div className={styles.action}>
+            <TextLink href={hero.secondaryCta.href}>{hero.secondaryCta.label}</TextLink>
+          </div>
         </Grid>
       </Container>
     </Section>

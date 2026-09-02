@@ -130,3 +130,23 @@
   margin-top: auto;
   padding-top: 40px;
 }
+
+/* ---------------------------------------------------------------------------
+   The node of the entry being pointed at fills acid — something changes here,
+   and the pointer is what makes it the one in question.
+
+   Deliberately not a fixed "current" node: marking one entry as where the year
+   has reached would assert a position in it, and a date is exactly what this
+   section is forbidden to state. Fine pointers only, and nothing is carried by
+   it that the row does not already say in words.
+   --------------------------------------------------------------------------- */
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .row :global(span[class*="dot"]) {
+    transition: background var(--motion-normal) var(--ease-system);
+  }
+
+  .row:hover :global(span[class*="dot"]) {
+    background: var(--acid);
+  }
+}

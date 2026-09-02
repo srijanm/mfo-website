@@ -81,6 +81,13 @@
   padding-top: 8px;
 }
 
+/* Section-ending action, beneath the closing line. Named apart from `.action`,
+   which is the per-tier call to action: one class for both silently changed
+   the tiers' spacing. */
+.sectionAction {
+  margin-top: 20px;
+}
+
 .closingText {
   margin: 0;
   max-width: 64ch;

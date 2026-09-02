@@ -147,3 +147,10 @@
   grid-column: 1 / -1;
   margin-bottom: 28px;
 }
+
+/* Section-ending action. Sits under the matrix's closing rule, so the section
+   punctuates rather than simply stopping. */
+.action {
+  grid-column: 1 / -1;
+  margin-top: 28px;
+}

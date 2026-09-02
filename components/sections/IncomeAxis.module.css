@@ -354,6 +354,11 @@
     display: block;
     width: 100%;
   }
+
+  :global(html.js) .sticky .action {
+    flex: none;
+    padding-top: 24px;
+  }
 }
 
 /* Outside the sticky treatment neither the axis strip nor the object exists:
@@ -361,6 +366,11 @@
 .axis,
 .record {
   display: none;
+}
+
+/* Only the sticky composition has a panel foot to hang this on. */
+.action {
+  margin-top: 32px;
 }
 
 /* The one place depth is permitted on this page: an information object sitting
