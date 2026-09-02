@@ -8,7 +8,12 @@
   --rule-grid-pad-inline: 40px;
 }
 
+/* A column, so the mark can be pushed to its foot. Moving the ring below the
+   copy alone did not close the gap — the ledger beside it is simply taller, so
+   the ring has to be anchored to the bottom rather than merely placed last. */
 .copy {
+  display: flex;
+  flex-direction: column;
   padding-block: 28px 0;
 }
 
@@ -118,9 +123,10 @@
   }
 }
 
-/* The section mark. The ring is this section's mark rather than an 88px plate:
-   two circular marks in one section is one too many, and the ring says the same
-   thing with more of it. */
+/* The section mark, anchoring the foot of the left column. The ring is this
+   section's mark rather than an 88px plate: two circular marks in one section
+   is one too many, and the ring says the same thing with more of it. */
 .ring {
-  margin-bottom: 32px;
+  margin-top: auto;
+  padding-top: 40px;
 }

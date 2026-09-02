@@ -76,17 +76,22 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
          ordinary paper section, and a page carries at most one ink block. */
       className={cx(sticky && styles.sticky, sticky && "surface-ink")}
     >
-      <Container>
-        <Grid>
-          <div className={styles.intro}>
-            <Plate kind="incomeAxis" className={styles.plate} />
-            <h2 id="income-axis" className={styles.headline}>
-              {incomeAxis.headline}
-            </h2>
-            {compact ? null : <p className={styles.lede}>{incomeAxis.intro}</p>}
-          </div>
-        </Grid>
-      </Container>
+      {/* Outside the sticky composition this introduces the section in the
+          ordinary way. Inside it, the same copy is the chapter's header and
+          lives in the panel below, so it introduces the axis rather than
+          occupying a screen of its own before it. */}
+      {sticky ? null : (
+        <Container>
+          <Grid>
+            <div className={styles.intro}>
+              <Plate kind="incomeAxis" className={styles.plate} />
+              <h2 id="income-axis" className={styles.headline}>
+                {incomeAxis.headline}
+              </h2>
+            </div>
+          </Grid>
+        </Container>
+      )}
 
       <div className={styles.scroller}>
         {/* Empty, aria-hidden, and display:none outside the sticky treatment. */}
@@ -107,6 +112,15 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
               MASTER_BUILD_SPEC.md §17 places it in the panel's lower portion.
               This deviates from that on the owner's instruction. Decorative:
               every label it marks is in the list below. */}
+          {sticky ? (
+            <Container className={styles.chapter}>
+              <h2 id="income-axis" className={styles.chapterHeadline}>
+                {incomeAxis.headline}
+              </h2>
+              <p className={styles.chapterLede}>{incomeAxis.intro}</p>
+            </Container>
+          ) : null}
+
           {sticky ? (
             /* The header holds nothing but the axis, and the axis is
                decorative — every label on it is the milestone list below — so

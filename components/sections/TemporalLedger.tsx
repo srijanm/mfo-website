@@ -31,15 +31,19 @@ export function TemporalLedger() {
       <Container>
         <div className={cx("rule-grid", "rule-grid--4-8", styles.split)}>
           <div className={styles.copy}>
+            <h2 id="temporal-ledger" className={styles.headline}>
+              {temporalLedger.headline}
+            </h2>
+            <p className={styles.body}>{temporalLedger.body}</p>
+
+            {/* The mark sits under the copy rather than above it, so the left
+                column ends level with the ledger instead of stopping short and
+                leaving the lower left empty. */}
             <YearRing
               className={styles.ring}
               stages={entries.map((entry) => ({ id: entry.id, label: entry.label }))}
               caption={temporalLedger.yearLabel}
             />
-            <h2 id="temporal-ledger" className={styles.headline}>
-              {temporalLedger.headline}
-            </h2>
-            <p className={styles.body}>{temporalLedger.body}</p>
           </div>
 
           <div>
