@@ -1,0 +1,90 @@
+/* Item 09. The page rail.
+
+   The one persistent decorative element, and the only one that bends the
+   contract. It is not scroll-jacking: the wheel is never touched and every node
+   is an ordinary anchor.
+
+   It only appears where the layout actually has a margin to hold it. The grid
+   is 1440px with a 32px gutter, so the page's left margin is
+   (viewport - 1440) / 2 + 32. The rail with its active label is about 130px
+   wide, which needs a viewport of roughly 1700px before it clears the content
+   at all — 1760px is the first width with real room either side of it. Below
+   that it is not rendered, because a rail sitting on top of the copy is worse
+   than no rail. */
+
+.rail {
+  display: none;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: block;
+}
+
+/* A real anchor, at the project's 44px minimum. */
+.node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+/* Only the section the reader is level with, or the one being pointed at,
+   names itself — and only that one is in the document. The others are the node
+   alone, so the rail stays a mark rather than a menu. */
+.label {
+  font-size: var(--fs-small);
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.nodeActive {
+  color: var(--ink);
+}
+
+@media (min-width: 1760px) {
+  .rail {
+    display: block;
+    position: fixed;
+    left: 32px;
+    top: 50%;
+    transform: translateY(-50%);
+    /* Under the sticky header, which owns the top of the page. */
+    z-index: 1;
+  }
+
+  /* The passed portion of the rail. */
+  .fill {
+    position: absolute;
+    left: 6px;
+    top: 22px;
+    width: 2px;
+    background: var(--acid);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .fill {
+    transition: height var(--motion-slow) var(--ease-system);
+  }
+}
+
+/* §29 and the contract: under reduced motion the rail comes out entirely. Every
+   destination it points at is a section of the page the reader is already in,
+   and the footer carries every link on the site. */
+@media (prefers-reduced-motion: reduce) {
+  .rail {
+    display: none;
+  }
+}

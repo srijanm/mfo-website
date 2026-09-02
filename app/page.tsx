@@ -1,3 +1,4 @@
+import { PageRail } from "@/components/chrome";
 import {
   AdditionalFinancialSupport,
   CoreScopeMatrix,
@@ -38,6 +39,10 @@ import { pricing } from "@/lib/content/pricing";
 export default function HomePage() {
   return (
     <>
+      {/* Mounted here rather than in the root layout: the rail points at DOM
+          ids this page declares, and must not appear on pages that do not. */}
+      <PageRail />
+
       <Hero />
       <RecognitionStrip />
       <LatentProblemTable />
