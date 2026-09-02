@@ -1318,3 +1318,106 @@ test.describe("flair", () => {
     await ctx.close();
   });
 });
+
+/**
+ * The amended visual system.
+ *
+ * Two of these can only be checked on a rendered page: how many colour blocks a
+ * page actually ends up with once its components are composed, and whether any
+ * text on a dark surface resolves to a colour that fails AA. guardrails.mjs
+ * catches the single-file cases; these catch the composed ones.
+ */
+test.describe("surfaces", () => {
+  /**
+   * Real pages only. /styleguide is deliberately outside all three: it renders
+   * every primitive on all four surfaces, several times over, which is both
+   * more colour blocks than a page may carry and — by design — the one place
+   * a paper-surface component is shown failing on ink. Excluding it is the
+   * point of it existing; these rules still bind everywhere they apply.
+   */
+  const SURFACE_ROUTES = [
+    "/", "/how-it-works", "/pricing", "/who-its-for", "/who-its-for/foreign-income",
+    "/about", "/get-started", "/guides", "/contact", "/privacy", "/terms",
+  ];
+
+  test("a page carries at most one ink block and one acid block", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const over: string[] = [];
+    for (const route of SURFACE_ROUTES) {
+      await page.goto(route);
+      const counts = await page.evaluate(() => ({
+        ink: document.querySelectorAll(".surface-ink").length,
+        acid: document.querySelectorAll(".surface-acid").length,
+      }));
+      if (counts.ink > 1) over.push(`${route}: ${counts.ink} ink blocks`);
+      if (counts.acid > 1) over.push(`${route}: ${counts.acid} acid blocks`);
+    }
+    expect(over).toEqual([]);
+  });
+
+  test("ink and acid blocks are never adjacent", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const adjacent: string[] = [];
+    for (const route of SURFACE_ROUTES) {
+      await page.goto(route);
+      const bad = await page.evaluate(() => {
+        const blocks = [...document.querySelectorAll(".surface-ink, .surface-acid")];
+        return blocks.filter((block) => {
+          const next = block.nextElementSibling;
+          return (
+            next !== null &&
+            (next.classList.contains("surface-ink") || next.classList.contains("surface-acid"))
+          );
+        }).length;
+      });
+      if (bad > 0) adjacent.push(`${route}: ${bad}`);
+    }
+    expect(adjacent).toEqual([]);
+  });
+
+  test("text on every surface clears its own contrast floor", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const failures: string[] = [];
+    for (const route of SURFACE_ROUTES) {
+      await page.goto(route);
+      const bad = await page.evaluate(() => {
+        const px = (v: string) => parseFloat(v) || 0;
+        const chan = (c: number) => { const v = c / 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+        const lum = (c: number[]) => 0.2126 * chan(c[0]) + 0.7152 * chan(c[1]) + 0.0722 * chan(c[2]);
+        const parse = (v: string) => (v.match(/[\d.]+/g) ?? []).slice(0, 4).map(Number);
+        const backdrop = (el: Element): number[] => {
+          let n: Element | null = el;
+          while (n && n !== document.documentElement) {
+            const c = parse(getComputedStyle(n).backgroundColor);
+            if (c.length >= 3 && (c[3] === undefined || c[3] > 0)) return c.slice(0, 3);
+            n = n.parentElement;
+          }
+          return [246, 247, 242];
+        };
+        const out: string[] = [];
+        for (const el of document.querySelectorAll("body *")) {
+          if (![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent?.trim())) continue;
+          const cs = getComputedStyle(el);
+          if (cs.visibility === "hidden" || cs.display === "none" || cs.opacity === "0") continue;
+          const r = el.getBoundingClientRect();
+          if (!r.width || !r.height) continue;
+          const bg = backdrop(el);
+          const fg = parse(cs.color);
+          const a = fg[3] === undefined ? 1 : fg[3];
+          const over = [0, 1, 2].map((i) => fg[i] * a + bg[i] * (1 - a));
+          const l1 = lum(over), l2 = lum(bg);
+          const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+          const size = px(cs.fontSize);
+          const large = size >= 24 || (size >= 18.66 && parseInt(cs.fontWeight, 10) >= 700);
+          const need = large ? 3 : 4.5;
+          if (ratio < need) {
+            out.push(`${ratio.toFixed(2)}:1 need ${need} — "${(el.textContent ?? "").trim().slice(0, 30)}"`);
+          }
+        }
+        return out;
+      });
+      for (const b of bad) failures.push(`${route}: ${b}`);
+    }
+    expect(failures).toEqual([]);
+  });
+});

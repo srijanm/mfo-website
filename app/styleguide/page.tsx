@@ -17,6 +17,7 @@ import {
   IncomingPaymentRecord,
 } from "@/components/objects";
 import { reviewed, unreviewed } from "@/lib/content/reviewed";
+import { Plate } from "@/components/plates";
 import { specimens as SAMPLE } from "@/lib/content/specimens";
 import { defaultMilestones } from "@/lib/content/site-content";
 import { cx } from "@/lib/cx";
@@ -66,6 +67,36 @@ const OBLIGATION_PENDING = {
   what: unreviewed("Placeholder obligation"),
   when: unreviewed("Placeholder date"),
 };
+
+const SURFACES = [
+  { id: "paper", className: "surface-paper", label: "Paper — the default" },
+  { id: "white", className: "surface-white", label: "White — document objects" },
+  { id: "ink", className: "surface-ink", label: "Ink — the chapter break" },
+  { id: "acid", className: "surface-acid", label: "Acid — the closing panel" },
+] as const;
+
+/**
+ * The same primitive, four times, once on each surface.
+ *
+ * This is the point of the section: a component that hard-codes a paper-surface
+ * colour looks correct everywhere else and disappears on ink, and the only
+ * reliable way to find that is to put it there and look.
+ */
+function OnEverySurface({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className={styles.surfaceRow}>
+      <p className={styles.surfaceRowLabel}>{label}</p>
+      <div className={styles.surfaceGrid}>
+        {SURFACES.map((surface) => (
+          <div key={surface.id} className={cx(styles.surfaceCell, surface.className)}>
+            <span className={styles.surfaceName}>{surface.label}</span>
+            {children}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function Specimen({
   state,
@@ -459,6 +490,81 @@ export default function StyleguidePage() {
               </div>
             ))}
           </div>
+        </Container>
+      </Section>
+
+      <Section labelledBy="surfaces" dense>
+        <Container>
+          <h2 id="surfaces" className={styles.groupTitle}>
+            Every primitive, on every surface
+          </h2>
+          <p className={styles.groupNote}>
+            Four surfaces, and a page carries at most one ink block and one acid
+            block. Each surface rebinds the rule tokens, so a nested component
+            inherits the right rules rather than hard-coding them. What it does
+            not rebind is <code>--muted</code>: muted on ink is 3.6:1 and fails,
+            so a component on ink has to ask for <code>--muted-on-ink</code> by
+            name. Anything below that vanishes or greys out on the ink row is a
+            component still assuming it is on paper.
+          </p>
+
+          <OnEverySurface label="Rule — default, strong, active">
+            <div className={styles.surfaceStack}>
+              <Rule />
+              <Rule strong />
+              <Rule active />
+            </div>
+          </OnEverySurface>
+
+          <OnEverySurface label="Threshold node — inactive, active, labelled">
+            <div className={styles.surfaceInline}>
+              <ThresholdNode />
+              <ThresholdNode active />
+              <ThresholdNode active label="First income" />
+            </div>
+          </OnEverySurface>
+
+          <OnEverySurface label="Type — body, lead, small label">
+            <div className={styles.surfaceStack}>
+              <p className={styles.typeSample}>Row title at body weight 500.</p>
+              <p className={cx(styles.typeSample, styles.lead)}>
+                Section intro at the lead step.
+              </p>
+              <p className={cx(styles.typeSample, styles.small, styles.mutedSample)}>
+                Data label, small and muted
+              </p>
+            </div>
+          </OnEverySurface>
+
+          <OnEverySurface label="Actions — primary, reversed, text link">
+            <div className={styles.surfaceInline}>
+              <Button href="/get-started">See what I need</Button>
+              <Button href="/get-started" tone="ink">
+                See what I need
+              </Button>
+              <TextLink href="/pricing">View pricing</TextLink>
+            </div>
+          </OnEverySurface>
+
+          <OnEverySurface label="Disclosure">
+            <Disclosure summary="A question, in a ruled row">
+              <p className={styles.typeSample}>
+                The panel keeps its own measure on any surface.
+              </p>
+            </Disclosure>
+          </OnEverySurface>
+
+          <OnEverySurface label="Information object — white by definition">
+            <DeadlineRecord
+              what={OBLIGATION_REVIEWED.what}
+              when={OBLIGATION_REVIEWED.when}
+              status="MFO tracks"
+            />
+          </OnEverySurface>
+
+          <OnEverySurface label="Section mark">
+            <Plate kind="recognition" />
+          </OnEverySurface>
         </Container>
       </Section>
     </>
