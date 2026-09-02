@@ -190,8 +190,7 @@
     height: calc(100svh - var(--nav-h-total, 64px));
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    padding-block: 48px 56px;
+    padding-block: 36px 56px;
   }
 
   :global(html.js) .sticky .panelInner {
@@ -304,13 +303,19 @@
     max-width: none;
   }
 
-  /* The full-width line and node axis, lower portion of the panel. */
+  /* The axis is the panel's header: a persistent position indicator directly
+     under the nav, above the content it describes. It is closed by a rule
+     rather than opened by one, because the nav's own rule is already the line
+     above it. */
+  :global(html.js) .sticky .axisHeader {
+    flex: none;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--rule);
+  }
+
   :global(html.js) .sticky .axis {
     display: block;
     width: 100%;
-    margin-top: 32px;
-    padding-top: 32px;
-    border-top: 1px solid var(--rule);
   }
 }
 
