@@ -17,17 +17,7 @@ import {
   IncomingPaymentRecord,
 } from "@/components/objects";
 import { reviewed, unreviewed } from "@/lib/content/reviewed";
-import {
-  RecordGates,
-  RecordStates,
-  RecordTrack,
-  WatchBracket,
-  WatchEnclosure,
-  WatchSightlines,
-  YearBand,
-  YearFolded,
-  YearQuarters,
-} from "@/components/illustration";
+import { RecordStates, WatchBracket, YearQuarters } from "@/components/illustration";
 import { Plate } from "@/components/plates";
 import { specimens as SAMPLE } from "@/lib/content/specimens";
 import { defaultMilestones } from "@/lib/content/site-content";
@@ -120,31 +110,25 @@ const ILLUSTRATION_SLOTS = [
   {
     id: "year",
     title: "A. The shape of a compliance year",
-    note: "For H07. The year as a structure, not a calendar grid.",
+    note: "H07. The year as a structure, not a calendar grid.",
     candidates: [
-      { id: "a1", label: "A1 — four quarters, one live", render: YearQuarters },
-      { id: "a2", label: "A2 — the year as a band, seen at an angle", render: YearBand },
-      { id: "a3", label: "A3 — one continuous line, folded", render: YearFolded },
+      { id: "a1", label: "Four quarters, one live", render: YearQuarters },
     ],
   },
   {
     id: "watch",
     title: "B. A system watching a sequence",
-    note: "For H06, which is three columns of text and nothing else.",
+    note: "H06. The sequence is yours; the watching is ours.",
     candidates: [
-      { id: "b1", label: "B1 — one bracket over the whole line", render: WatchBracket },
-      { id: "b2", label: "B2 — the sequence inside the thing watching it", render: WatchEnclosure },
-      { id: "b3", label: "B3 — one place, several things", render: WatchSightlines },
+      { id: "b1", label: "One bracket over the whole line", render: WatchBracket },
     ],
   },
   {
     id: "record",
     title: "C. A record moving through states",
-    note: "For H09. Draft to filed, without naming any particular filing.",
+    note: "H09. Draft to filed, without naming any particular filing.",
     candidates: [
-      { id: "c1", label: "C1 — the same record, four times along a track", render: RecordTrack },
-      { id: "c2", label: "C2 — one record, resolving a line at a time", render: RecordStates },
-      { id: "c3", label: "C3 — a record passing gates", render: RecordGates },
+      { id: "c1", label: "One record, resolving a line at a time", render: RecordStates },
     ],
   },
 ] as const;
@@ -547,14 +531,15 @@ export default function StyleguidePage() {
       <Section labelledBy="illustration" dense>
         <Container>
           <h2 id="illustration" className={styles.groupTitle}>
-            Illustration candidates
+            Illustration
           </h2>
           <p className={styles.groupNote}>
-            Line art only: strokes and no fills, neutral lines in
-            <code> currentColor</code> so they invert on ink, and acid on
-            exactly one element — the one that is active or changing. Strokes
-            are non-scaling, so a 1px line is 1px at any render size. None of
-            them carries text, and none is on the homepage yet.
+            The three drawings now on the homepage, kept here so they can be
+            checked on a surface they do not otherwise appear on. Line art only:
+            strokes and no fills, neutral lines in <code>currentColor</code> so
+            they invert on ink, and acid on exactly one element — the one that
+            is active or changing. Strokes are non-scaling, so a 1px line is
+            1px at any render size, and none of them carries text.
           </p>
           <p className={styles.groupNote}>
             The narrow column is 128px, which is tighter than a 320px viewport

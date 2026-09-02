@@ -1,4 +1,5 @@
 import { Container, Grid, Section } from "@/components/foundation";
+import { RecordStates } from "@/components/illustration";
 import { Plate } from "@/components/plates";
 import { trustLedger } from "@/lib/content/homepage";
 
@@ -21,6 +22,10 @@ export function TrustLedger() {
           <h2 id="trust-ledger" className={styles.headline}>
             {trustLedger.headline}
           </h2>
+
+          {/* One record resolving a state at a time — what the rows below
+              describe, as a shape. It names no filing. */}
+          <RecordStates className={styles.mark} />
 
           <ul className={styles.rows}>
             {rows.map((row) => (

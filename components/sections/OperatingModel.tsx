@@ -1,5 +1,5 @@
 import { Container, Grid, Section } from "@/components/foundation";
-import { SheetStack } from "@/components/plates";
+import { WatchBracket } from "@/components/illustration";
 import { operatingModel } from "@/lib/content/homepage";
 import { cx } from "@/lib/cx";
 
@@ -16,11 +16,13 @@ export function OperatingModel() {
     <Section labelledBy="operating-model">
       <Container>
         <Grid>
-          <SheetStack className={styles.stack} />
-
           <h2 id="operating-model" className={styles.headline}>
             {operatingModel.headline}
           </h2>
+
+          {/* The operating model as a shape: the sequence is yours, the
+              bracket over it is ours. */}
+          <WatchBracket className={styles.mark} />
 
           <ul className={cx("rule-grid", styles.pillars)}>
             {operatingModel.pillars.map((pillar) => (
