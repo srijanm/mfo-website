@@ -15,10 +15,13 @@
   border-bottom: 1px solid var(--rule);
 }
 
-/* Real buttons, on the rule system rather than as chips. */
-.toggle {
+/* Real buttons, on the rule system rather than as chips. The inactive tab is
+   not just quieter text: it carries a hairline under it, so it reads as the
+   other half of a control rather than as a second label. */
+.tab {
+  position: relative;
   min-height: 44px;
-  padding: 10px 20px 10px 0;
+  padding: 10px 20px;
   border: 0;
   background: transparent;
   color: var(--muted);
@@ -27,13 +30,41 @@
   cursor: pointer;
 }
 
-.toggle + .toggle {
-  padding-left: 20px;
+.tab:first-child {
+  padding-left: 0;
+}
+
+.tab + .tab {
   border-left: 1px solid var(--rule);
 }
 
-.toggleOn {
+/* The affordance on both, and the acid mark on the selected one. Two pixels of
+   acid is the whole signal — it is the same mark the axis uses for "you are
+   here". */
+.tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--rule-strong);
+}
+
+.tab:first-child::after {
+  left: 0;
+}
+
+.tabOn {
   color: var(--ink);
+}
+
+.tabOn::after {
+  background: var(--acid);
+}
+
+.panel {
+  min-width: 0;
 }
 
 .grid {
@@ -68,8 +99,17 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* The crossfade between the two shapes, and the tab mark following it. One
+     pass: the component performs itself once and then never moves on its own. */
   :global(html.js) .cell {
-    transition: background var(--motion-fast) var(--ease-system);
+    transition: background var(--motion-slow) var(--ease-system);
+  }
+
+  :global(html.js) .tab,
+  :global(html.js) .tab::after {
+    transition:
+      color var(--motion-normal) var(--ease-system),
+      background var(--motion-normal) var(--ease-system);
   }
 }
 

@@ -7,6 +7,16 @@
    the closing row closes the block. The four dividers therefore terminate on a
    horizontal at both ends. */
 
+/* Section intro: --fs-lead, --ink-2, above the first rule — CLAUDE.md. */
+.lead {
+  margin: 0 0 20px;
+  max-width: 48ch;
+  font-size: var(--fs-lead);
+  line-height: 1.44;
+  letter-spacing: -.018em;
+  color: var(--ink-2);
+}
+
 .cells {
   --rule-grid-pad-block: 40px;
   margin: 0;

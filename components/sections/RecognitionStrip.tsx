@@ -1,6 +1,6 @@
 import { Container, Section } from "@/components/foundation";
 import { EventField, Plate } from "@/components/plates";
-import { recognitionClosing } from "@/lib/content/homepage";
+import { recognitionClosing, recognitionLead } from "@/lib/content/homepage";
 import { recognition } from "@/lib/content/site-content";
 import { cx } from "@/lib/cx";
 
@@ -9,15 +9,23 @@ import styles from "./RecognitionStrip.module.css";
 /**
  * H02 — recognition.
  *
- * The section carries no heading of its own: the four labels are the content,
- * and the closing row draws the conclusion. Nothing was invented to give it a
- * title it was not written with.
+ * One object: a line that says what the reader is looking at, the four labels,
+ * and the conclusion, inside a single bounded rule structure. Every rule in it
+ * belongs to the block, so nothing floats above or below it.
+ *
+ * The lead line is a placeholder — the copy doc supplies the labels and the
+ * closing row and nothing to introduce them. See lib/content/homepage.ts.
  */
 export function RecognitionStrip() {
   return (
     <Section dense>
       <Container>
         <Plate kind="recognition" className={styles.plate} />
+
+        {/* The lead sits inside the block, above its first rule, so the labels
+            arrive with something in front of them. */}
+        <p className={styles.lead}>{recognitionLead}</p>
+
         <ul className={cx("rule-grid", "rule-grid--continues", styles.cells)}>
           {recognition.map((label) => (
             <li key={label} className={styles.cell}>
