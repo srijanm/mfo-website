@@ -1,6 +1,7 @@
 import { Container, Grid, Section, TextLink } from "@/components/foundation";
 import { formatAnnualPrice, type PricingContent } from "@/lib/content/pricing";
 import { approvedPlanScope } from "@/lib/content/pricing-scope";
+import { primaryCta } from "@/lib/content/navigation";
 import { cx } from "@/lib/cx";
 
 import { PlanComparisonMatrix } from "./PlanComparisonMatrix";
@@ -62,6 +63,10 @@ export function PricingSection({ content, id = "pricing" }: PricingSectionProps)
 
           <div className={styles.closing}>
             <p className={styles.closingText}>{content.closing}</p>
+
+            <div className={styles.sectionAction}>
+              <TextLink href={primaryCta.href}>{primaryCta.label}</TextLink>
+            </div>
           </div>
         </Grid>
       </Container>

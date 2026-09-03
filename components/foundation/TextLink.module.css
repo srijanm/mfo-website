@@ -18,6 +18,12 @@
   line-height: 1;
 }
 
+/* On ink, --ink is 1:1 and invisible. Acid is 16.2:1 and is what an action
+   looks like on the dark chapter. */
+:global(.surface-ink) .link {
+  color: var(--acid);
+}
+
 /* The underline is a rule that draws, not a text-decoration that appears, so
    it matches every other line on the site. Where motion is not welcome the
    ordinary underline does the same job. */
@@ -39,7 +45,7 @@
     right: 0;
     bottom: -4px;
     height: 1px;
-    background: var(--ink);
+    background: currentColor;
     transform: scaleX(0);
     transform-origin: left center;
     transition: transform var(--motion-normal) var(--ease-system);

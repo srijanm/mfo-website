@@ -26,7 +26,7 @@ type FaqSectionProps = {
  */
 export function FaqSection({ items, headline }: FaqSectionProps) {
   return (
-    <Section labelledBy={headline ? "faq-headline" : undefined}>
+    <Section dense labelledBy={headline ? "faq-headline" : undefined}>
       <Container>
         <Grid>
           <div className={styles.list}>

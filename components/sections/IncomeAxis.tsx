@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { Container, Grid, NodeAxis, Section, ThresholdNode } from "@/components/foundation";
+import { Container, Grid, NodeAxis, Section, TextLink, ThresholdNode } from "@/components/foundation";
 import { Plate } from "@/components/plates";
 import { DeadlineRecord } from "@/components/objects";
 import { incomeAxis } from "@/lib/content/homepage";
+import { primaryCta } from "@/lib/content/navigation";
 import { factValue } from "@/lib/content/reviewed";
 import { cx } from "@/lib/cx";
 
@@ -196,6 +197,15 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
             </ol>
           </Container>
 
+          {/* The chapter's way out. At the foot of the panel rather than after
+              the scroller: the panel is what the reader is looking at for the
+              whole section, and an action below 320vh of scroll is one nobody
+              reaches. Acid, because on ink that is what a text link is. */}
+          {sticky ? (
+            <Container className={styles.action}>
+              <TextLink href={primaryCta.href}>{primaryCta.label}</TextLink>
+            </Container>
+          ) : null}
         </div>
       </div>
     </Section>

@@ -61,6 +61,13 @@
   display: none;
 }
 
+/* An open row is the one thing on the accordion that has changed state, which
+   is the only meaning §6 allows the acid mark to carry. */
+.isOpen .marker::before {
+  height: 2px;
+  background: var(--acid);
+}
+
 /* The panel animates between zero and its natural height. `visibility` does
    the hiding rather than `display`, because display cannot transition — and
    unlike opacity alone, it still removes the panel from the accessibility tree
