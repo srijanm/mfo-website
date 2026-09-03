@@ -123,10 +123,9 @@
   }
 }
 
-/* The section mark, anchoring the foot of the left column. The ring is this
-   section's mark rather than an 88px plate: two circular marks in one section
-   is one too many, and the ring says the same thing with more of it. */
-.ring {
+/* The section mark, anchoring the foot of the left column. */
+.mark {
+  width: 168px;
   margin-top: auto;
   padding-top: 40px;
 }

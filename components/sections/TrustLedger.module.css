@@ -98,3 +98,27 @@
   grid-column: 1 / -1;
   margin-bottom: 28px;
 }
+
+/* Cols 9-12, beside the headline, which had nothing in them. The row is left
+   to auto-placement: this section's plate already occupies row one, so pinning
+   the mark there put it beside the plate instead of the headline. */
+.mark {
+  grid-column: 9 / -1;
+  align-self: center;
+  justify-self: end;
+  width: 100%;
+  max-width: 300px;
+}
+
+/* Below desktop the grid is 8 then 4 columns, so a 9/-1 placement creates an
+   implicit thirteenth column and widens the row — which stops the ruled block
+   below from spanning it. The mark flows in the normal order instead. */
+@media (max-width: 1023px) {
+  .mark {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    justify-self: start;
+    max-width: 260px;
+    margin-bottom: 8px;
+  }
+}

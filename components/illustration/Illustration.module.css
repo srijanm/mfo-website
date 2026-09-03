@@ -33,3 +33,12 @@
 .svg :global(.node) {
   stroke-width: 1;
 }
+
+/* The simpler form. Below 768px the detail comes out; every drawing is
+   composed so that what is left is a complete figure rather than one with a
+   hole in it. */
+@media (max-width: 767px) {
+  .svg :global(.detail) {
+    display: none;
+  }
+}

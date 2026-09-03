@@ -12,10 +12,12 @@
 }
 
 /* Cols 9-12, beside the headline, which had nothing in them. */
-.stack {
+.mark {
   grid-column: 9 / -1;
-  grid-row: 1;
+  align-self: center;
   justify-self: end;
+  width: 100%;
+  max-width: 300px;
 }
 
 .pillars {
@@ -27,14 +29,7 @@
 }
 
 @media (min-width: 1024px) {
-  /* Cols 9-12, beside the headline, which had nothing in them. */
-.stack {
-  grid-column: 9 / -1;
-  grid-row: 1;
-  justify-self: end;
-}
-
-.pillars {
+  .pillars {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
@@ -60,14 +55,7 @@
     grid-column: 1 / -1;
   }
 
-  /* Cols 9-12, beside the headline, which had nothing in them. */
-.stack {
-  grid-column: 9 / -1;
-  grid-row: 1;
-  justify-self: end;
-}
-
-.pillars {
+  .pillars {
     --rule-grid-pad-block: 28px;
 
     margin-top: 48px;
@@ -75,5 +63,18 @@
 
   .body {
     max-width: 56ch;
+  }
+}
+
+/* Below desktop the grid is 8 then 4 columns, so a 9/-1 placement creates an
+   implicit thirteenth column and widens the row — which stops the ruled block
+   below from spanning it. The mark flows in the normal order instead. */
+@media (max-width: 1023px) {
+  .mark {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    justify-self: start;
+    max-width: 260px;
+    margin-bottom: 8px;
   }
 }

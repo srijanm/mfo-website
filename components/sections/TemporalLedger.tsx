@@ -1,5 +1,5 @@
 import { Container, Section, ThresholdNode } from "@/components/foundation";
-import { YearRing } from "@/components/plates";
+import { YearQuarters } from "@/components/illustration";
 import { temporalLedger } from "@/lib/content/homepage";
 import { factValue } from "@/lib/content/reviewed";
 import { cx } from "@/lib/cx";
@@ -39,11 +39,7 @@ export function TemporalLedger() {
             {/* The mark sits under the copy rather than above it, so the left
                 column ends level with the ledger instead of stopping short and
                 leaving the lower left empty. */}
-            <YearRing
-              className={styles.ring}
-              stages={entries.map((entry) => ({ id: entry.id, label: entry.label }))}
-              caption={temporalLedger.yearLabel}
-            />
+            <YearQuarters className={styles.mark} />
           </div>
 
           <div>
