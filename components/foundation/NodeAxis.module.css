@@ -62,6 +62,17 @@
   white-space: nowrap;
 }
 
+/* Muted on ink is 3.6:1 and fails; --muted-on-ink is 6.9:1. The active label is
+   restated after it, because the ink selector carries one more class and would
+   otherwise flatten the active state. */
+:global(.surface-ink) .label {
+  color: var(--muted-on-ink);
+}
+
+:global(.surface-ink) .stop:has(:global(span[class*="dotActive"])) .label {
+  color: inherit;
+}
+
 /* A field marking rather than a progress indicator: ink at low opacity, no
    acid, nothing that moves — §25. */
 .quiet {

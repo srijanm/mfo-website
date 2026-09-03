@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { Container, Grid, Section, StepAxis, ThresholdNode } from "@/components/foundation";
+import { Container, Grid, NodeAxis, Section, ThresholdNode } from "@/components/foundation";
 import { Plate } from "@/components/plates";
 import { DeadlineRecord } from "@/components/objects";
 import { incomeAxis } from "@/lib/content/homepage";
@@ -99,6 +99,31 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
         ) : null}
 
         <div className={styles.panel}>
+          {/* The axis is the panel's header, not its footer. Below the content
+              it describes, the reader saw the detail change before they could
+              see where they were; at the top it is a persistent position
+              indicator, visible on the first milestone and every one after.
+
+              MASTER_BUILD_SPEC.md §17 places it in the panel's lower portion.
+              This deviates from that on the owner's instruction. Decorative:
+              every label it marks is in the list below. */}
+          {sticky ? (
+            /* The header holds nothing but the axis, and the axis is
+               decorative — every label on it is the milestone list below — so
+               the whole band is out of the accessibility tree. Written as a
+               plain container div because Container takes no ARIA props. */
+            <div aria-hidden="true" className={cx("container", styles.axisHeader)}>
+              <NodeAxis
+                className={styles.axis}
+                stops={milestones.map((milestone) => ({
+                  id: milestone.id,
+                  label: milestone.label,
+                }))}
+                activeIndex={active}
+              />
+            </div>
+          ) : null}
+
           <Container className={styles.panelInner}>
             <ol className={cx(styles.list, compact && styles.listCompact)}>
               {milestones.map((milestone, index) => (
@@ -157,20 +182,6 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
             </ol>
           </Container>
 
-          {/* The full-width line and node axis, in the lower portion of the
-              sticky panel. Decorative: every label it marks is in the list. */}
-          {sticky ? (
-            <Container>
-              <StepAxis
-                className={styles.axis}
-                stops={milestones.map((milestone) => ({
-                  id: milestone.id,
-                  label: milestone.label,
-                }))}
-                activeIndex={active}
-              />
-            </Container>
-          ) : null}
         </div>
       </div>
     </Section>

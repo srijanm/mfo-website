@@ -80,3 +80,15 @@
 :global(.surface-ink) .labelActive {
   color: inherit;
 }
+
+/* On ink, an inactive node is a mark on the rule, not a piece of text: paper
+   at full strength would read as louder than the label beside it. The active
+   node keeps its acid fill and takes an acid stroke, so it stays the one thing
+   on the axis that is filled. */
+:global(.surface-ink) .dot {
+  border-color: var(--rule-on-ink);
+}
+
+:global(.surface-ink) .dotActive {
+  border-color: var(--acid);
+}
