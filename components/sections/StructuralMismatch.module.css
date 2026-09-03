@@ -168,7 +168,9 @@
   }
 }
 
-/* Sits under the copy, in the space the left cell already had. */
-.grids {
-  margin-top: 44px;
-}
+/* The offset-grid plate used to sit here. It stood about 320px tall, which made
+   the left column that much taller than the four rows beside it and left 370px
+   of empty paper to the right of the divider — and the divider ran the whole
+   way down it. A section ends where its content ends, so the plate is
+   unmounted rather than the void being lived with. It is still built, and
+   still wants a column with room in it. */
