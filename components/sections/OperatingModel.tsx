@@ -27,7 +27,7 @@ export function OperatingModel() {
 
           <Reveal as="ul" variant="rows" className={cx("rule-grid", styles.pillars)}>
             {operatingModel.pillars.map((pillar) => (
-              <li key={pillar.id} className={styles.pillar}>
+              <li key={pillar.id}>
                 <h3 className={styles.title}>{pillar.title}</h3>
                 <p className={styles.body}>{pillar.body}</p>
               </li>
