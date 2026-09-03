@@ -342,14 +342,16 @@ test.describe("get-started intake", () => {
     expect(await page.locator(`#${describedBy}`).innerText()).toBe(await error.innerText());
 
     /* And the invalid state is programmatically determinable, not only
-       described — the same treatment the text fields on the last step get. A
-       bare fieldset carries no radiogroup role, so it goes on the controls. */
-    const radios = page.locator('fieldset input[type="radio"]');
-    const count = await radios.count();
-    expect(count).toBeGreaterThan(0);
-    for (let i = 0; i < count; i++) {
-      await expect(radios.nth(i)).toHaveAttribute("aria-invalid", "true");
-    }
+       described — the same treatment the text fields on the last step get. It
+       sits on the group, because aria-invalid is not supported on role=radio,
+       which is what the inputs are. */
+    const group = page.locator('[role="radiogroup"]');
+    await expect(group).toHaveAttribute("aria-invalid", "true");
+
+    /* The role means the legend no longer names the group on its own. */
+    const labelledBy = await group.getAttribute("aria-labelledby");
+    expect(labelledBy).toBeTruthy();
+    expect(await page.locator(`#${labelledBy}`).innerText()).toBeTruthy();
   });
 
   test("persists nothing client-side", async ({ page }) => {
