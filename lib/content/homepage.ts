@@ -449,6 +449,16 @@ export type FaqItem = {
  * each question is a top-level heading. That keeps the document's heading
  * order intact without inventing a title the section was not written with.
  */
+/**
+ * PLACEHOLDER — NEEDS OWNER SIGN-OFF.
+ *
+ * docs/HOMEPAGE_COPY_AND_CONTENT.md §H12 supplies the seven questions and no
+ * heading for them, and the section was rendering with none: seven h2s in a row
+ * with nothing naming them. This is written to fill that hole, not approved.
+ * Replace it or delete it, but do not treat it as signed-off copy.
+ */
+export const homepageFaqHeadline = "Questions people ask before they start.";
+
 export const homepageFaq: readonly FaqItem[] = [
   {
     id: "not-enough-yet",

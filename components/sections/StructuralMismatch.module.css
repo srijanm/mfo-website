@@ -63,7 +63,8 @@
   display: block;
   margin-bottom: 6px;
   font-size: var(--fs-small);
-  font-weight: 500;
+  /* Data label: --fs-small, --muted, weight 400 — CLAUDE.md typography. */
+  font-weight: 400;
   color: var(--muted);
 }
 

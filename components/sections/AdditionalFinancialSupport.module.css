@@ -29,11 +29,14 @@
   list-style: none;
 }
 
+/* Layer B is subordinate by construction, so this reads lighter than the core
+   scope matrix it would otherwise mirror: a shorter row, a tighter rhythm and
+   the UI step rather than body. Same content, less weight. */
 .row {
   display: grid;
   grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.6fr);
   gap: var(--grid-gap-desktop);
-  padding: 18px 0;
+  padding: 13px 0;
   border-top: 1px solid var(--rule);
 }
 
@@ -45,14 +48,14 @@
   margin: 0;
   font-size: var(--fs-ui);
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 .description {
   margin: 0;
   max-width: 62ch;
   font-size: var(--fs-ui);
-  line-height: 1.5;
+  line-height: 1.45;
   color: var(--ink-2);
 }
 
@@ -68,7 +71,7 @@
   }
 
   .rows {
-    margin-top: 32px;
+    margin-top: 28px;
   }
 
   .row {

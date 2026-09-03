@@ -107,7 +107,8 @@
 .fieldLabel {
   margin: 0;
   font-size: var(--fs-small);
-  font-weight: 500;
+  /* Data label: --fs-small, --muted, weight 400 — CLAUDE.md typography. */
+  font-weight: 400;
   color: var(--muted);
 }
 
@@ -270,11 +271,33 @@
     max-width: 18ch;
   }
 
+  /* A two-column ruled record, the same shape as the incoming payment object:
+     a fixed label column on the left, values on the right, one rule between
+     rows. Stacked, the two read as equal blocks and neither is subordinate.
+
+     gap is 0 and the spacing is padding: a column gap here would leave each
+     row's rule broken in two with a gap between the halves, which is the shape
+     the rule-system guardrail rejects. */
   :global(html.js) .sticky .fields {
-    margin-top: 32px;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 16px 0;
+    margin-top: 36px;
+    grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+    gap: 0;
     max-width: none;
+  }
+
+  :global(html.js) .sticky .field dt,
+  :global(html.js) .sticky .field dd {
+    padding-block: 15px;
+  }
+
+  :global(html.js) .sticky .field dt {
+    padding-right: 24px;
+  }
+
+  /* One rule between rows. Both halves carry it, so it runs unbroken. */
+  :global(html.js) .sticky .field + .field dt,
+  :global(html.js) .sticky .field + .field dd {
+    border-top: 1px solid var(--rule);
   }
 
   :global(html.js) .sticky .fieldValue {

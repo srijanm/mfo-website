@@ -12,7 +12,7 @@ import {
   TrustLedger,
 } from "@/components/sections";
 import { FaqSection, FinalCtaSection, PricingSection } from "@/components/shared";
-import { finalCta, homepageFaq } from "@/lib/content/homepage";
+import { finalCta, homepageFaq, homepageFaqHeadline } from "@/lib/content/homepage";
 import { pricing } from "@/lib/content/pricing";
 
 /**
@@ -54,7 +54,7 @@ export default function HomePage() {
       <TrustLedger />
       <PricingSection content={pricing} />
       <AdditionalFinancialSupport />
-      <FaqSection items={homepageFaq} />
+      <FaqSection items={homepageFaq} headline={homepageFaqHeadline} />
       <FinalCtaSection content={finalCta} />
     </>
   );
