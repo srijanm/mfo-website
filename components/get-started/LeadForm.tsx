@@ -162,6 +162,7 @@ export function LeadForm() {
   }
 
   const errorId = (field: string) => `${fieldId}-${field}-error`;
+  const legendId = `${fieldId}-legend`;
 
   /* Resolved means: the person has put something in and nothing has come back
      about it. Read from the answers and errors the form already holds, so the
@@ -210,9 +211,19 @@ export function LeadForm() {
       {currentChoice ? (
         <fieldset
           className={styles.fieldset}
+          /* An explicit radiogroup, so the group can carry its own invalid
+             state: aria-invalid is not supported on role=radio, which is what
+             the inputs are, and a bare fieldset exposes no role that takes it.
+             With the role set the legend no longer names the group on its own,
+             so the name is stated with aria-labelledby. */
+          role="radiogroup"
+          aria-labelledby={legendId}
+          aria-invalid={errors[currentChoice.id] ? true : undefined}
           aria-describedby={errors[currentChoice.id] ? errorId(currentChoice.id) : undefined}
         >
-          <legend className={styles.legend}>{currentChoice.question}</legend>
+          <legend id={legendId} className={styles.legend}>
+            {currentChoice.question}
+          </legend>
 
           <div className={styles.choices}>
             {currentChoice.options.map((option) => (
@@ -223,13 +234,6 @@ export function LeadForm() {
                   name={currentChoice.id}
                   value={option}
                   checked={answers[currentChoice.id] === option}
-                  /* The group's error is announced through the fieldset's
-                     aria-describedby, but that only describes it. The invalid
-                     state has to be programmatically determinable too, the way
-                     it already is on the text fields below — and a bare
-                     fieldset has no radiogroup role to carry it, so it goes on
-                     the controls. */
-                  aria-invalid={errors[currentChoice.id] ? true : undefined}
                   onChange={() => setAnswer(currentChoice.id, option)}
                 />
                 <span aria-hidden="true" className={styles.marker} />
