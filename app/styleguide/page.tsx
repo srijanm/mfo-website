@@ -17,6 +17,17 @@ import {
   IncomingPaymentRecord,
 } from "@/components/objects";
 import { reviewed, unreviewed } from "@/lib/content/reviewed";
+import {
+  RecordGates,
+  RecordStates,
+  RecordTrack,
+  WatchBracket,
+  WatchEnclosure,
+  WatchSightlines,
+  YearBand,
+  YearFolded,
+  YearQuarters,
+} from "@/components/illustration";
 import { Plate } from "@/components/plates";
 import { specimens as SAMPLE } from "@/lib/content/specimens";
 import { defaultMilestones } from "@/lib/content/site-content";
@@ -97,6 +108,46 @@ function OnEverySurface({ label, children }: { label: string; children: React.Re
     </div>
   );
 }
+
+/**
+ * Candidate line art, three per slot.
+ *
+ * Every candidate is shown on paper and on ink, and at two sizes: the width it
+ * would take in a section, and the width it would take in a 320px viewport.
+ * A drawing that only survives one of those four is not a candidate.
+ */
+const ILLUSTRATION_SLOTS = [
+  {
+    id: "year",
+    title: "A. The shape of a compliance year",
+    note: "For H07. The year as a structure, not a calendar grid.",
+    candidates: [
+      { id: "a1", label: "A1 — four quarters, one live", render: YearQuarters },
+      { id: "a2", label: "A2 — the year as a band, seen at an angle", render: YearBand },
+      { id: "a3", label: "A3 — one continuous line, folded", render: YearFolded },
+    ],
+  },
+  {
+    id: "watch",
+    title: "B. A system watching a sequence",
+    note: "For H06, which is three columns of text and nothing else.",
+    candidates: [
+      { id: "b1", label: "B1 — one bracket over the whole line", render: WatchBracket },
+      { id: "b2", label: "B2 — the sequence inside the thing watching it", render: WatchEnclosure },
+      { id: "b3", label: "B3 — one place, several things", render: WatchSightlines },
+    ],
+  },
+  {
+    id: "record",
+    title: "C. A record moving through states",
+    note: "For H09. Draft to filed, without naming any particular filing.",
+    candidates: [
+      { id: "c1", label: "C1 — the same record, four times along a track", render: RecordTrack },
+      { id: "c2", label: "C2 — one record, resolving a line at a time", render: RecordStates },
+      { id: "c3", label: "C3 — a record passing gates", render: RecordGates },
+    ],
+  },
+] as const;
 
 function Specimen({
   state,
@@ -490,6 +541,65 @@ export default function StyleguidePage() {
               </div>
             ))}
           </div>
+        </Container>
+      </Section>
+
+      <Section labelledBy="illustration" dense>
+        <Container>
+          <h2 id="illustration" className={styles.groupTitle}>
+            Illustration candidates
+          </h2>
+          <p className={styles.groupNote}>
+            Line art only: strokes and no fills, neutral lines in
+            <code> currentColor</code> so they invert on ink, and acid on
+            exactly one element — the one that is active or changing. Strokes
+            are non-scaling, so a 1px line is 1px at any render size. None of
+            them carries text, and none is on the homepage yet.
+          </p>
+          <p className={styles.groupNote}>
+            The narrow column is 128px, which is tighter than a 320px viewport
+            actually gives — at that width this page drops to one column and a
+            drawing gets about 248px. Anything legible at 128px is legible
+            there. Resize the window to see the real one.
+          </p>
+
+          {ILLUSTRATION_SLOTS.map((slot) => (
+            <div key={slot.id} className={styles.slot}>
+              <h3 className={styles.slotTitle}>{slot.title}</h3>
+              <p className={styles.slotNote}>{slot.note}</p>
+
+              {slot.candidates.map((candidate) => {
+                const Drawing = candidate.render;
+                return (
+                  <div key={candidate.id} className={styles.candidate}>
+                    <p className={styles.candidateLabel}>{candidate.label}</p>
+                    <div className={styles.candidateGrid}>
+                      <div className={cx(styles.drawingCell, "surface-paper")}>
+                        <span className={styles.cellNote}>Paper · section width</span>
+                        <Drawing />
+                      </div>
+                      <div className={cx(styles.drawingCell, "surface-ink")}>
+                        <span className={styles.cellNote}>Ink · section width</span>
+                        <Drawing />
+                      </div>
+                      <div className={cx(styles.drawingCell, "surface-paper")}>
+                        <span className={styles.cellNote}>Paper · narrow, 128px</span>
+                        <div className={styles.narrow}>
+                          <Drawing />
+                        </div>
+                      </div>
+                      <div className={cx(styles.drawingCell, "surface-ink")}>
+                        <span className={styles.cellNote}>Ink · narrow, 128px</span>
+                        <div className={styles.narrow}>
+                          <Drawing />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </Container>
       </Section>
 

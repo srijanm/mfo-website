@@ -295,3 +295,86 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Illustration candidates.
+
+   Four cells per candidate: both surfaces, at the width a drawing would take
+   in a section and at the width it would take in a 320px viewport. A drawing
+   that only survives one of the four is not a candidate.
+   --------------------------------------------------------------------------- */
+
+.slot {
+  padding-top: 40px;
+}
+
+.slotTitle {
+  margin: 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-h3);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -.028em;
+}
+
+.slotNote {
+  margin: 8px 0 0;
+  font-size: var(--fs-ui);
+  color: var(--muted);
+}
+
+.candidate {
+  padding-top: 28px;
+}
+
+.candidateLabel {
+  margin: 0 0 12px;
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+.candidateGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.drawingCell {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: var(--radius-panel);
+  min-width: 0;
+}
+
+.cellNote {
+  font-size: var(--fs-small);
+  opacity: .7;
+}
+
+/* Deliberately narrower than a 320px viewport actually gives. At 320px the
+   container is 288px and this page drops to one column, so a drawing there gets
+   about 248px. 128px is the conservative case: anything that survives here
+   survives the real one. Resize the page to check the real one. */
+.narrow {
+  width: 100%;
+  max-width: 128px;
+}
+
+@media (max-width: 1023px) {
+  .candidateGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 599px) {
+  .candidateGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .narrow {
+    max-width: none;
+  }
+}

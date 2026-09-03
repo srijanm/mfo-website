@@ -1,0 +1,35 @@
+/* Line art, per CLAUDE.md.
+
+   Everything neutral is drawn in currentColor, so a drawing inverts with the
+   surface it lands on instead of carrying a colour of its own. The one element
+   that is active or changing is acid, and nothing else is.
+
+   Strokes are non-scaling, so a 1px line stays a 1px line whether the drawing
+   is rendered at 240px or at 96px. That is what makes the same file legible at
+   320px without a separate mobile variant. */
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* No fills anywhere. The acid accents below are strokes too. */
+.svg * {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+/* The one thing that is changing. */
+.svg :global(.acid) {
+  stroke: var(--acid);
+  stroke-width: 1.5;
+}
+
+/* A node is a mark on a line, so it keeps the 1px weight of the line. */
+.svg :global(.node) {
+  stroke-width: 1;
+}
