@@ -48,7 +48,9 @@
   /* A circle, not a rounded rectangle: percentage radius is exempt from the
      6px ceiling that governs rectangular surfaces. */
   border-radius: 50%;
-  border: 1px solid var(--ink);
+  /* currentColor, so the outline is the surface's own text colour: ink on
+     paper, paper on ink. A hard-coded --ink disappears on a dark surface. */
+  border: 1px solid currentColor;
   background: transparent;
 }
 
@@ -63,6 +65,18 @@
   color: var(--muted);
 }
 
+/* Inherits the surface's text colour rather than assuming paper. */
 .labelActive {
-  color: var(--ink);
+  color: inherit;
+}
+
+/* Muted on ink is 3.6:1 and fails; --muted-on-ink is 6.9:1. The active label
+   is restated after it, because the ink selector carries one more class than
+   .labelActive and would otherwise flatten the active state. */
+:global(.surface-ink) .label {
+  color: var(--muted-on-ink);
+}
+
+:global(.surface-ink) .labelActive {
+  color: inherit;
 }

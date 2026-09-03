@@ -1,11 +1,9 @@
 /* H13, §25. The one full acid field on the page.
-   Ink on acid. The field itself is full-bleed; its rule is not — it comes from
-   the shared `.section` rule, drawn at container width in the on-acid value so
-   it does not disappear into the field. */
 
-.section {
-  background: var(--acid);
-}
+   The background, text colour and rule colour all come from `.surface-acid`.
+   The field itself is full-bleed; its rule is not — it is the shared `.section`
+   rule, drawn at container width, and it picks up the on-acid value because the
+   surface rebinds it. */
 
 /* The field is the height of what is in it, and what is in it is centred: it
    used to run 120px of padding either side of a block sitting in the top-left
