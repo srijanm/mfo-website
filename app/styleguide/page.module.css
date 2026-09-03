@@ -221,3 +221,77 @@
 .factFlag {
   color: var(--muted);
 }
+
+/* ---------------------------------------------------------------------------
+   Every primitive, on every surface.
+
+   Four cells per row, one per surface, so a component that assumes paper is
+   visible as a hole in the ink column rather than as a surprise in production.
+   The cells carry a radius because a colour block is a section-level panel.
+   --------------------------------------------------------------------------- */
+
+.surfaceRow {
+  padding-block: 28px;
+  border-top: 1px solid var(--rule);
+}
+
+.surfaceRowLabel {
+  margin: 0 0 16px;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.surfaceGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.surfaceCell {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border-radius: var(--radius-panel);
+  min-width: 0;
+}
+
+/* Named in the surface's own text colour, so the label is legible on all four
+   without any of them being special-cased. */
+.surfaceName {
+  font-size: var(--fs-small);
+  font-weight: 500;
+  opacity: .7;
+}
+
+.surfaceStack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.surfaceInline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Deliberately plain --muted: this is the specimen that shows what happens to a
+   paper-surface label when it lands on ink. */
+.mutedSample {
+  color: var(--muted);
+}
+
+@media (max-width: 1023px) {
+  .surfaceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 599px) {
+  .surfaceGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

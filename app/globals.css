@@ -28,9 +28,17 @@
   --error: #B42318;
   --success: #2D6A4F;
 
+  /* Muted text on a dark surface. Plain --muted on ink is 3.6:1 and fails AA;
+     this is 6.9:1. Never use --muted on ink. */
+  --muted-on-ink: #9A9E96;
+
+  /* Rules, one per surface. `--rule` and `--rule-strong` always mean "the rule
+     colour of the surface I am on" — the surface classes below rebind them, so
+     a nested component never has to know which surface it landed on. */
   --rule: rgba(17, 19, 15, 0.16);
   --rule-strong: rgba(17, 19, 15, 0.34);
   --rule-on-acid: rgba(17, 19, 15, 0.24);
+  --rule-on-ink: rgba(246, 247, 242, 0.20);
 
   /* Layout */
   --page-max: 1440px;
@@ -57,7 +65,15 @@
 
   /* Geometry */
   --radius-button: 2px;
-  --radius-object: 6px;
+  --radius-object: 8px;
+  --radius-panel: 12px;
+
+  /* Depth. Exactly two, and no others.
+     --shadow-object is for an information object sitting on top of a colour
+     block. Objects on paper stay flat, and no ruled row, table, text block,
+     pricing column or section container ever takes either of these. */
+  --shadow-object: 0 1px 2px rgba(17, 19, 15, .04), 0 8px 24px rgba(17, 19, 15, .06);
+  --shadow-overlay: 0 12px 40px rgba(17, 19, 15, .08);
 
   /* Motion */
   --motion-fast: 140ms;
@@ -159,6 +175,50 @@ body {
 .data-number {
   font-variant-numeric: tabular-nums lining-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+/* ---------------------------------------------------------------------------
+   Surfaces.
+
+   Four, and a page carries at most one ink block and one acid block. Each class
+   sets its own background and text colour and rebinds the rule tokens, so a
+   component dropped onto it inherits the right rules instead of hard-coding
+   them. A colour block spans the full viewport; its content stays on the
+   container grid inside it.
+
+   Note what these deliberately do not rebind: `--muted`. Muted on ink fails AA,
+   so a component on ink must ask for `--muted-on-ink` by name rather than have
+   it quietly swapped underneath it — guardrails fails the build on `--muted`
+   inside an ink scope, and the styleguide renders every primitive on all four
+   surfaces so the ones that assume paper are visible before they ship.
+   --------------------------------------------------------------------------- */
+
+.surface-paper {
+  background: var(--paper);
+  color: var(--ink);
+  --rule: rgba(17, 19, 15, 0.16);
+  --rule-strong: rgba(17, 19, 15, 0.34);
+}
+
+.surface-white {
+  background: var(--white);
+  color: var(--ink);
+  --rule: rgba(17, 19, 15, 0.16);
+  --rule-strong: rgba(17, 19, 15, 0.34);
+}
+
+.surface-ink {
+  background: var(--ink);
+  color: var(--paper);
+  --rule: var(--rule-on-ink);
+  --rule-strong: var(--rule-on-ink);
+}
+
+.surface-acid {
+  background: var(--acid);
+  color: var(--ink);
+  --rule: var(--rule-on-acid);
+  --rule-strong: var(--rule-on-acid);
 }
 
 .rule-top { border-top: 1px solid var(--rule); }

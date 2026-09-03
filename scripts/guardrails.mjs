@@ -21,7 +21,7 @@ const SCAN_DIRS = ["app", "components", "lib"];
 const GUIDES_DIR = "content/guides";
 const SCAN_EXTENSIONS = new Set([".css", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".mdx"]);
 
-/** MASTER_BUILD_SPEC.md §4. The only hex values permitted anywhere. */
+/** CLAUDE.md "Colour — one hue, four surfaces". The only hex permitted. */
 const LOCKED_PALETTE = new Set([
   "#F6F7F2", // paper
   "#FFFFFF", // white
@@ -32,17 +32,41 @@ const LOCKED_PALETTE = new Set([
   "#2457FF", // focus
   "#B42318", // functional error
   "#2D6A4F", // functional success
+  "#9A9E96", // muted on ink — 6.9:1, where plain muted would be 3.6:1
 ]);
 
 /**
- * Shadows are permitted only on overlay/menu surfaces. A box-shadow is allowed
- * when its enclosing CSS selector (or, in TS/JSX, its own line) names one of
- * these.
+ * Depth is two tokens and nothing else. A box-shadow is permitted only when its
+ * value is one of them; any other shadow, anywhere, fails. --shadow-object is
+ * for an information object on top of a colour block, --shadow-overlay for the
+ * menu. Where either is used is a review question; that it is one of these two
+ * is not.
  */
-const OVERLAY_ALLOWLIST = ["overlay", "menu", "dialog", "popover", "drawer"];
+const SHADOW_TOKENS = ["--shadow-object", "--shadow-overlay"];
 
-/** Radius ceiling in px. Buttons are 2px, literal record surfaces 6px max. */
-const MAX_RADIUS_PX = 6;
+/** Radius ceiling in px. Buttons 2px, objects 8px, section panels 12px. */
+const MAX_RADIUS_PX = 12;
+
+/**
+ * Illustration is line art, inline SVG, never raster. Photography of real
+ * people is a separate permission and lives outside the illustration layer, so
+ * this is scoped to it rather than banning raster site-wide.
+ */
+const ILLUSTRATION_DIR = "components/plates";
+const RASTER = /\.(png|jpe?g|gif|webp|avif|bmp|tiff?)\b/i;
+
+/**
+ * An illustration may not draw a tax fact. CLAUDE.md rule 3 covers SVG
+ * explicitly: no date, no amount, no rate inside a drawing.
+ */
+const SVG_TAX_PATTERNS = [
+  [/\b\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i, "a date"],
+  [/\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2}\b/i, "a date"],
+  [/\b\d{4}-\d{2}-\d{2}\b/, "a date"],
+  [/(?:₹|\bRs\.?\s*|\bINR\s+)\s*\d/i, "a rupee amount"],
+  [/\d\s*%/, "a percentage"],
+  [/\d\s*(?:per\s*cent|percent)\b/i, "a percentage"],
+];
 
 /** Weights at or above this are not brand styling. */
 const MAX_FONT_WEIGHT = 600;
@@ -235,14 +259,19 @@ function checkFile(file) {
     const value = match[1].trim();
     if (/^none\b/i.test(value)) continue;
 
-    const context = `${selectorAt(match.index)} ${lineText}`.toLowerCase();
-    const allowed = OVERLAY_ALLOWLIST.some((token) => context.includes(token));
+    /* The only permitted values are the two tokens. Anything else — a literal
+       shadow, a third token, a tweak of one of these — fails. */
+    const allowed = SHADOW_TOKENS.some((token) =>
+      new RegExp(`var\\(\\s*${token}\\s*[,)]`).test(value),
+    );
     if (!allowed) {
       report(
         file,
         line,
         "box-shadow",
-        `Shadows are permitted only on overlay or menu surfaces (${OVERLAY_ALLOWLIST.join(", ")}). No content shadows.`,
+        `Depth is ${SHADOW_TOKENS.join(" and ")} and nothing else. ` +
+          "Objects on paper stay flat, and no ruled row, table, text block, " +
+          "pricing column or section container takes a shadow at all.",
         lineText,
       );
     }
@@ -267,7 +296,8 @@ function checkFile(file) {
           file,
           line,
           "border-radius",
-          `${size}px exceeds the ${MAX_RADIUS_PX}px ceiling. Buttons are 2px; literal record surfaces are 6px max.`,
+          `${size}px exceeds the ${MAX_RADIUS_PX}px ceiling. Buttons and inputs ` +
+            "are 2px, information objects 8px, section panels 12px.",
           lineText,
         );
         break;
@@ -363,6 +393,66 @@ function checkFile(file) {
         "`amount` field in lib/content/.",
       lineText,
     );
+  }
+
+  // --- raster in the illustration layer ---
+  if (relative.split(path.sep).join("/").startsWith(ILLUSTRATION_DIR)) {
+    for (const match of text.matchAll(new RegExp(RASTER, "gi"))) {
+      const { line, text: lineText } = at(match.index);
+      report(
+        file,
+        line,
+        "raster-illustration",
+        `Illustration is inline SVG line art, never raster (${match[0]}).`,
+        lineText,
+      );
+    }
+  }
+
+  // --- muted text inside an ink surface ---
+  if (isCss) {
+    for (const match of text.matchAll(/var\(\s*--muted\s*[,)]/g)) {
+      const selector = selectorAt(match.index);
+      if (!/\bsurface-ink\b/.test(selector)) continue;
+      const { line, text: lineText } = at(match.index);
+      report(
+        file,
+        line,
+        "muted-on-ink",
+        "--muted on ink is 3.6:1 and fails AA. Use --muted-on-ink, which is 6.9:1.",
+        lineText,
+      );
+    }
+  }
+
+  // --- more than one ink or acid block declared in a single file ---
+  for (const surface of ["surface-ink", "surface-acid"]) {
+    const uses = [...text.matchAll(new RegExp(`["'\\s]${surface}["'\\s]`, "g"))];
+    if (uses.length <= 1) continue;
+    const { line, text: lineText } = at(uses[1].index);
+    report(
+      file,
+      line,
+      "colour-block-count",
+      `A page carries at most one ${surface} block; this file declares ${uses.length}.`,
+      lineText,
+    );
+  }
+
+  // --- an illustration may not draw a tax fact ---
+  for (const svg of text.matchAll(/<svg\b[\s\S]*?<\/svg>/gi)) {
+    for (const [pattern, what] of SVG_TAX_PATTERNS) {
+      const hit = svg[0].match(pattern);
+      if (!hit) continue;
+      const { line, text: lineText } = at(svg.index + (hit.index ?? 0));
+      report(
+        file,
+        line,
+        "svg-tax-fact",
+        `An illustration may not draw ${what} — CLAUDE.md rule 3 covers SVG explicitly.`,
+        lineText,
+      );
+    }
   }
 
   // --- looping animation ---
