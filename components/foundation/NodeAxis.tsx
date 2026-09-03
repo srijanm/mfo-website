@@ -1,3 +1,8 @@
+"use client";
+
+import type { CSSProperties } from "react";
+
+import { useRevealOnce } from "@/components/motion";
 import { cx } from "@/lib/cx";
 
 import styles from "./NodeAxis.module.css";
@@ -25,22 +30,33 @@ type NodeAxisProps = {
  * spacing; the first and last are pulled inside the line's ends so the axis
  * cannot push its container sideways.
  *
+ * On first entry the line draws left to right and the nodes appear along it in
+ * order, once — §28. Afterwards the only thing that moves is the progress fill
+ * and the active node, and only where a caller is actually changing which node
+ * is active. The observer disconnects when it fires, so nothing replays.
+ *
  * Decorative by construction: it is hidden from assistive tech, because every
  * label it marks is present as real text in the section that owns it.
  */
 export function NodeAxis({ stops, activeIndex = null, quiet, className }: NodeAxisProps) {
+  const { ref, revealed } = useRevealOnce<HTMLDivElement>();
   const last = stops.length - 1;
   const position = (index: number) => (last === 0 ? 0 : (index / last) * 100);
-  const filled = activeIndex === null ? 0 : position(activeIndex);
+  const filled = activeIndex === null ? 0 : position(activeIndex) / 100;
 
   return (
     <div
+      ref={ref}
       aria-hidden="true"
-      className={cx(styles.axis, quiet && styles.quiet, className)}
+      className={cx(styles.axis, quiet && styles.quiet, revealed && styles.isDrawn, className)}
+      style={{ "--node-count": stops.length } as CSSProperties}
     >
       <span className={styles.line} />
       {!quiet && activeIndex !== null && activeIndex > 0 ? (
-        <span className={styles.filled} style={{ width: `${filled}%` }} />
+        /* Full width, scaled rather than sized: §28 asks for transform and
+           opacity, and an animated width would lay the axis out again on every
+           frame of the fill. */
+        <span className={styles.filled} style={{ "--fill": filled } as CSSProperties} />
       ) : null}
 
       {stops.map((stop, index) => (
@@ -51,7 +67,7 @@ export function NodeAxis({ stops, activeIndex = null, quiet, className }: NodeAx
             index === 0 && styles.stopFirst,
             index === last && styles.stopLast,
           )}
-          style={{ left: `${position(index)}%` }}
+          style={{ left: `${position(index)}%`, "--node-index": index } as CSSProperties}
         >
           <ThresholdNode
             className={styles.node}

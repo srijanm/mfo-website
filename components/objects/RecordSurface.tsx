@@ -58,12 +58,15 @@ export function RecordSurface({
   note,
   className,
 }: RecordSurfaceProps) {
-  const rows = groups.flatMap((group, groupIndex) =>
-    group.map((row, rowIndex) => ({
-      ...row,
-      startsGroup: groupIndex > 0 && rowIndex === 0,
-    })),
-  );
+  /* One flat sequence of grid children: the rows of each group, with a drawn
+     divider standing between one group and the next. The divider is a child of
+     the same list rather than a margin on the next row, so it takes its own
+     place in the construction order — §28 builds the object as amount, then
+     the metadata rows, then the divider, then the system rows. */
+  const items = groups.flatMap((group, groupIndex) => [
+    ...(groupIndex > 0 ? [{ divider: true as const, key: `divider-${groupIndex}` }] : []),
+    ...group.map((row) => ({ ...row, divider: false as const, key: row.label })),
+  ]);
 
   return (
     <figure className={cx(styles.surface, Boolean(note) && styles.hasNote, className)}>
@@ -71,7 +74,7 @@ export function RecordSurface({
       <hr aria-hidden="true" className={styles.titleRule} />
 
       {amount ? (
-        <p className={cx(styles.amount, "data-number")}>
+        <Reveal as="p" delay={140} className={cx(styles.amount, "data-number")}>
           {amountValue !== undefined && amountFormat ? (
             <CountUp to={amountValue} format={amountFormat}>
               {amount}
@@ -79,24 +82,30 @@ export function RecordSurface({
           ) : (
             amount
           )}
-        </p>
+        </Reveal>
       ) : null}
 
-      <Reveal as="dl" variant="rows" className={styles.rows}>
-        {rows.map((row) => (
-          <div
-            key={row.label}
-            className={cx(styles.row, row.startsGroup && styles.groupStart)}
-          >
-            <dt className={styles.label}>{row.label}</dt>
-            <dd className={cx(styles.value, "data-number")}>
-              {row.state === "unresolved" ? (
-                <ThresholdNode className={styles.rowNode} />
-              ) : null}
-              {row.value ?? EMPTY_VALUE}
-            </dd>
-          </div>
-        ))}
+      {/* `cells` rather than `rows`: each row is a display:contents wrapper so
+          that its label and value join the one shared grid, and an element with
+          no box cannot be faded or moved. The choreography runs on the cells. */}
+      <Reveal as="dl" variant="cells" delay={240} className={styles.rows}>
+        {items.map((item) =>
+          item.divider ? (
+            <div key={item.key} className={styles.divider}>
+              <span aria-hidden="true" className={styles.dividerRule} />
+            </div>
+          ) : (
+            <div key={item.key} className={styles.row}>
+              <dt className={styles.label}>{item.label}</dt>
+              <dd className={cx(styles.value, "data-number")}>
+                {item.state === "unresolved" ? (
+                  <ThresholdNode className={styles.rowNode} />
+                ) : null}
+                {item.value ?? EMPTY_VALUE}
+              </dd>
+            </div>
+          ),
+        )}
       </Reveal>
 
       {note ? <p className={styles.note}>{note}</p> : null}

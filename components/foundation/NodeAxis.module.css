@@ -17,14 +17,19 @@
   background: var(--rule);
 }
 
-/* The portion already passed, §6. */
+/* The portion already passed, §6. Full width and scaled from the left rather
+   than sized, so the fill is a transform and never a layout pass. */
 .filled {
+  width: 100%;
   height: 2px;
   background: var(--acid);
+  transform: scaleX(var(--fill, 0));
+  transform-origin: left center;
 }
 
 .line {
   width: 100%;
+  transform-origin: left center;
 }
 
 .stop {
@@ -88,4 +93,131 @@
    keeps this a field marking rather than a live state. */
 .quiet .node :global(span[class*="dotActive"]) {
   background: var(--ink);
+}
+
+
+/* ---------------------------------------------------------------------------
+   Motion, §28.
+
+   Both gates on every hidden resting state. With no JavaScript nothing ever
+   adds .isDrawn, and under reduced motion globals.css flattens the durations —
+   so outside the gate the line is at full width, every node is present, and
+   the axis is simply drawn.
+   --------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The line draws left to right on first entry, once. 720ms is the major-rule
+     token, inside the 650-800ms §28 gives a rule. */
+  :global(html.js) .axis:not(.isDrawn) .line {
+    transform: scaleX(0);
+  }
+
+  :global(html.js) .axis.isDrawn .line {
+    transform: scaleX(1);
+    transition: transform var(--motion-rule) var(--ease-reveal);
+  }
+
+  /* Nodes appear along it in sequence, each waiting on the stretch of line
+     that reaches it. */
+  :global(html.js) .axis:not(.isDrawn) .stop {
+    opacity: 0;
+  }
+
+  :global(html.js) .axis.isDrawn .stop {
+    opacity: 1;
+    transition: opacity var(--motion-row) var(--ease-system);
+    transition-delay: calc(var(--node-index, 0) * var(--stagger-row));
+  }
+
+  /* The progress fill follows the active node. 320ms is motion-tokens
+     incomeAxis.lineDuration. It waits for the line under it to finish. */
+  :global(html.js) .filled {
+    transition: transform 320ms var(--ease-system) var(--motion-rule);
+  }
+
+  /* The node takes its acid fill in 180ms and settles at the 1.18 scale from
+     motion-tokens incomeAxis.activeNodeScale. The fill is a colour rather than
+     an opacity because the filled node is the resting state — it has to be
+     right with no JavaScript at all, and only the change between the two is
+     what animates. */
+  :global(html.js) .node :global(span[class*="dot"]) {
+    transition:
+      background-color var(--motion-node) var(--ease-system),
+      border-color var(--motion-node) var(--ease-system),
+      transform var(--motion-node) var(--ease-system);
+  }
+
+  :global(html.js) .axis:not(.quiet) .node :global(span[class*="dotActive"]) {
+    transform: scale(1.18);
+  }
+
+  /* One pulse ring, once, on the node becoming active. A ring rather than a
+     scale on the node itself: the node is already holding the 1.18 scale, and
+     two transforms on one element cannot both be true. Purely decorative and
+     purely additive — it expands out of the node and is gone.
+
+     `both` with a single iteration means it holds its final frame, which is
+     fully transparent. It is not a loop and never re-triggers: the element
+     that carries it is only ever mounted with this state. */
+  :global(html.js) .axis:not(.quiet) .stop:has(:global(span[class*="dotActive"]))::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border: 1px solid var(--acid);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: nodePulseRing var(--motion-pulse) var(--ease-system) 1 both;
+  }
+
+  /* The end nodes are pulled inside the line, so their ring follows them. */
+  :global(html.js) .stopFirst:has(:global(span[class*="dotActive"]))::after {
+    left: 6px;
+  }
+
+  :global(html.js) .stopLast:has(:global(span[class*="dotActive"]))::after {
+    left: auto;
+    right: 0;
+    margin-left: 0;
+  }
+
+  /* The quiet axis is a closing mark, not a live indicator: its active node is
+     the last one and it never moves. So the fill arrives after the node that
+     carries it, which is what makes the mark read left to right and finish on
+     the filled end. `both` holds it hollow through the wait.
+
+     The filled node is still the resting state — this only animates the
+     arrival, so with no JavaScript or under reduced motion the axis is drawn,
+     complete, with its last node filled. */
+  :global(html.js) .quiet.isDrawn .stop:last-of-type :global(span[class*="dotActive"]) {
+    animation: fillLastNode var(--motion-node) var(--ease-system)
+      calc(var(--node-count, 1) * var(--stagger-row)) 1 both;
+  }
+
+  :global(html.js) .label {
+    transition: color var(--motion-normal) var(--ease-system);
+  }
+}
+
+/* The quiet axis sits on the acid field, where an acid fill would be invisible
+   — §25 keeps it ink. So this fills to ink, not to acid: the sequence §28 asks
+   for is preserved, and the colour is the one that can actually be seen. */
+@keyframes fillLastNode {
+  from { background: transparent; }
+  to { background: var(--ink); }
+}
+
+/* One expansion out and away. No overshoot, no spring, no second iteration. */
+@keyframes nodePulseRing {
+  from {
+    opacity: .9;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.6);
+  }
 }

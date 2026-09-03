@@ -113,6 +113,8 @@
 .strip:nth-child(7) { opacity: .38; }
 .strip:nth-child(8) { opacity: .24; }
 .strip:nth-child(9) { opacity: .12; }
+/* resting-state-ok — the last step of a static ramp, and the same for
+   everyone. Nothing releases it. */
 .strip:nth-child(10) { opacity: 0; }
 
 /* The field is a desktop composition. Below that the hero stacks and a grid

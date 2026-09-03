@@ -135,6 +135,64 @@ const PAYMENT_CURRENCY_FIELD = /^\s*currency:\s*"USD",?\s*$/;
 const INFINITE_ANIMATION = /animation-iteration-count\s*:\s*infinite|animation\s*:[^;}\n]*\binfinite\b/i;
 
 /**
+ * CLAUDE.md rule 7, and the single most expensive mistake available in this
+ * codebase.
+ *
+ * globals.css kills animation under `prefers-reduced-motion` with `!important`.
+ * So an element parked at `opacity: 0` waiting for an observer to release it
+ * never transitions back, and renders BLANK — not un-animated, blank — for
+ * every visitor who has asked for reduced motion. The same is true with
+ * JavaScript off, where no observer ever runs at all.
+ *
+ * Every hidden resting state therefore has to sit inside a
+ * `@media (prefers-reduced-motion: no-preference)` block, so that outside it
+ * the rule does not exist and the content is simply there.
+ *
+ * A declaration that is a genuine state rather than a resting state — a closed
+ * accordion panel, which is closed for everyone — is exempt, but has to say so
+ * with `resting-state-ok` on the line or in the comment just above it, and the
+ * comment has to give the reason.
+ */
+const HIDDEN_RESTING_STATE = [
+  [/opacity\s*:\s*0(?:\.0+)?\s*[;}]/i, "opacity: 0"],
+  [/transform\s*:[^;}\n]*\bscaleX?\(\s*0(?:\.0+)?\s*\)/i, "a zero scale"],
+  [/stroke-dashoffset\s*:\s*(?!0\b)[.\d]/i, "a non-zero stroke-dashoffset"],
+];
+
+const RESTING_STATE_EXEMPTION = /resting-state-ok/;
+
+/**
+ * The character ranges of every `@media (prefers-reduced-motion: no-preference)`
+ * block in a stylesheet, and of every `@keyframes` block — a keyframe is a step
+ * in an animation that is only ever applied inside the gate, not a state any
+ * element rests in.
+ */
+function motionSafeRanges(text) {
+  const ranges = [];
+  const opener = /@(media([^{]*)|keyframes[^{]*)\{/g;
+  let match;
+
+  while ((match = opener.exec(text))) {
+    const isKeyframes = match[1].startsWith("keyframes");
+    const guards = isKeyframes ||
+      /prefers-reduced-motion\s*:\s*no-preference/i.test(match[2] ?? "");
+    if (!guards) continue;
+
+    let depth = 1;
+    let index = opener.lastIndex;
+    while (index < text.length && depth > 0) {
+      const character = text[index];
+      if (character === "{") depth += 1;
+      else if (character === "}") depth -= 1;
+      index += 1;
+    }
+    ranges.push([match.index, index]);
+  }
+
+  return ranges;
+}
+
+/**
  * A placeholder guide is written to show the shape of the library, not to
  * answer anything. It must be impossible to mistake for reviewed guidance, so
  * it may not state a tax fact of any kind: no thresholds, no dates, no rates,
@@ -459,6 +517,38 @@ function checkFile(file) {
         `An illustration may not draw ${what} — CLAUDE.md rule 3 covers SVG explicitly.`,
         lineText,
       );
+    }
+  }
+
+  // --- a hidden resting state outside the reduced-motion gate ---
+  if (isCss) {
+    const safe = motionSafeRanges(text);
+    const guarded = (index) => safe.some(([from, to]) => index >= from && index < to);
+
+    for (const [pattern, what] of HIDDEN_RESTING_STATE) {
+      const scan = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : `${pattern.flags}g`);
+      for (const match of text.matchAll(scan)) {
+        if (guarded(match.index)) continue;
+
+        const { line, text: lineText } = at(match.index);
+        /* The marker may sit on the line itself or anywhere in the comment
+           immediately above it, which is usually where the reason belongs. */
+        const preamble = lines.slice(Math.max(0, line - 5), line).join("\n");
+        if (RESTING_STATE_EXEMPTION.test(preamble)) continue;
+
+        report(
+          file,
+          line,
+          "unguarded-hidden-state",
+          `${what} outside @media (prefers-reduced-motion: no-preference). ` +
+            "globals.css kills transitions under reduced motion with !important, " +
+            "so this renders blank rather than un-animated — and blank again with " +
+            "JavaScript off, where no observer runs. Move it inside the gate, or " +
+            "mark the line resting-state-ok if it is a real state rather than one " +
+            "waiting to be released.",
+          lineText,
+        );
+      }
     }
   }
 

@@ -1,3 +1,6 @@
+"use client";
+
+import { useRevealOnce } from "@/components/motion";
 import { cx } from "@/lib/cx";
 
 import styles from "./Illustration.module.css";
@@ -21,6 +24,18 @@ type Props = { className?: string };
  * rather than a gap. No size is set as a percentage — a percent sign inside an
  * SVG reads to guardrails as an illustration drawing a rate — so the responsive
  * width lives in the stylesheet.
+ *
+ * Each draws itself on once, the first time it is reached: the strokes run out
+ * from nothing over 700ms and the acid element resolves after them, so the
+ * figure assembles and the one thing that is changing arrives last. It never
+ * replays — the observer disconnects the moment it fires — and nothing here
+ * rotates, pulses or loops.
+ *
+ * The mechanism is `stroke-dashoffset` over shapes that declare
+ * `pathLength="1"`, which is what lets a single dash length cover a 350-unit
+ * arc and a 12-unit tick alike. That resting state is gated in the stylesheet,
+ * so with no JavaScript or under reduced motion no dash is applied at all and
+ * the drawing is simply there, complete, at full stroke.
  */
 function Frame({
   viewBox,
@@ -34,15 +49,22 @@ function Frame({
   height: number;
   children: React.ReactNode;
 }) {
+  /* Observed on the drawing itself rather than on a wrapper. A wrapper would
+     either take part in the section's grid, or use display:contents and
+     generate no box at all — and an element with no box is never intersected,
+     so the drawing would stay at zero stroke forever. */
+  const { ref, revealed } = useRevealOnce<SVGSVGElement>();
+
   return (
     <svg
+      ref={ref}
       aria-hidden="true"
       focusable="false"
       viewBox={viewBox}
       width={width}
       height={height}
       preserveAspectRatio="xMidYMid meet"
-      className={cx(styles.svg, className)}
+      className={cx(styles.svg, revealed && styles.isDrawn, className)}
     >
       {children}
     </svg>
@@ -61,12 +83,12 @@ function Frame({
 export function YearQuarters({ className }: Props) {
   return (
     <Frame viewBox="0 0 160 160" width={160} height={160} className={className}>
-      <circle className="detail" cx="80" cy="80" r="36" />
-      <path className="acid" d="M136 80 A56 56 0 0 1 80 136" />
-      <path d="M80 136 A56 56 0 0 1 24 80" />
-      <path d="M24 80 A56 56 0 0 1 80 24" />
-      <path d="M80 24 A56 56 0 0 1 136 80" />
-      <path d="M128 80 H148 M80 128 V148 M32 80 H12 M80 32 V12" />
+      <circle className="detail" pathLength={1} cx="80" cy="80" r="36" />
+      <path className="acid" pathLength={1} d="M136 80 A56 56 0 0 1 80 136" />
+      <path pathLength={1} d="M80 136 A56 56 0 0 1 24 80" />
+      <path pathLength={1} d="M24 80 A56 56 0 0 1 80 24" />
+      <path pathLength={1} d="M80 24 A56 56 0 0 1 136 80" />
+      <path pathLength={1} d="M128 80 H148 M80 128 V148 M32 80 H12 M80 32 V12" />
     </Frame>
   );
 }
@@ -84,14 +106,14 @@ export function YearQuarters({ className }: Props) {
 export function WatchBracket({ className }: Props) {
   return (
     <Frame viewBox="0 0 240 120" width={240} height={120} className={className}>
-      <path d="M24 58 V34 H216 V58" />
-      <path d="M24 88 H216" />
-      <path d="M120 34 V82" />
-      <circle className="node" cx="24" cy="88" r="5" />
-      <circle className="node detail" cx="72" cy="88" r="5" />
-      <circle className="node acid" cx="120" cy="88" r="5" />
-      <circle className="node detail" cx="168" cy="88" r="5" />
-      <circle className="node" cx="216" cy="88" r="5" />
+      <path pathLength={1} d="M24 58 V34 H216 V58" />
+      <path pathLength={1} d="M24 88 H216" />
+      <path pathLength={1} d="M120 34 V82" />
+      <circle pathLength={1} className="node" cx="24" cy="88" r="5" />
+      <circle pathLength={1} className="node detail" cx="72" cy="88" r="5" />
+      <circle pathLength={1} className="node acid" cx="120" cy="88" r="5" />
+      <circle pathLength={1} className="node detail" cx="168" cy="88" r="5" />
+      <circle pathLength={1} className="node" cx="216" cy="88" r="5" />
     </Frame>
   );
 }
@@ -118,8 +140,9 @@ export function RecordStates({ className }: Props) {
     <Frame viewBox="0 0 240 120" width={240} height={120} className={className}>
       {frames.map((frame) => (
         <g key={frame.x}>
-          <rect x={frame.x} y="20" width="36" height="52" rx="4" />
+          <rect pathLength={1} x={frame.x} y="20" width="36" height="52" rx="4" />
           <path
+            pathLength={1}
             className="detail"
             d={Array.from(
               { length: frame.lines },
@@ -128,8 +151,8 @@ export function RecordStates({ className }: Props) {
           />
         </g>
       ))}
-      <path className="acid" d="M196 67 H216" />
-      <path d="M38 88 H206" />
+      <path className="acid" pathLength={1} d="M196 67 H216" />
+      <path pathLength={1} d="M38 88 H206" />
     </Frame>
   );
 }

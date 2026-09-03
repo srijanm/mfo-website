@@ -1,5 +1,6 @@
 import { Container, Grid, Section } from "@/components/foundation";
 import { WatchBracket } from "@/components/illustration";
+import { Reveal } from "@/components/motion";
 import { operatingModel } from "@/lib/content/homepage";
 import { cx } from "@/lib/cx";
 
@@ -24,14 +25,14 @@ export function OperatingModel() {
               bracket over it is ours. */}
           <WatchBracket className={styles.mark} />
 
-          <ul className={cx("rule-grid", styles.pillars)}>
+          <Reveal as="ul" variant="rows" className={cx("rule-grid", styles.pillars)}>
             {operatingModel.pillars.map((pillar) => (
               <li key={pillar.id} className={styles.pillar}>
                 <h3 className={styles.title}>{pillar.title}</h3>
                 <p className={styles.body}>{pillar.body}</p>
               </li>
             ))}
-          </ul>
+          </Reveal>
         </Grid>
       </Container>
     </Section>

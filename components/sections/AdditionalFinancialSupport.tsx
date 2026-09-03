@@ -1,4 +1,5 @@
 import { Container, Grid, Section } from "@/components/foundation";
+import { Reveal } from "@/components/motion";
 import { additionalSupportSection } from "@/lib/content/pricing";
 import { additionalSupport } from "@/lib/content/site-content";
 
@@ -23,14 +24,14 @@ export function AdditionalFinancialSupport() {
           </h2>
           <p className={styles.body}>{additionalSupportSection.body}</p>
 
-          <ul className={styles.rows}>
+          <Reveal as="ul" variant="rows" className={styles.rows}>
             {additionalSupport.map((item) => (
               <li key={item.id} className={styles.row}>
                 <h3 className={styles.title}>{item.title}</h3>
                 <p className={styles.description}>{item.body}</p>
               </li>
             ))}
-          </ul>
+          </Reveal>
         </Grid>
       </Container>
     </Section>

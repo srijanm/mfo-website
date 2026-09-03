@@ -1,5 +1,6 @@
 import { Container, Section, ThresholdNode } from "@/components/foundation";
 import { YearQuarters } from "@/components/illustration";
+import { Reveal } from "@/components/motion";
 import { temporalLedger } from "@/lib/content/homepage";
 import { factValue } from "@/lib/content/reviewed";
 import { cx } from "@/lib/cx";
@@ -45,7 +46,7 @@ export function TemporalLedger() {
           <div>
             <p className={styles.year}>{temporalLedger.yearLabel}</p>
 
-            <ol className={styles.rows}>
+            <Reveal as="ol" variant="rows" className={styles.rows}>
               <li className={styles.row}>
                 <div className={styles.rail}>
                   <span aria-hidden="true" className={styles.railLine} />
@@ -80,7 +81,7 @@ export function TemporalLedger() {
                 </div>
                 <p className={styles.bookend}>{temporalLedger.endLabel}</p>
               </li>
-            </ol>
+            </Reveal>
           </div>
         </div>
       </Container>

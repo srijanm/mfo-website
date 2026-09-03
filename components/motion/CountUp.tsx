@@ -41,7 +41,10 @@ export function CountUp({ children, to, format, className }: CountUpProps) {
 
     const start = performance.now();
     const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / 900);
+      /* 640ms, so the figure has settled inside the 800ms §28 gives the hero.
+         The loop ends when t reaches 1 and is never restarted — `done` latches
+         on the first run, so this is a finite count, not a frame loop. */
+      const t = Math.min(1, (now - start) / 640);
       if (t < 1) {
         el.textContent = formatValue(to * (1 - Math.pow(1 - t, 3)));
         requestAnimationFrame(tick);

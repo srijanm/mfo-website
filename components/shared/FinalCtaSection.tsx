@@ -1,4 +1,5 @@
 import { Button, Container, Grid, NodeAxis } from "@/components/foundation";
+import { Reveal } from "@/components/motion";
 import { cx } from "@/lib/cx";
 import type { FinalCtaContent } from "@/lib/content/homepage";
 
@@ -33,7 +34,10 @@ export function FinalCtaSection({ content }: FinalCtaSectionProps) {
     >
       <Container>
         <Grid className={styles.grid}>
-          <div className={styles.statement}>
+          {/* One reveal on first entry, and then nothing: the closing panel
+              is somewhere a reader arrives at and stops, so anything that kept
+              moving here would be moving in front of a decision. */}
+          <Reveal variant="rows" className={styles.statement}>
             <h2 id="final-cta" className={styles.headline}>
               {content.headline}
             </h2>
@@ -43,7 +47,7 @@ export function FinalCtaSection({ content }: FinalCtaSectionProps) {
                 {content.cta.label}
               </Button>
             </div>
-          </div>
+          </Reveal>
 
           <NodeAxis className={styles.axis} stops={AXIS_STOPS} activeIndex={4} quiet />
         </Grid>

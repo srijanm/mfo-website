@@ -1,5 +1,6 @@
 import { Container, Grid, Section } from "@/components/foundation";
 import { RecordStates } from "@/components/illustration";
+import { Reveal } from "@/components/motion";
 import { Plate } from "@/components/plates";
 import { trustLedger } from "@/lib/content/homepage";
 
@@ -27,7 +28,7 @@ export function TrustLedger() {
               describe, as a shape. It names no filing. */}
           <RecordStates className={styles.mark} />
 
-          <ul className={styles.rows}>
+          <Reveal as="ul" variant="rows" className={styles.rows}>
             {rows.map((row) => (
               <li key={row.id} className={styles.row}>
                 <div>
@@ -41,7 +42,7 @@ export function TrustLedger() {
                 </div>
               </li>
             ))}
-          </ul>
+          </Reveal>
         </Grid>
       </Container>
     </Section>
