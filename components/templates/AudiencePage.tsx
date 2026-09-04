@@ -1,17 +1,11 @@
-import { Container, Grid, Section } from "@/components/foundation";
+import { Button, Container, Grid, Section } from "@/components/foundation";
 import { IncomingPaymentRecord } from "@/components/objects";
-import {
-  AdditionalFinancialSupport,
-  CoreScopeMatrix,
-  IncomeAxis,
-  TemporalLedger,
-} from "@/components/sections";
-import { FaqSection, FinalCtaSection, PricingSection } from "@/components/shared";
+import { FaqSection, FinalCtaSection } from "@/components/shared";
 import { cx } from "@/lib/cx";
-import type { Audience, AudienceBlock } from "@/lib/content/audiences";
-import { faqByIds, finalCta } from "@/lib/content/homepage";
-import { pricingPage } from "@/lib/content/pricing";
-import { factValue } from "@/lib/content/reviewed";
+import type { Audience, AudienceRow } from "@/lib/content/audiences";
+import { homepageFaqHeadline } from "@/lib/content/homepage";
+import { formatAnnualPrice } from "@/lib/content/pricing";
+import { howWeBehave, priceBlock, standardClose } from "@/lib/content/standard-blocks";
 
 import styles from "./AudiencePage.module.css";
 
@@ -20,66 +14,49 @@ type AudiencePageProps = {
 };
 
 /**
- * One template for all four /who-its-for children.
- *
- * Each page's body is a list of shared blocks in the order its spec names
- * them, so the pages differ by content and sequence rather than by code. Every
- * block renders copy that already exists elsewhere on the site, which means an
- * audience page cannot assert anything the homepage does not.
- *
- * Layer B appears only where a spec asks for it, and only at the position it
- * asks for — on the foreign-income page that is after the core scope and after
- * the topic questions, never before.
+ * One template for the three audience pages, per the final structure doc:
+ * hero · what's actually different here · what we run for you · how we
+ * behave · price · questions · close. Every block after the hero renders
+ * from the audience's own content or from the standard blocks, so the pages
+ * differ by content, never by code.
  */
+
+type RowListSectionProps = {
+  id: string;
+  label: string;
+  title: string;
+  rows: readonly AudienceRow[];
+};
+
+/**
+ * The page's one repeating shape: a labelled section whose content is a
+ * bounded list of title/body rows split on the 4/8 line.
+ */
+function RowListSection({ id, label, title, rows }: RowListSectionProps) {
+  return (
+    <Section dense labelledBy={id}>
+      <Container>
+        <p className="section-label">{label}</p>
+        <h2 id={id} className="section-headline section-headline--wide">
+          {title}
+        </h2>
+        <ul className={styles.rows}>
+          {rows.map((row) => (
+            <li key={row.id} className={styles.row}>
+              <h3 className={styles.rowTitle}>{row.title}</h3>
+              <p className={styles.rowBody}>{row.body}</p>
+            </li>
+          ))}
+        </ul>
+      </Container>
+    </Section>
+  );
+}
+
 export function AudiencePage({ audience }: AudiencePageProps) {
-  const writtenTopics = audience.sections.filter((section) => section.body !== null);
-
-  const renderBlock = (block: AudienceBlock) => {
-    switch (block) {
-      case "checklist":
-        return audience.checklist ? (
-          <Section key={block} labelledBy="checklist">
-            <Container>
-              <div
-                className={cx("rule-grid", "rule-grid--4-8", styles.checklistSplit)}
-              >
-                <h2 id="checklist" className={styles.checklistTitle}>
-                  {audience.checklist.title}
-                </h2>
-                <ul className={cx("rule-grid-flush", styles.checklist)}>
-                  {audience.checklist.items.map((item) => (
-                    <li key={item} className={styles.checklistItem}>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Container>
-          </Section>
-        ) : null;
-
-      case "core-scope":
-        return <CoreScopeMatrix key={block} />;
-
-      case "calendar":
-        return <TemporalLedger key={block} />;
-
-      case "axis":
-        return <IncomeAxis key={block} compact />;
-
-      case "topic-faq":
-        return audience.topicFaq ? (
-          <FaqSection
-            key={block}
-            headline={audience.topicFaq.title}
-            items={faqByIds(audience.topicFaq.ids)}
-          />
-        ) : null;
-
-      case "additional-support":
-        return <AdditionalFinancialSupport key={block} />;
-    }
-  };
+  const close = audience.closeHeadline
+    ? { ...standardClose, headline: audience.closeHeadline }
+    : standardClose;
 
   return (
     <>
@@ -88,9 +65,15 @@ export function AudiencePage({ audience }: AudiencePageProps) {
           <Grid>
             <div className={styles.copy}>
               <h1 id="audience-headline" className={styles.headline}>
-                {audience.headline}
+                {audience.hero.headline}
               </h1>
-              {audience.lead ? <p className={styles.lead}>{audience.lead}</p> : null}
+              <p className={styles.lead}>{audience.hero.lead}</p>
+              <div className={styles.actions}>
+                <Button href="/get-started">See what I need</Button>
+                <Button href="/pricing" tone="secondary">
+                  View pricing
+                </Button>
+              </div>
             </div>
 
             {audience.record ? (
@@ -111,30 +94,48 @@ export function AudiencePage({ audience }: AudiencePageProps) {
         </Container>
       </section>
 
-      {writtenTopics.length > 0 ? (
-        <Section>
-          <Container>
-            <Grid>
-              <ul className={styles.topics}>
-                {writtenTopics.map((section) => (
-                  <li key={section.id} className={styles.topic}>
-                    <h2 className={styles.topicTitle}>{section.title}</h2>
-                    <p className={styles.topicBody}>{factValue(section.body!)}</p>
-                  </li>
-                ))}
-              </ul>
-            </Grid>
-          </Container>
-        </Section>
-      ) : null}
+      <RowListSection
+        id="situation"
+        label={audience.situation.label}
+        title={audience.situation.title}
+        rows={audience.situation.rows}
+      />
 
-      {audience.blocks.map(renderBlock)}
+      <RowListSection
+        id="scope"
+        label={audience.scope.label}
+        title={audience.scope.title}
+        rows={audience.scope.rows}
+      />
 
-      <PricingSection content={pricingPage.tiers} />
+      <RowListSection
+        id="behave"
+        label={howWeBehave.label}
+        title={howWeBehave.title}
+        rows={howWeBehave.rows}
+      />
 
-      <FaqSection items={faqByIds(audience.generalFaqIds)} />
+      <Section labelledBy="price" dense>
+        <Container>
+          <h2 id="price" className="section-headline section-headline--wide">
+            {priceBlock.title}
+          </h2>
+          <p className={cx("data-number", styles.prices)}>
+            {priceBlock.points.map(formatAnnualPrice).join(" · ")}{" "}
+            <span className={styles.perYear}>{priceBlock.perYear}</span>
+          </p>
+          <p className={styles.priceClosing}>{priceBlock.closing}</p>
+          <div className={styles.priceAction}>
+            <Button href={priceBlock.cta.href} tone="secondary">
+              {priceBlock.cta.label}
+            </Button>
+          </div>
+        </Container>
+      </Section>
 
-      <FinalCtaSection content={finalCta} />
+      <FaqSection items={audience.questions} headline={homepageFaqHeadline} />
+
+      <FinalCtaSection content={close} />
     </>
   );
 }

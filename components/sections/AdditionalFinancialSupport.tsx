@@ -19,6 +19,7 @@ export function AdditionalFinancialSupport() {
     <Section dense labelledBy="additional-support">
       <Container>
         <Grid>
+          <p className={`section-label ${styles.label}`}>{additionalSupportSection.label}</p>
           <h2 id="additional-support" className={styles.headline}>
             {additionalSupportSection.headline}
           </h2>

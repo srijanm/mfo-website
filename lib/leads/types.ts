@@ -3,7 +3,8 @@ import { intakeSteps } from "@/lib/content/get-started";
 export type LeadPayload = {
   paidBy: string;
   stage: string;
-  needs: string;
+  /** Step 3 accepts more than one answer, so this is always a list. */
+  needs: string[];
   name: string;
   email: string;
   phone: string;
@@ -23,6 +24,16 @@ function optionsFor(id: "paidBy" | "stage" | "needs"): readonly string[] {
 
 function text(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
+}
+
+/**
+ * The multi-select arrives as an array; a lone string is still accepted so a
+ * pre-multi-select client (or a hand-rolled POST in the old shape) keeps
+ * working. Deduplicated, so a replayed value cannot inflate the list.
+ */
+function textList(value: unknown): string[] {
+  const list = Array.isArray(value) ? value.map(text) : [text(value)];
+  return [...new Set(list.filter((item) => item.length > 0))];
 }
 
 /**
@@ -47,7 +58,7 @@ export function validateLead(input: unknown): {
 
   const paidBy = text(raw.paidBy);
   const stage = text(raw.stage);
-  const needs = text(raw.needs);
+  const needs = textList(raw.needs);
   const name = text(raw.name);
   const email = text(raw.email);
   const phone = text(raw.phone);
@@ -55,7 +66,10 @@ export function validateLead(input: unknown): {
 
   if (!optionsFor("paidBy").includes(paidBy)) errors.paidBy = "Choose how you are paid.";
   if (!optionsFor("stage").includes(stage)) errors.stage = "Choose where you are now.";
-  if (!optionsFor("needs").includes(needs)) errors.needs = "Choose what you need help with.";
+
+  /* At least one, and every one an option the intake actually offered. */
+  if (needs.length === 0 || !needs.every((item) => optionsFor("needs").includes(item)))
+    errors.needs = "Choose what you need help with.";
 
   if (!name) errors.name = "Tell us your name.";
   else if (name.length > MAX.name) errors.name = "That name is too long.";

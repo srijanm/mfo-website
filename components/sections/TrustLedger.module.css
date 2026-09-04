@@ -89,33 +89,93 @@
   }
 }
 
-/* The section mark. Placed as a grid child, it spans the row so it cannot
-   claim a column and shift the ruled block below it out of alignment. */
-.plate {
+/* -------------------------------------------------- the filing sequence */
+
+/* Four states of one return, in order, under the rows they substantiate. The
+   ruled block above ends on its own bottom rule; the sequence stands clear of
+   it rather than adding another. */
+.sequence {
   grid-column: 1 / -1;
-  margin-bottom: 28px;
+  margin-top: 44px;
 }
 
-/* Cols 9-12, beside the headline, which had nothing in them. The row is left
-   to auto-placement: this section's plate already occupies row one, so pinning
-   the mark there put it beside the plate instead of the headline. */
-.mark {
-  grid-column: 9 / -1;
-  align-self: center;
-  justify-self: end;
-  width: 100%;
-  max-width: 300px;
+.sequenceLabel {
+  margin: 0 0 20px;
+  font-size: var(--fs-small);
+  font-weight: 400;
+  color: var(--muted);
 }
 
-/* Below desktop the grid is 8 then 4 columns, so a 9/-1 placement creates an
-   implicit thirteenth column and widens the row — which stops the ruled block
-   below from spanning it. The mark flows in the normal order instead. */
-@media (max-width: 1023px) {
-  .mark {
-    grid-column: 1 / -1;
-    grid-row: auto;
-    justify-self: start;
-    max-width: 260px;
-    margin-bottom: 8px;
+.states {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.state {
+  position: relative;
+  flex: 1;
+  font-size: var(--fs-ui);
+  font-weight: 500;
+  padding-top: 20px;
+}
+
+/* The node each state hangs from. */
+.node {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper);
+  z-index: 1;
+}
+
+/* The last state is the one the sequence resolves to. */
+.state:last-child .node {
+  background: var(--acid);
+}
+
+/* The line the states sit on, drawn from node to node rather than under the
+   final label's empty flex space. */
+.state:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 9px;
+  right: 0;
+  height: 1px;
+  background: var(--rule);
+}
+
+@media (max-width: 767px) {
+  .states {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .state {
+    padding: 0 0 18px 24px;
+  }
+
+  .state:last-child {
+    padding-bottom: 0;
+  }
+
+  .node {
+    top: 6px;
+  }
+
+  .state:not(:last-child)::before {
+    top: 15px;
+    left: 4px;
+    right: auto;
+    bottom: 0;
+    width: 1px;
+    height: auto;
   }
 }

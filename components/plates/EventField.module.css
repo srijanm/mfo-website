@@ -8,6 +8,7 @@
 }
 
 .controls {
+  position: relative;
   display: flex;
   gap: 0;
   margin-bottom: 20px;
@@ -15,11 +16,26 @@
   border-bottom: 1px solid var(--rule);
 }
 
-/* Real buttons, on the rule system rather than as chips. The inactive tab is
-   not just quieter text: it carries a hairline under it, so it reads as the
-   other half of a control rather than as a second label. */
+/* The bar's baseline: a 2px track running the full control width — the width
+   of the field below it — rather than a per-tab underline that stopped dead at
+   the last tab and left the rest of the row to a hairline nobody can see. The
+   acid mark on the selected tab sits on this track. */
+.controls::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--rule-strong);
+}
+
+/* Real buttons, on the rule system rather than as chips. Lifted above the
+   track's pseudo-element — painted after the buttons — so the selected tab's
+   acid mark shows on top of it. */
 .tab {
   position: relative;
+  z-index: 1;
   min-height: 44px;
   padding: 10px 20px;
   border: 0;
@@ -38,9 +54,10 @@
   border-left: 1px solid var(--rule);
 }
 
-/* The affordance on both, and the acid mark on the selected one. Two pixels of
-   acid is the whole signal — it is the same mark the axis uses for "you are
-   here". */
+/* The acid mark on the selected tab. Two pixels of acid is the whole signal —
+   it is the same mark the axis uses for "you are here" — laid over the shared
+   track, exactly the tab's own span of it. Transparent rather than absent on
+   the unselected tab, so selection is a crossfade on one element. */
 .tab::after {
   content: "";
   position: absolute;
@@ -48,11 +65,7 @@
   right: 0;
   bottom: -1px;
   height: 2px;
-  background: var(--rule-strong);
-}
-
-.tab:first-child::after {
-  left: 0;
+  background: transparent;
 }
 
 .tabOn {
@@ -92,6 +105,12 @@
   background: var(--acid);
 }
 
+/* The phone-width field, rendered by EventField at fortnight resolution.
+   Hidden wherever the full field fits. */
+.gridMobile {
+  display: none;
+}
+
 .caption {
   margin: 16px 0 0;
   font-size: var(--fs-small);
@@ -117,10 +136,30 @@
   }
 }
 
-/* Fifty-two columns at phone width is about 2px a cell. Fortnights instead —
-   the field still reads and the page never scrolls sideways. */
+/* Fifty-two columns at phone width is a couple of unreadable pixels a cell —
+   and rewrapping the 52-cell rows into a narrower column count scrambled the
+   five years into static. Below 768px the full-resolution grid comes out and
+   the fortnight variant takes over: the same data folded two weeks to a cell,
+   so every row is still one unwrapped line and the field keeps the shape it
+   has on desktop, at cells roughly twice the area. Legible at 320px as the
+   simpler mobile variant the illustration rules ask for. */
 @media (max-width: 767px) {
   .grid {
+    display: none;
+  }
+
+  .gridMobile {
+    display: grid;
     grid-template-columns: repeat(26, minmax(0, 1fr));
+    gap: 2px;
+  }
+
+  /* At ~11px a cell, acid sits so close to paper in luminance that the one
+     active mark could vanish. A 1px ink ring — an outline, not a shadow, so
+     the two depth tokens stay the only shadows on the site — keeps it the most
+     visible thing in the field. */
+  .cellTodo {
+    outline: 1px solid var(--ink);
+    outline-offset: -1px;
   }
 }

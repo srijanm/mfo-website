@@ -19,7 +19,11 @@
   padding: 18px 0;
   border: 0;
   background: transparent;
-  color: var(--ink);
+  /* Inherited, not hard-coded: the row renders on whichever surface holds it,
+     so the trigger takes the surface's own text colour — ink on paper, paper
+     on ink. A button does not inherit colour on its own, hence the explicit
+     `inherit`. */
+  color: inherit;
   font-family: var(--font-sans);
   font-size: var(--fs-lead);
   font-weight: 400;
@@ -48,7 +52,9 @@
   position: absolute;
   inset: 50% 0 auto 0;
   height: 1px;
-  background: var(--ink);
+  /* currentColor, so the marker is drawn in the surface's own text colour and
+     stays legible on ink and acid alike. */
+  background: currentColor;
 }
 
 /* The upright of the plus. Drawn as a horizontal bar turned a quarter turn,
@@ -78,11 +84,13 @@
   }
 }
 
-/* An open row is the one thing on the accordion that has changed state, which
-   is the only meaning §6 allows the acid mark to carry. */
+/* The open minus stays currentColor like the plus it came from: a state marker
+   has to hold ≥3:1 on its surface, and acid on paper is about 1.2:1. The state
+   is carried by the shape — plus closed, minus open — with the 2px weight as a
+   secondary cue; acid never carries it alone. */
 .isOpen .marker::before {
   height: 2px;
-  background: var(--acid);
+  background: currentColor;
 }
 
 /* The panel animates between zero and its natural height. `visibility` does
@@ -130,6 +138,12 @@
   padding: 0 0 24px;
   max-width: 64ch;
   color: var(--ink-2);
+}
+
+/* --ink-2 is the paper surface's secondary text and is ~1.5:1 on ink. On the
+   dark surface the secondary step is --muted-on-ink, at 6.9:1. */
+:global(.surface-ink) .panelBody {
+  color: var(--muted-on-ink);
 }
 
 @media (max-width: 767px) {

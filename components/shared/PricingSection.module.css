@@ -57,28 +57,6 @@
   color: var(--muted);
 }
 
-.scopeLine {
-  margin: 20px 0 0;
-  max-width: 30ch;
-  font-size: var(--fs-body);
-  line-height: 1.5;
-  color: var(--ink-2);
-}
-
-/* An unfilled slot, drawn as one. Dashed and muted so it cannot be read as a
-   claim about what the tier includes — which is the thing CLAUDE.md rule 2
-   forbids stating without a reviewed mapping. Delete the modifier from
-   lib/content/pricing.ts the moment real inclusions land and the line renders
-   as ordinary copy with no other change. */
-.scopePlaceholder {
-  min-height: 76px;
-  padding: 14px 16px;
-  border: 1px dashed var(--rule-strong);
-  border-radius: var(--radius-button);
-  font-size: var(--fs-ui);
-  color: var(--muted);
-}
-
 .action {
   margin-top: 24px;
 }
@@ -118,7 +96,4 @@
     margin-top: 48px;
   }
 
-  .scopeLine {
-    max-width: 52ch;
-  }
 }

@@ -132,6 +132,9 @@ html {
   background: var(--paper);
   color: var(--ink);
   text-rendering: optimizeLegibility;
+  /* The sticky header is 64px tall; anything scrolled to by id must land
+     below it, not underneath it. */
+  scroll-padding-top: 88px;
 }
 
 body {
@@ -245,12 +248,13 @@ body {
   color: var(--ink-2);
 }
 
-.section-eyebrow {
-  margin: 0 0 18px;
+/* The small muted label above a section heading. Sentence case — decorative
+   uppercase eyebrows are banned; this carries a real name for the section's
+   register ("Your situation", "Included in the annual fee"). */
+.section-label {
+  margin: 0 0 14px;
   font-size: var(--fs-small);
-  font-weight: 500;
-  letter-spacing: .08em;
-  text-transform: uppercase;
+  font-weight: 400;
   color: var(--muted);
 }
 
@@ -312,29 +316,6 @@ body {
   color: var(--ink);
   --rule: var(--rule-on-acid);
   --rule-strong: var(--rule-on-acid);
-}
-
-/* ---------------------------------------------------------------------------
-   Alternating surfaces down a page.
-
-   Every section carried the same paper background separated only by a hairline,
-   so consecutive sections read as one undifferentiated column. Paper and white
-   now alternate down every page, which gives each boundary a real edge instead
-   of a 1px line.
-
-   Declared here, on position, rather than as a prop on each section component:
-   the same components appear at different points on different pages, and which
-   surface a section takes is a fact about where it sits, not about what it is.
-
-   `:not([class*="surface-"])` keeps the sections that have already declared a
-   surface — the ink chapter, the acid close — out of the alternation entirely,
-   so the rule can never repaint one of them.
-   --------------------------------------------------------------------------- */
-
-main > section:nth-of-type(even):not([class*="surface-"]) {
-  background-color: var(--white);
-  background-image: var(--texture);
-  background-blend-mode: multiply;
 }
 
 /* A chapter break is a change of surface, not an event. §28 asks for the

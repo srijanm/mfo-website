@@ -40,6 +40,19 @@
   letter-spacing: -.028em;
 }
 
+/* The link is ink, not the user agent's blue: guides stay inside the one-hue
+   palette, and the underline alone says it goes somewhere. */
+.rowTitle a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.rowTitle a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+
 .answer {
   margin: 10px 0 0;
   max-width: 62ch;

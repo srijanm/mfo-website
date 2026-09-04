@@ -4,14 +4,11 @@ import { expect, test, type Page } from "@playwright/test";
 const ROUTES = [
   "/",
   "/get-started",
-  "/how-it-works",
   "/pricing",
-  "/who-its-for",
-  "/who-its-for/foreign-income",
-  "/who-its-for/freelancers-consultants",
-  "/who-its-for/creators",
-  "/who-its-for/independent-professionals",
-  "/about",
+  "/paid-from-abroad",
+  "/freelancers",
+  "/creators",
+  "/how-we-work",
   "/contact",
   "/privacy",
   "/terms",
@@ -184,9 +181,10 @@ test.describe("homepage architecture", () => {
     "Your work changed",                       // 4. Structural mismatch
     "Your obligations change",                 // 5. Income Axis
     "The CA and compliance work we are built to run",  // 6. Core scope
-    "Transparent pricing without any nasty surprises", // 7. Pricing
-    "I don’t earn enough for this yet",        // 8. FAQ
-    "Tell us how you earn",                    // 9. Final CTA
+    "Judge us by what happens before we file anything", // 7. Trust ledger
+    "Transparent pricing without any nasty surprises", // 8. Pricing
+    "I don’t earn enough for this yet",        // 9. FAQ
+    "Tell us how you earn",                    // 10. Final CTA
   ];
 
   /* Cut from this page. Each is asserted absent rather than merely dropped from
@@ -195,7 +193,6 @@ test.describe("homepage architecture", () => {
   const REMOVED = [
     "You shouldn’t have to know which question to ask",
     "Your work has deadlines",
-    "Judge us by what happens before we file anything",
     "And when something else comes up",
   ];
 
@@ -331,21 +328,25 @@ test.describe("get-started intake", () => {
     await expect(page.getByText("Step 1 of 4")).toBeVisible();
     await expect(page.getByRole("heading", { name: "How are you paid?" })).toBeVisible();
 
-    await choose(page, "An overseas company");
+    await choose(page, "Overseas company or platform");
     await expect(page.getByText("Step 2 of 4")).toBeVisible();
 
     await choose(page, "First year");
-    await choose(page, "Foreign income");
+    // Step 3 accepts more than one answer.
+    await pick(page, "Setting things up properly");
+    await pick(page, "I don’t know what I need");
+    await page.getByRole("button", { name: "Continue" }).click();
 
     await expect(page.getByText("Step 4 of 4")).toBeVisible();
     await expect(page.getByLabel("Name")).toBeVisible();
     await expect(page.getByLabel("Email")).toBeVisible();
     await expect(page.getByLabel("Phone")).toBeVisible();
 
-    // Back returns to the previous question with the answer still selected.
+    // Back returns to the previous question with the answers still selected.
     await page.getByRole("button", { name: "Back" }).click();
     await expect(page.getByText("Step 3 of 4")).toBeVisible();
-    await expect(page.getByRole("radio", { name: "Foreign income" })).toBeChecked();
+    await expect(page.getByRole("checkbox", { name: "Setting things up properly" })).toBeChecked();
+    await expect(page.getByRole("checkbox", { name: "I don’t know what I need" })).toBeChecked();
   });
 
   test("continuing without a choice reports an error tied to the field", async ({ page }) => {
@@ -376,7 +377,7 @@ test.describe("get-started intake", () => {
 
   test("persists nothing client-side", async ({ page }) => {
     await page.goto("/get-started");
-    await choose(page, "Indian clients");
+    await choose(page, "Indian clients directly");
     await expect(page.getByText("Step 2 of 4")).toBeVisible();
 
     const stored = await page.evaluate(() => ({
@@ -393,9 +394,9 @@ test.describe("get-started intake", () => {
   test("a failed send never shows the success state", async ({ page }) => {
     await page.goto("/get-started");
 
-    await choose(page, "Both");
-    await choose(page, "Not sure");
-    await choose(page, "Getting set up");
+    await choose(page, "A mix");
+    await choose(page, "Longer than that");
+    await choose(page, "Catching up on something I think I’ve missed");
 
     await page.getByLabel("Name").fill("Test Person");
     await page.getByLabel("Email").fill("test@example.com");
@@ -416,9 +417,9 @@ test.describe("get-started intake", () => {
   test("shows the success state only when the send succeeds", async ({ page }) => {
     await page.goto("/get-started");
 
-    await choose(page, "Both");
-    await choose(page, "Not sure");
-    await choose(page, "Getting set up");
+    await choose(page, "A mix");
+    await choose(page, "Longer than that");
+    await choose(page, "Catching up on something I think I’ve missed");
 
     await page.getByLabel("Name").fill("Test Person");
     await page.getByLabel("Email").fill("test@example.com");
@@ -441,7 +442,7 @@ test.describe("get-started intake", () => {
  * as secondary support, in section 5 — so nothing before that section may name
  * a Layer B service, and the three other audience pages carry none at all.
  */
-test.describe("who it's for", () => {
+test.describe("audience pages", () => {
   const LAYER_B_TERMS = [
     "FX",
     "foreign exchange",
@@ -453,75 +454,83 @@ test.describe("who it's for", () => {
     "MIS",
   ];
 
-  const AUDIENCES = [
-    "foreign-income",
-    "freelancers-consultants",
-    "creators",
-    "independent-professionals",
-  ];
+  const AUDIENCES = ["/paid-from-abroad", "/freelancers", "/creators"];
 
-  test("the hub links to every audience page", async ({ page }) => {
-    await page.goto("/who-its-for");
+  test("the header dropdown and the recognition strip link to every audience page", async ({
+    page,
+  }) => {
+    await page.goto("/");
 
-    // Scoped to main: the footer legitimately links to these pages as well.
-    for (const slug of AUDIENCES) {
-      await expect(page.locator(`main a[href="/who-its-for/${slug}"]`)).toHaveCount(1);
+    for (const path of AUDIENCES) {
+      /* Two per header: the desktop dropdown and the mobile disclosure both
+         live inside the one nav landmark, only ever one of them displayed. */
+      const count = await page.locator(`header a[href="${path}"]`).count();
+      expect(count, `${path} is missing from the header`).toBeGreaterThan(0);
     }
+
+    // The recognition strip doubles as navigation; two cells share /freelancers.
+    const strip = page.locator("main section").filter({ hasText: "How your money reaches you" });
+    await expect(strip.locator('a[href="/paid-from-abroad"]')).toHaveCount(1);
+    await expect(strip.locator('a[href="/freelancers"]')).toHaveCount(2);
+    await expect(strip.locator('a[href="/creators"]')).toHaveCount(1);
   });
 
-  test("foreign income names no Layer B service before secondary support", async ({ page }) => {
-    await page.goto("/who-its-for/foreign-income");
-
-    const sections = page.locator("main > section");
-    const total = await sections.count();
-
-    // Secondary support is the section that opens with the approved headline.
-    let supportIndex = -1;
-    for (let i = 0; i < total; i += 1) {
-      if ((await sections.nth(i).innerText()).includes("And when something else comes up")) {
-        supportIndex = i;
-        break;
-      }
-    }
-
-    expect(supportIndex, "the additional-support section was not found").toBeGreaterThan(-1);
-
-    for (let i = 0; i < supportIndex; i += 1) {
-      const text = await sections.nth(i).innerText();
-      for (const term of LAYER_B_TERMS) {
-        expect(
-          new RegExp(`\\b${term}\\b`, "i").test(text),
-          `"${term}" appears in section ${i + 1}, before secondary support`,
-        ).toBe(false);
-      }
-    }
-  });
-
-  test("the other audience pages carry no Layer B service at all", async ({ page }) => {
-    for (const slug of AUDIENCES.slice(1)) {
-      await page.goto(`/who-its-for/${slug}`);
+  test("no audience page names a Layer B service", async ({ page }) => {
+    for (const path of AUDIENCES) {
+      await page.goto(path);
       const text = await page.locator("main").innerText();
 
       for (const term of LAYER_B_TERMS) {
         expect(
           new RegExp(`\\b${term}\\b`, "i").test(text),
-          `"${term}" appears on /who-its-for/${slug}, whose spec does not list it`,
+          `"${term}" appears on ${path} — Layer B belongs on /pricing, after the tiers`,
         ).toBe(false);
       }
     }
   });
 
-  test("each audience page has one h1 and its own headline", async ({ page }) => {
+  test("each audience page has one h1, its own headline, and the doc's sections", async ({
+    page,
+  }) => {
     const seen = new Set<string>();
 
-    for (const slug of AUDIENCES) {
-      await page.goto(`/who-its-for/${slug}`);
+    for (const path of AUDIENCES) {
+      await page.goto(path);
       const headings = page.locator("h1");
       await expect(headings).toHaveCount(1);
 
       const text = await headings.innerText();
-      expect(seen.has(text), `${slug} repeats another audience's headline`).toBe(false);
+      expect(seen.has(text), `${path} repeats another audience's headline`).toBe(false);
       seen.add(text);
+
+      const body = (await page.locator("main").innerText()).replace(/\s+/g, " ");
+      for (const marker of [
+        "What’s actually different here",
+        "What we run for you",
+        "How we behave",
+        "Three annual prices",
+        "Questions people ask before they start",
+      ]) {
+        expect(body, `${path} is missing "${marker}"`).toContain(marker);
+      }
+    }
+  });
+
+  test("the old URLs redirect permanently onto the final structure", async ({ request }) => {
+    const MOVES: [string, string][] = [
+      ["/who-its-for/foreign-income", "/paid-from-abroad"],
+      ["/who-its-for/freelancers-consultants", "/freelancers"],
+      ["/who-its-for/independent-professionals", "/freelancers"],
+      ["/who-its-for/creators", "/creators"],
+      ["/who-its-for", "/"],
+      ["/how-it-works", "/how-we-work"],
+      ["/about", "/how-we-work"],
+    ];
+
+    for (const [from, to] of MOVES) {
+      const response = await request.get(from, { maxRedirects: 0 });
+      expect(response.status(), `${from} should redirect permanently`).toBe(308);
+      expect(response.headers()["location"], `${from} should land on ${to}`).toBe(to);
     }
   });
 });
@@ -549,14 +558,17 @@ test.describe("navigation", () => {
   });
 });
 
-/** No stock photography anywhere; real team images only, on /about. */
-test.describe("about", () => {
-  test("ships no photography and states where it will go", async ({ page }) => {
-    await page.goto("/about");
+/** No stock photography anywhere; /how-we-work is honest about anonymity. */
+test.describe("how we work", () => {
+  test("ships no photography and states the signing commitment plainly", async ({ page }) => {
+    await page.goto("/how-we-work");
 
     await expect(page.locator("main img")).toHaveCount(0);
     await expect(
-      page.getByText("The named professionals responsible for the work"),
+      page.getByText("We don’t publish the team on this site yet."),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Every return we file is signed by an ICAI-registered chartered accountant."),
     ).toBeVisible();
   });
 });
@@ -644,20 +656,21 @@ test.describe("guides", () => {
 test.describe("metadata", () => {
   const INDEXED = [
     "/",
-    "/how-it-works",
-    "/who-its-for",
-    "/who-its-for/foreign-income",
+    "/paid-from-abroad",
+    "/freelancers",
+    "/creators",
     "/pricing",
-    "/guides",
-    "/about",
+    "/how-we-work",
     "/contact",
   ];
 
+  /* /guides is built and reachable but noindexed until it has real content. */
   const NOT_INDEXED = [
     "/get-started",
     "/privacy",
     "/terms",
     "/styleguide",
+    "/guides",
     "/guides/how-we-decide-what-you-need",
   ];
 
@@ -754,7 +767,7 @@ test.describe("metadata", () => {
  * observer ever runs. Both are asserted, on every route that animates.
  */
 test.describe("motion", () => {
-  const ROUTES = ["/", "/how-it-works", "/pricing", "/who-its-for/foreign-income", "/about"];
+  const ROUTES = ["/", "/pricing", "/paid-from-abroad", "/freelancers", "/how-we-work"];
 
   /** Text hidden inside a collapsed disclosure is meant to be hidden. */
   const hiddenTextOutsideDisclosures = async (page: import("@playwright/test").Page) =>
@@ -885,156 +898,67 @@ test.describe("motion", () => {
 /**
  * The Income Axis.
  *
- * The sticky composition is an enhancement layered on one copy of the content.
- * What is asserted here is that the enhancement behaves, and — more
- * importantly — that every route out of it lands on the static vertical
- * progression with nothing hidden.
+ * One static vertical progression on the ink chapter, identical in structure
+ * at every viewport, motion preference and scripting state. The sticky
+ * scroll-scrub composition is gone: it double-painted stages during every
+ * exchange and held a multi-viewport black band open.
  */
 test.describe("income axis", () => {
   const axisSection = (page: import("@playwright/test").Page) =>
     page.locator("main > section").filter({ has: page.locator("#income-axis") });
 
-  test.describe("desktop, scripted", () => {
-    test("scrolls normally through a sticky panel and never takes focus", async ({ page }) => {
+  const expectsStaticComposition = (label: string) => {
+    test(`${label} renders the static vertical progression`, async ({ page }) => {
       await page.goto("/");
-      const section = axisSection(page);
-      const box = (await section.boundingBox())!;
 
-      const geometry = await section.evaluate((el) => {
-        const panel = el.querySelector('[class*="panel"]')!;
-        const scroller = el.querySelector('[class*="scroller"]')!;
-        const style = getComputedStyle(panel);
-        return {
-          scrollLength: scroller.getBoundingClientRect().height / window.innerHeight,
-          position: style.position,
-          top: style.top,
-        };
-      });
-
-      /* §17 puts this at roughly 300-340vh; the owner asked for the section to
-         be more compact and it is now 260vh. Still a multi-screen chapter, and
-         still ordinary document scrolling. */
-      expect(geometry.scrollLength).toBeGreaterThanOrEqual(2.4);
-      expect(geometry.scrollLength).toBeLessThanOrEqual(2.8);
-      expect(geometry.position).toBe("sticky");
-      expect(geometry.top).toBe("64px");
-
-      // Focus is never moved by scrolling.
-      await page.keyboard.press("Tab");
-      const before = await page.evaluate(() => document.activeElement?.textContent);
-      await page.evaluate((y) => window.scrollTo(0, y), box.y + box.height / 2);
-      await page.waitForTimeout(400);
-      const after = await page.evaluate(() => document.activeElement?.textContent);
-      expect(after).toBe(before);
-    });
-
-    test("the active milestone advances through the section", async ({ page }) => {
-      await page.goto("/");
-      const box = (await axisSection(page).boundingBox())!;
-
-      /* Read the state, not the paint: a colour sampled during the fill
-         transition is a transient value and makes this flaky. */
-      const activeIndex = () =>
-        page.evaluate(() => {
-          const stops = [...document.querySelectorAll('[class*="NodeAxis_stop"]')];
-          return stops.findIndex((stop) =>
-            /dotActive/.test(String(stop.querySelector('span[class*="dot"]')?.className ?? "")),
-          );
-        });
-
-      await page.evaluate((y) => window.scrollTo(0, y), box.y + 40);
-      await page.waitForTimeout(200);
-      const first = await activeIndex();
-
-      /* Sampled well inside the section. The observer's root is the viewport
-         midline, which sits half a screen below the scroll position, so past
-         roughly 0.84 of the section it has already cleared the last sentinel
-         and nothing fires — the reading would be stale rather than wrong. */
-      await page.evaluate((y) => window.scrollTo(0, y), box.y + box.height * 0.7);
-      await page.waitForTimeout(200);
-      const last = await activeIndex();
-
-      expect(first).toBe(0);
-      expect(last).toBeGreaterThan(first);
-    });
-
-    test("uses the motion-token values and never loops", async ({ page }) => {
-      await page.goto("/");
-      const box = (await axisSection(page).boundingBox())!;
-      await page.evaluate((y) => window.scrollTo(0, y), box.y + box.height * 0.45);
-      await page.waitForTimeout(700);
-
-      const motion = await axisSection(page).evaluate((el) => {
-        const dot = getComputedStyle(el.querySelector('span[class*="dotActive"]')!);
-        /* The pulse is a ring on the stop, not a scale on the node: the node
-           is already holding its 1.18, and one element cannot carry two
-           transforms at once. */
-        const stop = el.querySelector('[class*="NodeAxis_stop"]:has(span[class*="dotActive"])')!;
-        const ring = getComputedStyle(stop, "::after");
-        const looping = [...el.querySelectorAll("*")].filter(
-          (node) =>
-            getComputedStyle(node).animationIterationCount === "infinite" ||
-            getComputedStyle(node, "::after").animationIterationCount === "infinite",
-        ).length;
-        return {
-          transform: dot.transform,
-          fill: dot.backgroundColor,
-          fillDuration: dot.transitionDuration,
-          pulseDuration: ring.animationDuration,
-          pulseCount: ring.animationIterationCount,
-          looping,
-        };
-      });
-
-      // motion-tokens: activeNodeScale 1.18, nodePulse 0.42s, one iteration.
-      expect(motion.transform).toBe("matrix(1.18, 0, 0, 1.18, 0, 0)");
-      // Settled, so the fill has finished interpolating.
-      expect(motion.fill).toBe("rgb(215, 255, 0)");
-      // The node takes its acid fill in 180ms — §28.
-      expect(motion.fillDuration.split(", ")[0]).toBe("0.18s");
-      expect(motion.pulseDuration).toBe("0.42s");
-      expect(motion.pulseCount).toBe("1");
-      expect(motion.looping).toBe(0);
-    });
-  });
-
-  /** Every fallback lands on the static vertical progression. */
-  const expectsStaticFallback = (label: string) => {
-    test(`${label} falls back to the static vertical progression`, async ({ page }) => {
-      await page.goto("/");
+      /* The rows reveal on first entry when scripted; measure the resting
+         state after the section has been reached, which is the state a
+         reader ever sees. */
+      await axisSection(page).scrollIntoViewIfNeeded();
+      await page.waitForTimeout(900);
 
       const state = await axisSection(page).evaluate((el) => {
-        const panel = el.querySelector('[class*="panel"]')!;
         const milestones = [...el.querySelectorAll("li")];
+        const sticky = [...el.querySelectorAll("*")].filter(
+          (node) => getComputedStyle(node).position === "sticky",
+        );
         return {
-          position: getComputedStyle(panel).position,
           total: milestones.length,
           hidden: milestones.filter((item) => {
             const style = getComputedStyle(item);
             return style.opacity === "0" || style.visibility === "hidden";
           }).length,
+          sticky: sticky.length,
+          height: el.getBoundingClientRect().height,
+          viewport: window.innerHeight,
         };
       });
 
-      expect(state.position).toBe("static");
       expect(state.total).toBe(5);
       expect(state.hidden).toBe(0);
+      expect(state.sticky, "nothing in the section may pin itself").toBe(0);
+      // A chapter, not a scroll-jack: it must not hold multiple viewports open.
+      expect(state.height).toBeLessThan(state.viewport * 3.5);
     });
   };
 
+  test.describe("desktop, scripted", () => {
+    expectsStaticComposition("desktop");
+  });
+
   test.describe("with reduced motion", () => {
     test.use({ contextOptions: { reducedMotion: "reduce" } });
-    expectsStaticFallback("reduced motion");
+    expectsStaticComposition("reduced motion");
   });
 
   test.describe("on mobile", () => {
     test.use({ viewport: { width: 375, height: 800 } });
-    expectsStaticFallback("mobile");
+    expectsStaticComposition("mobile");
   });
 
   test.describe("without JavaScript", () => {
     test.use({ javaScriptEnabled: false });
-    expectsStaticFallback("no JavaScript");
+    expectsStaticComposition("no JavaScript");
   });
 });
 
@@ -1049,8 +973,8 @@ test.describe("income axis", () => {
  */
 test.describe("measured", () => {
   const ROUTES = [
-    "/", "/how-it-works", "/pricing", "/who-its-for/foreign-income",
-    "/about", "/get-started", "/guides/how-we-decide-what-you-need",
+    "/", "/pricing", "/paid-from-abroad", "/freelancers", "/creators",
+    "/how-we-work", "/get-started", "/guides/how-we-decide-what-you-need",
   ];
 
   test("only Geist, and no weight above 600", async ({ page }) => {
@@ -1299,7 +1223,7 @@ test.describe("rule system", () => {
  * that survives reduced motion.
  */
 test.describe("flair", () => {
-  const FLAIR_ROUTES = ["/", "/how-it-works", "/pricing", "/who-its-for/foreign-income"];
+  const FLAIR_ROUTES = ["/", "/pricing", "/paid-from-abroad", "/freelancers"];
 
   test("every decorative mark is hidden from assistive tech", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
@@ -1380,8 +1304,8 @@ test.describe("surfaces", () => {
    * point of it existing; these rules still bind everywhere they apply.
    */
   const SURFACE_ROUTES = [
-    "/", "/how-it-works", "/pricing", "/who-its-for", "/who-its-for/foreign-income",
-    "/about", "/get-started", "/guides", "/contact", "/privacy", "/terms",
+    "/", "/pricing", "/paid-from-abroad", "/freelancers", "/creators",
+    "/how-we-work", "/get-started", "/guides", "/contact", "/privacy", "/terms",
   ];
 
   test("a page carries at most one ink block and one acid block", async ({ page }) => {
@@ -1472,7 +1396,7 @@ test.describe("surfaces", () => {
  * anything that keeps going.
  */
 test.describe("motion system", () => {
-  const ROUTES = ["/", "/pricing", "/how-it-works", "/who-its-for", "/about"];
+  const ROUTES = ["/", "/pricing", "/paid-from-abroad", "/creators", "/how-we-work"];
 
   /** Anything with text that is still transparent is content nobody can read. */
   const FADED = `(() => {
@@ -1674,9 +1598,8 @@ test.describe("motion system", () => {
  */
 test.describe("QA checklist", () => {
   const ROUTES = [
-    "/", "/pricing", "/how-it-works", "/who-its-for", "/who-its-for/foreign-income",
-    "/who-its-for/creators", "/who-its-for/freelancers-consultants",
-    "/who-its-for/independent-professionals", "/about", "/contact", "/guides",
+    "/", "/pricing", "/paid-from-abroad", "/freelancers", "/creators",
+    "/how-we-work", "/contact", "/guides",
     "/get-started", "/privacy", "/terms", "/guides/how-we-decide-what-you-need",
   ];
 

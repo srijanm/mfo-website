@@ -3,6 +3,10 @@
    takes the dense rhythm, so it reads as adjacent support rather than a second
    product. No icons, no expanded selling. */
 
+.label {
+  grid-column: 1 / -1;
+}
+
 .headline {
   grid-column: 1 / span 6;
   margin: 0;

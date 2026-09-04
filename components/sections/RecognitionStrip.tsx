@@ -1,42 +1,36 @@
+import Link from "next/link";
+
 import { Container, Section } from "@/components/foundation";
-import { EventField, Plate } from "@/components/plates";
+import { EventField } from "@/components/plates";
 import { recognitionClosing, recognitionLead } from "@/lib/content/homepage";
 import { recognition } from "@/lib/content/site-content";
 
 import styles from "./RecognitionStrip.module.css";
 
 /**
- * H02 — recognition.
+ * H02 — recognition, doubling as navigation.
  *
- * A header row, four cards, and the conclusion beneath them.
- *
- * The section mark used to sit on its own above a body-sized lead line, which
- * left it floating with nothing to belong to. It is now part of the header row:
- * mark and heading on one line, one rule under both. And the lead is the
- * section's heading — it takes the same `.section-headline` every other section
- * on the site does, so the four labels below it are visibly subordinate to it
- * rather than the same size.
- *
- * The four ways money arrives are cards rather than cells of a ruled grid: each
- * one is a separate thing the reader might be, so each gets its own object with
- * its own hover state.
+ * A heading, four linked cells, and the conclusion beneath them. Each cell
+ * names a way of earning and routes to the audience page that owns it — the
+ * whole cell is the link, so the target is the card and not a glyph inside it.
  */
 export function RecognitionStrip() {
   return (
     <Section dense labelledBy="recognition-headline">
       <Container>
-        <div className={styles.header}>
-          <Plate kind="recognition" className={styles.plate} />
-          <h2 id="recognition-headline" className="section-headline">
-            {recognitionLead}
-          </h2>
-        </div>
+        <h2 id="recognition-headline" className="section-headline">
+          {recognitionLead}
+        </h2>
 
         <ul className={styles.cards}>
-          {recognition.map((label) => (
-            <li key={label} className={styles.card}>
-              <span aria-hidden="true" className={styles.node} />
-              <span className={styles.cardLabel}>{label}</span>
+          {recognition.map((item) => (
+            <li key={item.label} className={styles.card}>
+              <Link href={item.href} className={styles.cardLink}>
+                <span className={styles.cardLabel}>{item.label}</span>
+                <span aria-hidden="true" className={styles.cardArrow}>
+                  →
+                </span>
+              </Link>
             </li>
           ))}
         </ul>

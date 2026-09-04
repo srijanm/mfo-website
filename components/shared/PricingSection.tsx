@@ -49,18 +49,9 @@ export function PricingSection({ content, id = "pricing" }: PricingSectionProps)
                   <span className={styles.perYear}>{content.perYear}</span>
                 </p>
                 <p className={styles.planLabel}>{content.planLabel}</p>
-                {/* A marked slot, not copy. It renders as a placeholder because
-                    the tier's inclusions are exactly the thing CLAUDE.md rule 2
-                    forbids writing without a reviewed mapping — so it has to be
-                    impossible to mistake for finished text. */}
-                <p
-                  className={cx(
-                    styles.scopeLine,
-                    content.scopePlaceholder && styles.scopePlaceholder,
-                  )}
-                >
-                  {content.scopeLine}
-                </p>
+                {/* No scope area while approvedPlanScope is null: rule 2 makes
+                    the tiers price-first, and an empty slot must not render as
+                    a marker a visitor can see. */}
                 <div className={styles.action}>
                   <Button href={content.cta.href} tone="secondary">
                     {content.cta.label}

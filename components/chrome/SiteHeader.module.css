@@ -69,6 +69,83 @@
   color: var(--ink);
 }
 
+/* -----------------------------------------------------------------------
+   The grouped entry. A <details> so it works without JavaScript; the panel
+   is a white document object on a hairline border, 2px radius like every
+   other control. */
+
+.dropdown {
+  position: relative;
+}
+
+.dropdownTrigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  min-width: 44px;
+  padding-inline: 4px;
+  font-size: var(--fs-ui);
+  color: var(--ink-2);
+  cursor: pointer;
+  list-style: none;
+  border-bottom: 1px solid transparent;
+}
+
+.dropdownTrigger::-webkit-details-marker {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dropdownTrigger:hover {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+  }
+}
+
+.dropdown[open] .dropdownTrigger {
+  color: var(--ink);
+}
+
+.dropdown[open] .dropdownMark {
+  transform: rotate(180deg);
+}
+
+.dropdownPanel {
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+  min-width: 236px;
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-button);
+  box-shadow: var(--shadow-overlay);
+  z-index: 20;
+}
+
+.dropdownLink {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 16px;
+  font-size: var(--fs-ui);
+  color: var(--ink-2);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dropdownLink:hover {
+    color: var(--ink);
+    background: var(--paper);
+  }
+}
+
 @media (max-width: 767px) {
   .bar {
     height: var(--nav-h-mobile);

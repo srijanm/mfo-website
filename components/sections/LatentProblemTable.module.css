@@ -156,15 +156,21 @@
    the text inside it — a rule and a reading measure never share an element. */
 .summaryRow {
   position: relative;
+  /* If this padding changes, --node-y below changes with it. */
   padding: 24px 0;
   border-top: 1px solid var(--rule);
 
   /* Where the rail stands, and how far down the row its node sits. Declared
      once here so the line segments, the node and the end markers cannot drift
      apart — which is exactly how the two markers ended up on different
-     offsets before. */
-  --rail-x: 92px;
-  --node-y: 30px;
+     offsets before.
+
+     --node-y is the vertical centre of the sentence's first line: the row's
+     top padding plus half the first line box (--fs-body at 1.5). A fixed 30px
+     sat the node — and the marker centred on it — visibly above the text it
+     belongs to. */
+  --rail-x: 104px;
+  --node-y: calc(24px + (var(--fs-body) * 1.5) / 2);
 }
 
 /* The line, in two segments per row: above the node and below it. Built this
@@ -205,15 +211,27 @@
   transform: translate(-50%, -50%);
 }
 
+/* The rail runs behind every node, and the dot itself is hollow —
+   transparent — so left alone the line showed straight through each circle.
+   Filled with the surface, the node punches a clean bead out of the line and
+   the rail reads as one continuous stroke from "Year one" to "Year three".
+   Selected the way ThresholdNode publishes its parts; the acid fill for a
+   passed node is declared later and still wins. */
+.rowNode :global(span[class*="dot"]) {
+  background: var(--paper);
+}
+
 /* The two end markers. In the rail's gutter, in the row whose node they name,
-   vertically centred on that node — so "Year three" is level with the last
-   node whether it sets on one line or two. Wide enough for both to sit on a
-   single line at every breakpoint the rail exists at. */
+   vertically centred on that node — which is itself centred on the sentence's
+   first line, so marker, node and text line up however many lines the
+   sentence runs to. The column stops 26px short of the rail: wide enough for
+   both markers to sit on one line at every breakpoint the rail exists at, with
+   clear air between the label and its dot. */
 .rowMarker {
   position: absolute;
   left: 0;
   top: var(--node-y);
-  width: calc(var(--rail-x) - 20px);
+  width: calc(var(--rail-x) - 26px);
   transform: translateY(-50%);
   font-size: var(--fs-small);
   font-weight: 500;
@@ -275,9 +293,11 @@
   }
 
   /* The gutter narrows to what the markers need and the text follows it, so
-     the rail keeps its geometry rather than being switched off. */
+     the rail keeps its geometry rather than being switched off. 92px leaves
+     the marker column 66px — "Year three" on one line, with air before the
+     node. */
   .summaryRow {
-    --rail-x: 76px;
+    --rail-x: 92px;
   }
 
   .summaryText {

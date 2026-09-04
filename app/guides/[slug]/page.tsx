@@ -33,15 +33,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: guide.title,
     description: guide.answer,
     path: `/guides/${guide.slug}`,
-    /* A placeholder is never indexed. It is not reviewed guidance and must not
-       be found by anyone searching for an answer. */
-    noIndex: guide.status === "placeholder",
+    /* Guides are built but noindexed until the library carries real content —
+       final structure doc. A placeholder additionally refuses to be followed. */
+    noIndex: true,
   });
 
   return guide.status === "placeholder"
     ? { ...metadata, robots: { index: false, follow: false } }
     : {
         ...metadata,
+        robots: { index: false, follow: true },
         openGraph: { ...metadata.openGraph, type: "article" },
       };
 }

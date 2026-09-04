@@ -1,13 +1,8 @@
-/* One layout for the three audience pages. */
+/* /how-we-work. A read: hero, four prose sections on the 4/8 split, one ruled
+   list of refusals, the standard close. */
 
-/* No bottom rule: the section that follows draws its own top rule on the
-   same line, and the two together rendered as a doubled 2px rule. */
 .hero {
   padding-block: var(--section-major-desktop);
-}
-
-.copy {
-  grid-column: 1 / span 7;
 }
 
 .headline {
@@ -28,22 +23,44 @@
   color: var(--ink-2);
 }
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 36px;
+/* Title left, prose right, on the same 4/8 line every split on the site uses. */
+.split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px var(--grid-gap);
 }
 
-.record {
-  grid-column: 8 / -1;
-  align-self: center;
-  justify-self: end;
-  width: 100%;
+@media (min-width: 1024px) {
+  .split {
+    grid-template-columns: calc((100% * 4 - 2 * var(--grid-gap)) / 12) minmax(0, 1fr);
+  }
 }
 
-/* The repeating shape: title/body rows split on the 5/7 line, bounded by the
-   list. The section heading sits 40px above the first rule. */
+.sectionTitle {
+  margin: 0;
+  font-size: var(--fs-h3);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -.028em;
+  max-width: 16ch;
+}
+
+.body {
+  max-width: 62ch;
+}
+
+.paragraph {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: 1.52;
+  color: var(--ink-2);
+}
+
+.paragraph + .paragraph {
+  margin-top: 16px;
+}
+
+/* The refusals, in the same bounded title/body rows the audience pages use. */
 .rows {
   margin: 40px 0 0;
   padding: 0;
@@ -86,60 +103,17 @@
 }
 
 @media (max-width: 1023px) {
-  .rowBody {
-    margin-top: 8px;
-  }
-}
-
-/* Price block. */
-.prices {
-  margin: 36px 0 0;
-  font-size: var(--fs-h3);
-  font-weight: 400;
-  letter-spacing: -.028em;
-  line-height: 1.2;
-}
-
-.perYear {
-  font-size: var(--fs-body);
-  color: var(--muted);
-}
-
-.priceClosing {
-  margin: 16px 0 0;
-  max-width: 52ch;
-  font-size: var(--fs-body);
-  line-height: 1.52;
-  color: var(--ink-2);
-}
-
-.priceAction {
-  margin-top: 28px;
-}
-
-@media (max-width: 1023px) {
   .hero {
     padding-block: var(--section-major-tablet);
   }
 
-  .copy,
-  .record {
-    grid-column: 1 / -1;
-  }
-
-  .record {
-    justify-self: start;
-    max-width: 420px;
-    margin-top: 40px;
+  .rowBody {
+    margin-top: 8px;
   }
 }
 
 @media (max-width: 767px) {
   .hero {
     padding-block: var(--section-major-mobile);
-  }
-
-  .record {
-    max-width: none;
   }
 }

@@ -7,11 +7,16 @@ import { pageMetadata } from "@/lib/metadata";
 
 import styles from "./page.module.css";
 
-export const metadata: Metadata = pageMetadata({
-  title: guidesIndex.title,
-  description: guidesIndex.lead,
-  path: "/guides",
-});
+export const metadata: Metadata = {
+  ...pageMetadata({
+    title: guidesIndex.title,
+    description: guidesIndex.lead,
+    path: "/guides",
+  }),
+  /* Built and reachable, but out of the index and the nav until it carries
+     real content — final structure doc. */
+  robots: { index: false, follow: true },
+};
 
 /**
  * The guides index. A knowledge library: ruled article rows, never a card

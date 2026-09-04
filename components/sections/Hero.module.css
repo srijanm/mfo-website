@@ -116,6 +116,29 @@
   }
 }
 
+/* ------------------------------------------------------------- the acid band
+
+   The band behind the emphasised words is drawn by the MaskedText primitive,
+   but its geometry there was tuned to nothing in particular: at display-1's
+   .96 line-height it started halfway down the lowercase and ran on past the
+   baseline into the next line's space, reading as a mispositioned rectangle.
+
+   Corrected here, against the type it actually sits behind. Geist's descent
+   puts the fragment's bottom edge .296em below the baseline, so `.28em` parks
+   the band's lower edge a hair under the baseline, and `.52em` of height
+   reaches just shy of the x-height's top (.53em): a marker stroke over the
+   lowercase body, hugging the words with the primitive's own small symmetric
+   bleed, clear of the line below at every wrap. Selected the way the node
+   primitives publish their parts — [class*="…"] — and outranking the source
+   rule on specificity rather than on bundle order. Gated exactly as the source
+   rule is: outside the gates the band does not exist to be positioned. */
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .headline :global(span[class*="emphasis"])::before {
+    bottom: .28em;
+    height: .52em;
+  }
+}
+
 @media (max-width: 767px) {
   .inner {
     padding-block: 40px 56px;

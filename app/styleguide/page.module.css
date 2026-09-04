@@ -59,6 +59,23 @@
   color: var(--muted);
 }
 
+/* Information objects only: shrink-to-fit flex gives same-component cards
+   slightly different intrinsic widths and leaves the row short of the
+   container. A grid aligns the cards to shared columns and tracks the
+   container edge; the cards themselves are untouched. */
+.objectGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 479px) {
+  .objectGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .stack {
   display: flex;
   flex-direction: column;
@@ -137,6 +154,13 @@
   line-height: 1.44;
   letter-spacing: -.018em;
   color: var(--ink-2);
+}
+
+/* --ink-2 is the paper surface's secondary step and is ~1.5:1 on ink. On the
+   dark surface the secondary step is --muted-on-ink, asked for by name — the
+   surface deliberately does not rebind --muted or --ink-2. */
+:global(.surface-ink) .lead {
+  color: var(--muted-on-ink);
 }
 
 .ui {

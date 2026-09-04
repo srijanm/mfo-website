@@ -4,17 +4,6 @@
   padding-block: var(--section-major-desktop);
 }
 
-/* Proposition left, lead right, so the hero holds the grid instead of the left
-   two thirds of it. Both keep their own measure. */
-.heroTitle {
-  grid-column: 1 / span 7;
-}
-
-.heroLead {
-  grid-column: 8 / -1;
-  align-self: end;
-}
-
 .title {
   margin: 0;
   max-width: 18ch;
@@ -25,26 +14,60 @@
 }
 
 .lead {
-  margin: 0;
+  margin: 28px 0 0;
+  max-width: 54ch;
   font-size: var(--fs-lead);
   line-height: 1.44;
   letter-spacing: -.018em;
   color: var(--ink-2);
 }
 
+/* How the scope gets agreed: four numbered steps on ruled rows. */
+.steps {
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  column-gap: var(--grid-gap);
+  padding-block: 26px;
+}
+
+.step + .step {
+  border-top: 1px solid var(--rule);
+}
+
+.stepNumber {
+  margin: 0;
+  font-size: var(--fs-body);
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.stepTitle {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.stepBody {
+  margin: 8px 0 0;
+  max-width: 58ch;
+  font-size: var(--fs-body);
+  line-height: 1.52;
+  color: var(--ink-2);
+}
+
 @media (max-width: 1023px) {
   .hero {
     padding-block: var(--section-major-tablet);
-  }
-
-  .heroTitle,
-  .heroLead {
-    grid-column: 1 / -1;
-  }
-
-  .heroLead {
-    margin-top: 28px;
-    max-width: 54ch;
   }
 }
 

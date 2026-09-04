@@ -447,7 +447,7 @@ export default function StyleguidePage() {
             surfaces on the site, permitted because the content is itself an
             object. White is reserved for exactly this. Every value is a prop.
           </p>
-          <div className={styles.specimens}>
+          <div className={styles.objectGrid}>
             <Specimen state="IncomingPaymentRecord — populated">
               <IncomingPaymentRecord
                 amount={SAMPLE.payment.amount}

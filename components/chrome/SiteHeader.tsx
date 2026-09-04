@@ -1,7 +1,8 @@
 import { Button, Container } from "@/components/foundation";
-import { primaryCta, primaryNav } from "@/lib/content/navigation";
+import { isNavGroup, primaryCta, primaryNav } from "@/lib/content/navigation";
 
 import { MobileMenu } from "./MobileMenu";
+import { NavDropdown } from "./NavDropdown";
 import { Wordmark } from "./Wordmark";
 import styles from "./SiteHeader.module.css";
 
@@ -22,11 +23,15 @@ export function SiteHeader() {
 
           <nav aria-label="Primary" className={styles.nav}>
             <div className={styles.desktopRow}>
-              {primaryNav.map((item) => (
-                <a key={item.href} href={item.href} className={styles.link}>
-                  {item.label}
-                </a>
-              ))}
+              {primaryNav.map((entry) =>
+                isNavGroup(entry) ? (
+                  <NavDropdown key={entry.label} label={entry.label} items={entry.children} />
+                ) : (
+                  <a key={entry.href} href={entry.href} className={styles.link}>
+                    {entry.label}
+                  </a>
+                ),
+              )}
               <Button href={primaryCta.href}>{primaryCta.label}</Button>
             </div>
 

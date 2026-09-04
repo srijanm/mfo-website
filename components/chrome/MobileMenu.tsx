@@ -3,7 +3,7 @@
 import { useEffect, useId, useState } from "react";
 
 import { Button, Container } from "@/components/foundation";
-import { primaryCta, primaryNav } from "@/lib/content/navigation";
+import { isNavGroup, primaryCta, primaryNav } from "@/lib/content/navigation";
 
 import styles from "./MobileMenu.module.css";
 
@@ -48,13 +48,31 @@ export function MobileMenu() {
       <div id={panelId} className={styles.menuPanel} hidden={!open}>
         <Container>
           <ul className={styles.list}>
-            {primaryNav.map((item) => (
-              <li key={item.href} className={styles.row}>
-                <a href={item.href} className={styles.rowLink} onClick={() => setOpen(false)}>
-                  {item.label}
-                </a>
-              </li>
-            ))}
+            {primaryNav.flatMap((entry) =>
+              isNavGroup(entry)
+                ? entry.children.map((item) => (
+                    <li key={item.href} className={styles.row}>
+                      <a
+                        href={item.href}
+                        className={styles.rowLink}
+                        onClick={() => setOpen(false)}
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  ))
+                : [
+                    <li key={entry.href} className={styles.row}>
+                      <a
+                        href={entry.href}
+                        className={styles.rowLink}
+                        onClick={() => setOpen(false)}
+                      >
+                        {entry.label}
+                      </a>
+                    </li>,
+                  ],
+            )}
           </ul>
           <div className={styles.ctaRow}>
             <Button href={primaryCta.href}>{primaryCta.label}</Button>

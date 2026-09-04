@@ -3,18 +3,6 @@
    under any circumstances. */
 
 /* Mark and heading on one line, closed by a rule. */
-.header {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding-bottom: 28px;
-  border-bottom: 1px solid var(--rule);
-}
-
-.plate {
-  flex: none;
-}
-
 /* Four across, two rows. The old form was eight ruled rows of Area / What we
    handle, which read as a table to be worked through top to bottom; these are
    eight independent areas, so they are laid out as a field the reader can
@@ -23,7 +11,7 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--grid-gap);
-  margin: 28px 0 0;
+  margin: 40px 0 0;
   padding: 0;
   list-style: none;
 }

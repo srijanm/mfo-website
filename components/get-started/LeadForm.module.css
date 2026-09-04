@@ -1,50 +1,93 @@
 /* The four-step intake. One question per screen, full-width ruled choices,
    visible progress, a back button. Nothing animates. Acid appears only on the
-   selected choice and the primary action. */
+   selected choice, the progress nodes already reached and the primary action. */
 
 /* The intake is a bounded 4/8 rule grid: the step ledger holds the left four
    columns and the current question the right eight, so the page occupies the
-   grid instead of a single narrow column with five empty beside it. The
-   question column is flush, so its ruled choices run its full width and
-   terminate on the divider. */
+   grid instead of a single narrow column with five empty beside it. Both cells
+   take their padding from the rule-grid variables, so the column divider is
+   drawn by the grid and terminates on the block's own top and bottom rules.
+
+   --inset is the question column's inline padding. Ruled rows inside the
+   column (the choices, the closing row) pull themselves back to the divider
+   with it and re-inset their content by the same amount, so every hairline
+   runs divider to edge while the text stays on the heading's column. */
 .form {
   --rule-grid-pad-block: 32px;
   --rule-grid-pad-inline: 40px;
+  --inset: 40px;
 
   grid-column: 1 / -1;
 }
 
 .main {
-  padding: 32px 0 32px 40px;
+  min-width: 0;
 }
 
+/* ---------------------------------------------------------------------------
+   The progress ledger.
+
+   Each item is one grid row: node in a fixed column, label beside it, the two
+   centred on each other. The rail is drawn per row as a 1px line behind the
+   node column — every row's segment spans its full height, the first stops at
+   its node's centre coming in and the last stops at its node's centre going
+   out — so the connector runs node centre to node centre with no measuring.
+   The node paints an opaque paper fill over the rail passing behind it.
+   --------------------------------------------------------------------------- */
+
+/* No padding reset: the cell's own rule-grid padding replaces the list
+   default wholesale, and zeroing it here would put the first node back on the
+   block's top hairline. */
 .ledger {
+  --node: 12px;
+
   margin: 0;
-  padding: 0;
   list-style: none;
 }
 
 .ledgerStep {
+  position: relative;
   display: grid;
-  grid-template-columns: 12px minmax(0, 1fr);
-  column-gap: 20px;
-}
-
-.ledgerRail {
-  display: flex;
-  justify-content: center;
-}
-
-/* Lets the connecting segment grow to the height of its row, so the ledger
-   reads as one continuous rail rather than four detached dots. */
-.ledgerNode {
-  flex: 1;
+  grid-template-columns: var(--node) minmax(0, 1fr);
+  column-gap: 16px;
   align-items: center;
-  --threshold-gap: 0px;
+  padding-block: 10px;
+}
+
+.ledgerStep::before {
+  content: "";
+  position: absolute;
+  left: calc((var(--node) - 1px) / 2);
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--rule);
+}
+
+.ledgerStep:first-child::before {
+  top: 50%;
+}
+
+.ledgerStep:last-child::before {
+  bottom: 50%;
+}
+
+/* Positioned so it paints above the rail segment behind it. */
+.ledgerNode {
+  position: relative;
+  width: var(--node);
+  height: var(--node);
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+/* §6: hollow means not yet, acid fill means reached — literally true here. */
+.ledgerStepReached .ledgerNode {
+  background: var(--acid);
 }
 
 .ledgerLabel {
-  padding: 10px 0;
   font-size: var(--fs-ui);
   line-height: 1.4;
   color: var(--muted);
@@ -57,14 +100,17 @@
   font-weight: 500;
 }
 
+/* --------------------------------------------------------------------------- */
+
 .progressLabel {
+  display: block;
   font-size: var(--fs-small);
   font-weight: 500;
   color: var(--muted);
 }
 
 .question {
-  margin: 40px 0 0;
+  margin: 16px 0 0;
   font-size: var(--fs-h2);
   font-weight: 400;
   line-height: 1.02;
@@ -94,17 +140,22 @@
   white-space: nowrap;
 }
 
+/* Full bleed: the ruled rows start on the column divider and their content
+   re-insets to the heading's column. */
 .choices {
+  margin-inline-start: calc(-1 * var(--inset));
   border-top: 1px solid var(--rule);
 }
 
 .choice {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 16px;
   width: 100%;
   min-height: 56px;
-  padding: 14px 0;
+  padding-block: 14px;
+  padding-inline-start: var(--inset);
   border-bottom: 1px solid var(--rule);
   font-size: var(--fs-lead);
   line-height: 1.32;
@@ -113,9 +164,10 @@
 }
 
 /* Transparent rather than tiny: the input covers the whole row, so the
-   measured interaction target is the row a person actually clicks. Form
-   controls do not inherit font by default, hence the explicit inherit. */
-.radio {
+   measured interaction target is the row a person actually clicks — the same
+   treatment for the radios and the multi-select's checkboxes. Form controls do
+   not inherit font by default, hence the explicit inherit. */
+.control {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -128,13 +180,9 @@
   cursor: pointer;
 }
 
-.choice {
-  position: relative;
-}
-
 /* The selected marker is the line-and-node primitive: hollow until chosen,
    acid once it is. Selection is never carried by colour alone — the checked
-   radio is what assistive tech reads. */
+   input is what assistive tech reads. */
 .marker {
   flex: none;
   width: 14px;
@@ -144,11 +192,17 @@
   background: transparent;
 }
 
-.radio:checked + .marker {
+/* The multi-select's marker is the square of the family — a box, at the input
+   radius, so more than one can be filled without reading as broken radios. */
+.markerBox {
+  border-radius: var(--radius-button);
+}
+
+.control:checked + .marker {
   background: var(--acid);
 }
 
-.radio:focus-visible + .marker {
+.control:focus-visible + .marker {
   outline: 2px solid var(--focus);
   outline-offset: 3px;
 }
@@ -243,9 +297,21 @@
   cursor: pointer;
 }
 
+/* The closing row: one rule, then the prompt and its action stacked below it
+   with even spacing. Full bleed like the choice rows, so its rule also runs
+   from the divider — and the cell's own bottom padding keeps the action clear
+   of the block's bottom rule instead of sitting on it. The action is its own
+   row rather than inline in the sentence, so it clears the 44px minimum.
+   Outlined: the acid control on this screen is the form's own Continue. */
 .alternative {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
   margin-top: 48px;
+  margin-inline-start: calc(-1 * var(--inset));
   padding-top: 24px;
+  padding-inline-start: var(--inset);
   border-top: 1px solid var(--rule);
 }
 
@@ -273,10 +339,42 @@
 }
 
 @media (max-width: 1023px) {
-  /* §5: the divider comes out and the ledger becomes a ruled row above the
-     question rather than a squeezed column beside it. */
-  .main {
-    padding: 32px 0;
+  /* §5: the divider comes out, both cells lose their inline padding with it,
+     and the ledger becomes a ruled row above the question. Its labels come out
+     too — the step label under it states the same position once, in words —
+     leaving a row of nodes joined edge to edge. */
+  .form {
+    --inset: 0px;
+  }
+
+  .ledger {
+    display: flex;
+    align-items: center;
+  }
+
+  .ledgerStep {
+    display: flex;
+    align-items: center;
+    column-gap: 0;
+    padding: 0;
+  }
+
+  .ledgerStep::before {
+    content: none;
+  }
+
+  /* The connector between nodes is a static segment in the row, so it needs
+     no positioning at all in this layout. */
+  .ledgerStep + .ledgerStep::before {
+    content: "";
+    position: static;
+    width: 28px;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .ledgerLabel {
+    display: none;
   }
 }
 

@@ -5,10 +5,9 @@
    rule, drawn at container width, and it picks up the on-acid value because the
    surface rebinds it. */
 
-/* The field is the height of what is in it, and what is in it is centred: it
-   used to run 120px of padding either side of a block sitting in the top-left
-   corner. The statement takes the left six columns and the axis the right five,
-   so the acid is a composition rather than a field with a corner used.
+/* The field is the height of what is in it, and what is in it is the
+   statement: headline, support, one action. Nothing decorative shares the
+   field with the decision it is asking for.
 
    The height comes from the global `.section--dense` rhythm, applied as a class
    rather than restated here: a `padding-block` on this module's own `.section`
@@ -18,15 +17,7 @@
 }
 
 .statement {
-  grid-column: 1 / span 6;
-}
-
-/* §6 as a field marking: one horizontal axis, five nodes, the last filled, in
-   ink at low opacity. No labels, no interaction and nothing that moves — §25
-   keeps the optional pointer effect out of the required build. */
-.axis {
-  grid-column: 8 / -1;
-  align-self: center;
+  grid-column: 1 / span 7;
 }
 
 /* Type comes from the canonical .section-headline. The closing panel used to
@@ -55,12 +46,6 @@
 @media (max-width: 1023px) {
   .statement {
     grid-column: 1 / -1;
-  }
-
-  /* §29: the marking is a desktop composition. Below that it would sit under
-     the action as decoration, so it comes out. */
-  .axis {
-    display: none;
   }
 }
 
