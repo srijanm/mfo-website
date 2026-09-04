@@ -35,6 +35,13 @@ export function ThresholdNode({
 }: ThresholdNodeProps) {
   const vertical = orientation === "vertical";
 
+  const dot = (
+    <span aria-hidden="true" className={cx(styles.dot, active && styles.dotActive)} />
+  );
+  const text = label ? (
+    <span className={cx(styles.label, active && styles.labelActive)}>{label}</span>
+  ) : null;
+
   return (
     <span className={cx(styles.node, vertical && styles.vertical, className)}>
       {lineBefore ? (
@@ -44,11 +51,21 @@ export function ThresholdNode({
         />
       ) : null}
 
-      <span aria-hidden="true" className={cx(styles.dot, active && styles.dotActive)} />
-
-      {label ? (
-        <span className={cx(styles.label, active && styles.labelActive)}>{label}</span>
-      ) : null}
+      {vertical ? (
+        /* On a vertical axis the label hangs beside the dot, out of the column
+           flow. In flow it would sit between the dot and the segment below it —
+           breaking the rail — and the widest label would decide the node's
+           width, pushing every dot off the shared axis by half a label. */
+        <span className={styles.anchor}>
+          {dot}
+          {text}
+        </span>
+      ) : (
+        <>
+          {dot}
+          {text}
+        </>
+      )}
 
       {lineAfter ? <span aria-hidden="true" className={styles.segment} /> : null}
     </span>

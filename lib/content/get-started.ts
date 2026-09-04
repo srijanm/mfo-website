@@ -1,9 +1,12 @@
-// The four-step intake. Questions, options and copy live here, never in the form.
+// The four-step intake. Questions, options and copy live here, never in the
+// form. Options per the final structure doc.
 
 export type IntakeStep = {
   id: "paidBy" | "stage" | "needs";
   question: string;
   options: readonly string[];
+  /** Step 3 accepts more than one answer. */
+  multiple?: boolean;
 };
 
 export const intakeSteps: readonly IntakeStep[] = [
@@ -11,36 +14,32 @@ export const intakeSteps: readonly IntakeStep[] = [
     id: "paidBy",
     question: "How are you paid?",
     options: [
-      "An overseas company",
-      "Indian clients",
-      "Both",
-      "Creator / brand income",
-      "Independent professional practice",
-      "Something else",
+      "Overseas company or platform",
+      "Indian clients directly",
+      "Brand or creator income",
+      "A mix",
     ],
   },
   {
     id: "stage",
     question: "Where are you now?",
     options: [
-      "Just started",
+      "Haven’t started earning yet",
       "First year",
-      "Already filing",
-      "Switching from another CA",
-      "Not sure",
+      "A year or two in",
+      "Longer than that",
     ],
   },
   {
     id: "needs",
     question: "What do you need help with?",
+    multiple: true,
     options: [
-      "I don’t know yet",
-      "Getting set up",
-      "GST / compliance",
-      "Filing / tax",
-      "Foreign income",
-      "Switching CA",
-      "Something else",
+      "I don’t know what I need",
+      "Setting things up properly",
+      "Something specific I’ve been asked for",
+      "Catching up on something I think I’ve missed",
+      "Switching from someone else",
     ],
   },
 ];
@@ -51,7 +50,7 @@ export const detailsStep = {
     name: { label: "Name", autoComplete: "name" },
     email: { label: "Email", autoComplete: "email" },
     phone: { label: "Phone", autoComplete: "tel" },
-    note: { label: "Anything else we should know?", optional: "Optional" },
+    note: { label: "Anything you want to add", optional: "Optional" },
   },
 } as const;
 
@@ -68,15 +67,18 @@ export const getStarted = {
 
   /** Shown at every step, so there is a route through without the form. */
   alternative: {
-    prompt: "Would rather not use a form?",
+    prompt: "Would you rather not use a form?",
     href: "/contact",
     label: "Get in touch",
   },
 
   chooseAnOption: "Choose one option to continue.",
+  chooseAtLeastOne: "Choose at least one to continue.",
 
-  /** Exact wording required by §27. */
+  /** Exact wording from the final structure doc. */
   success: "Got it. We’ll review how you earn and tell you what makes sense from here.",
+  successDetail:
+    "We’ll come back to you with what applies, what doesn’t, and the fee — in writing, before you commit to anything.",
 
   /**
    * Shown when the send fails. It never claims the message arrived, and it

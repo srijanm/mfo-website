@@ -16,18 +16,8 @@
   padding-block: 24px 0;
 }
 
-/* Mark and heading as one header block. The mark used to sit above the heading
-   as a block of its own with 28px under it, which read as a stray object; here
-   it is the first line of the header. */
-.copyHead {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+.heading {
   margin-bottom: 28px;
-}
-
-.plate {
-  flex: none;
 }
 
 .body {

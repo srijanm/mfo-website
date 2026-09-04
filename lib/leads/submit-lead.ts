@@ -25,7 +25,7 @@ function formatEmail(payload: LeadPayload): string {
   const lines = [
     `How they are paid: ${payload.paidBy}`,
     `Where they are now: ${payload.stage}`,
-    `What they need: ${payload.needs}`,
+    `What they need: ${payload.needs.join(", ")}`,
     "",
     `Name:  ${payload.name}`,
     `Email: ${payload.email}`,

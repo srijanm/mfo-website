@@ -2,11 +2,16 @@
 
 export const pricingPoints = [19999, 24999, 34999] as const;
 
+/**
+ * The recognition strip doubles as navigation: each cell names a way of
+ * earning and links to the audience page that owns it. Two cells share
+ * /freelancers — independent professionals merged into that page.
+ */
 export const recognition = [
-  "Remote pay by a global enterprise",
-  "Consulting",
-  "Creator or brand income",
-  "Independent professional income",
+  { label: "Paid by an overseas company", href: "/paid-from-abroad" },
+  { label: "Consulting for a few clients", href: "/freelancers" },
+  { label: "Creator or brand income", href: "/creators" },
+  { label: "Independent professional income", href: "/freelancers" },
 ] as const;
 
 export const coreScope = [

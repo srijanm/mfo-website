@@ -22,7 +22,8 @@ const STEP_QUESTIONS = [...intakeSteps.map((s) => s.question), detailsStep.quest
 type Answers = {
   paidBy: string;
   stage: string;
-  needs: string;
+  /** Step 3 accepts more than one answer. */
+  needs: string[];
   name: string;
   email: string;
   phone: string;
@@ -32,7 +33,7 @@ type Answers = {
 const EMPTY: Answers = {
   paidBy: "",
   stage: "",
-  needs: "",
+  needs: [],
   name: "",
   email: "",
   phone: "",
@@ -72,9 +73,19 @@ export function LeadForm() {
     requestAnimationFrame(() => headingRef.current?.focus());
   };
 
-  const setAnswer = (key: keyof Answers, value: string) => {
+  const setAnswer = <K extends keyof Answers>(key: K, value: Answers[K]) => {
     setAnswers((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => ({ ...prev, [key]: undefined }));
+  };
+
+  /** The multi-select step: a box toggles in and out of the list. */
+  const toggleNeed = (option: string) => {
+    setAnswer(
+      "needs",
+      answers.needs.includes(option)
+        ? answers.needs.filter((item) => item !== option)
+        : [...answers.needs, option],
+    );
   };
 
   /**
@@ -88,9 +99,19 @@ export function LeadForm() {
   const handleNext = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
-    if (currentChoice && !answers[currentChoice.id]) {
-      setErrors({ [currentChoice.id]: getStarted.chooseAnOption });
-      return;
+    if (currentChoice) {
+      const unanswered = currentChoice.multiple
+        ? answers.needs.length === 0
+        : !answers[currentChoice.id];
+
+      if (unanswered) {
+        setErrors({
+          [currentChoice.id]: currentChoice.multiple
+            ? getStarted.chooseAtLeastOne
+            : getStarted.chooseAnOption,
+        });
+        return;
+      }
     }
     goTo(step + 1);
   };
@@ -144,6 +165,7 @@ export function LeadForm() {
     return (
       <div className={styles.form}>
         <p className={styles.outcome}>{getStarted.success}</p>
+        <p className={styles.outcomeBody}>{getStarted.successDetail}</p>
       </div>
     );
   }
@@ -167,7 +189,7 @@ export function LeadForm() {
   /* Resolved means: the person has put something in and nothing has come back
      about it. Read from the answers and errors the form already holds, so the
      node never claims more than the form knows. */
-  const isResolved = (field: keyof Answers) =>
+  const isResolved = (field: "name" | "email" | "phone") =>
     answers[field].trim().length > 0 && !errors[field];
 
   return (
@@ -178,28 +200,31 @@ export function LeadForm() {
     >
       {/* Visible progress, as the spec requires, and the left four columns of
           the grid. Hidden from assistive tech: the step label below carries the
-          same position as text, and the current question is already the h2. */}
+          same position as text, and the current question is already the h2.
+
+          Each item is one row — node beside label, centred on each other — and
+          the connecting rail is drawn per row behind the node column, so it
+          runs node centre to node centre whatever height a wrapped label gives
+          its row. Below the desktop split the labels come out and the ledger
+          collapses to a row of joined nodes: the step label states the same
+          position once, in words. */}
       <ol aria-hidden="true" className={styles.ledger}>
         {STEP_QUESTIONS.map((question, index) => (
           <li
             key={question}
-            className={cx(styles.ledgerStep, index === step && styles.ledgerStepNow)}
+            className={cx(
+              styles.ledgerStep,
+              index <= step && styles.ledgerStepReached,
+              index === step && styles.ledgerStepNow,
+            )}
           >
-            <span className={styles.ledgerRail}>
-              <ThresholdNode
-                className={styles.ledgerNode}
-                orientation="vertical"
-                active={index <= step}
-                lineBefore={index > 0}
-                lineAfter={index < TOTAL_STEPS - 1}
-              />
-            </span>
+            <span className={styles.ledgerNode} />
             <span className={styles.ledgerLabel}>{question}</span>
           </li>
         ))}
       </ol>
 
-      <div className={cx("rule-grid-flush", styles.main)}>
+      <div className={styles.main}>
       <span className={styles.progressLabel}>
         {getStarted.progressLabel(step + 1, TOTAL_STEPS)}
       </span>
@@ -215,8 +240,10 @@ export function LeadForm() {
              state: aria-invalid is not supported on role=radio, which is what
              the inputs are, and a bare fieldset exposes no role that takes it.
              With the role set the legend no longer names the group on its own,
-             so the name is stated with aria-labelledby. */
-          role="radiogroup"
+             so the name is stated with aria-labelledby. The multi-select step
+             is a group of checkboxes, not a radiogroup, and mirrors the same
+             pattern — the invalid state stays on the group either way. */
+          role={currentChoice.multiple ? "group" : "radiogroup"}
           aria-labelledby={legendId}
           aria-invalid={errors[currentChoice.id] ? true : undefined}
           aria-describedby={errors[currentChoice.id] ? errorId(currentChoice.id) : undefined}
@@ -229,14 +256,25 @@ export function LeadForm() {
             {currentChoice.options.map((option) => (
               <label key={option} className={styles.choice}>
                 <input
-                  type="radio"
-                  className={styles.radio}
+                  type={currentChoice.multiple ? "checkbox" : "radio"}
+                  className={styles.control}
                   name={currentChoice.id}
                   value={option}
-                  checked={answers[currentChoice.id] === option}
-                  onChange={() => setAnswer(currentChoice.id, option)}
+                  checked={
+                    currentChoice.multiple
+                      ? answers.needs.includes(option)
+                      : answers[currentChoice.id] === option
+                  }
+                  onChange={() =>
+                    currentChoice.multiple
+                      ? toggleNeed(option)
+                      : setAnswer(currentChoice.id, option)
+                  }
                 />
-                <span aria-hidden="true" className={styles.marker} />
+                <span
+                  aria-hidden="true"
+                  className={cx(styles.marker, currentChoice.multiple && styles.markerBox)}
+                />
                 <span>{option}</span>
               </label>
             ))}

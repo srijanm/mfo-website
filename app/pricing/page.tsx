@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
-import { Container, Grid } from "@/components/foundation";
+import { Container, Section } from "@/components/foundation";
 import { AdditionalFinancialSupport, CoreScopeMatrix } from "@/components/sections";
 import { FaqSection, FinalCtaSection, PricingSection } from "@/components/shared";
-import { faqByIds, finalCta } from "@/lib/content/homepage";
-import { pricing, pricingPage } from "@/lib/content/pricing";
-import { cx } from "@/lib/cx";
+import { homepageFaqHeadline } from "@/lib/content/homepage";
+import { pricingPage } from "@/lib/content/pricing";
+import { standardClose } from "@/lib/content/standard-blocks";
 import { pageMetadata } from "@/lib/metadata";
 
 import styles from "./page.module.css";
@@ -17,45 +17,62 @@ export const metadata: Metadata = pageMetadata({
 });
 
 /**
- * The pricing page.
- *
- * Assembled from the same components the homepage uses, so the three price
- * points, the core scope and the additional-support framing cannot drift
- * between the two pages.
+ * The pricing page, in the order the final structure doc gives: hero, the
+ * three tiers, what the fee covers (the same core scope rows the homepage
+ * uses), how the scope gets agreed, and only after all of that the
+ * additional-support framing — Layer B stays below pricing.
  *
  * The plan comparison lives inside PricingSection and stays unmounted while
  * `approvedPlanScope` is null, which is the state today. Populating that one
  * object reveals it on both pages at once.
- *
- * The FAQ selects the pricing objections from the approved question set rather
- * than introducing new copy, and the closing CTA reuses the approved final-CTA
- * wording with the label §22 names for this page.
  */
 export default function PricingPage() {
   return (
     <>
       <section className={styles.hero} aria-labelledby="pricing-hero">
         <Container>
-          <Grid>
-            <div className={styles.heroTitle}>
-              <h1 id="pricing-hero" className={styles.title}>
-                {pricingPage.headline}
-              </h1>
-            </div>
-            <p className={cx(styles.heroLead, styles.lead)}>{pricingPage.lead}</p>
-          </Grid>
+          <h1 id="pricing-hero" className={styles.title}>
+            {pricingPage.headline}
+          </h1>
+          <p className={styles.lead}>{pricingPage.lead}</p>
         </Container>
       </section>
 
       <PricingSection content={pricingPage.tiers} />
 
-      <CoreScopeMatrix />
+      <CoreScopeMatrix
+        label={pricingPage.feeCovers.label}
+        headline={pricingPage.feeCovers.title}
+        showAction={false}
+      />
+
+      <Section labelledBy="scope-agreed">
+        <Container>
+          <p className="section-label">{pricingPage.scopeAgreed.label}</p>
+          <h2 id="scope-agreed" className="section-headline section-headline--wide">
+            {pricingPage.scopeAgreed.title}
+          </h2>
+          <ol className={styles.steps}>
+            {pricingPage.scopeAgreed.steps.map((step, index) => (
+              <li key={step.id} className={styles.step}>
+                <p className={`${styles.stepNumber} data-number`} aria-hidden="true">
+                  {index + 1}
+                </p>
+                <div>
+                  <h3 className={styles.stepTitle}>{step.title}</h3>
+                  <p className={styles.stepBody}>{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </Container>
+      </Section>
 
       <AdditionalFinancialSupport />
 
-      <FaqSection items={faqByIds(pricingPage.faqIds)} />
+      <FaqSection items={pricingPage.questions} headline={homepageFaqHeadline} />
 
-      <FinalCtaSection content={{ ...finalCta, cta: pricing.cta }} />
+      <FinalCtaSection content={standardClose} />
     </>
   );
 }

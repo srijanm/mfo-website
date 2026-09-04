@@ -1,5 +1,4 @@
 import { Container, Section } from "@/components/foundation";
-import { Plate } from "@/components/plates";
 import { coverageStages, structuralMismatch } from "@/lib/content/homepage";
 import { cx } from "@/lib/cx";
 
@@ -26,12 +25,9 @@ export function StructuralMismatch() {
       <Container>
         <div className={cx("rule-grid", "rule-grid--5-7", styles.split)}>
           <div className={styles.copy}>
-            <div className={styles.copyHead}>
-              <Plate kind="mismatch" className={styles.plate} />
-              <h2 id="structural-mismatch" className="section-headline">
-                {structuralMismatch.headline}
-              </h2>
-            </div>
+            <h2 id="structural-mismatch" className={cx("section-headline", styles.heading)}>
+              {structuralMismatch.headline}
+            </h2>
             {structuralMismatch.body.map((paragraph) => (
               <p key={paragraph} className={styles.body}>
                 {paragraph}

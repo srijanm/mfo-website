@@ -11,9 +11,31 @@
   gap: var(--threshold-gap, 12px);
 }
 
+/* Vertical is the ledger orientation, so the rail is continuous by default:
+   segments run node-to-node with no gap. A caller that wants breathing room
+   opens it with --threshold-gap. */
 .vertical {
   flex-direction: column;
-  gap: var(--threshold-gap, 8px);
+  gap: var(--threshold-gap, 0px);
+}
+
+/* The dot and its label, in the vertical orientation. The anchor is exactly
+   the dot's box — the label is positioned out of flow beside it — so the
+   column's width is the dot's width and every dot sits on the same axis no
+   matter what its label measures. Named without "dot" or "label" in it: axis
+   compositions select the real parts with [class*="dot"]. */
+.anchor {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+.vertical .label {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
 }
 
 .segment {
@@ -81,14 +103,24 @@
   color: inherit;
 }
 
-/* On ink, an inactive node is a mark on the rule, not a piece of text: paper
-   at full strength would read as louder than the label beside it. The active
-   node keeps its acid fill and takes an acid stroke, so it stays the one thing
-   on the axis that is filled. */
-:global(.surface-ink) .dot {
-  border-color: var(--rule-on-ink);
-}
-
+/* On ink the hollow node keeps its currentColor (paper) stroke — the rule
+   token there is paper at 20%, and a 1px circle drawn in it vanishes into the
+   surface. A state marker holds ≥3:1 on whatever it sits on. The active node
+   keeps its acid fill and takes an acid stroke, so it stays the one thing on
+   the axis that is filled. */
 :global(.surface-ink) .dotActive {
   border-color: var(--acid);
+}
+
+/* Acid on acid is invisible. On the acid surface the active fill is ink — the
+   hollow node already strokes ink via currentColor, so the filled node stays
+   the one solid thing on the axis — and a passed segment fills ink for the
+   same reason. */
+:global(.surface-acid) .dotActive {
+  border-color: var(--ink);
+  background: var(--ink);
+}
+
+:global(.surface-acid) .segmentActive {
+  background: var(--ink);
 }

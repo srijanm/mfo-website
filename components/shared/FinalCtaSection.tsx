@@ -1,13 +1,9 @@
-import { Button, Container, Grid, NodeAxis } from "@/components/foundation";
+import { Button, Container, Grid } from "@/components/foundation";
 import { Reveal } from "@/components/motion";
 import { cx } from "@/lib/cx";
 import type { FinalCtaContent } from "@/lib/content/homepage";
 
 import styles from "./FinalCtaSection.module.css";
-
-/* Five nodes, the last filled. A marking on the field, not a progress
-   indicator: it carries no labels and names nothing. */
-const AXIS_STOPS = [0, 1, 2, 3, 4].map((index) => ({ id: `stop-${index}` }));
 
 type FinalCtaSectionProps = {
   /** Supplied by the page from lib/content. */
@@ -48,8 +44,6 @@ export function FinalCtaSection({ content }: FinalCtaSectionProps) {
               </Button>
             </div>
           </Reveal>
-
-          <NodeAxis className={styles.axis} stops={AXIS_STOPS} activeIndex={4} quiet />
         </Grid>
       </Container>
     </section>

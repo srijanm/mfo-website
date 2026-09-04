@@ -1,93 +1,66 @@
-/* H05, §17 — static vertical progression.
-   This is exactly what mobile and reduced-motion visitors get, so it carries
-   the whole section on its own: no sticky positioning, no scroll state, no
-   animation, and nothing that only makes sense once something moves. */
+/* H05, §17 — the static vertical progression, on the ink chapter.
+   One composition at every viewport and motion preference. The sticky
+   scroll-scrub treatment is gone; this ordinary flow layout is the section,
+   and it carries standard section rhythm — no pinned panel, no scroll state,
+   no multi-viewport heights. */
 
 .intro {
   grid-column: 1 / span 7;
 }
 
-/* The chapter header's lede. Its heading takes the canonical
-   `.section-headline` from the token sheet, like every other section on the
-   site — including here, where the h2 renders on the dark chapter and where an
-   unstyled one would otherwise fall back to the browser's bold 700 default. */
-.chapterLede {
-  margin: 14px 0 0;
-  max-width: 62ch;
-  font-size: var(--fs-ui);
-  line-height: 1.45;
-  color: var(--ink-2);
-}
-
-:global(.surface-ink) .chapterLede {
-  color: var(--muted-on-ink);
-}
-
-.chapter {
-  padding-block: 8px 24px;
-}
-
 .lede {
-  margin: 24px 0 0;
+  margin: 16px 0 0;
   max-width: 54ch;
   font-size: var(--fs-lead);
   line-height: 1.44;
   letter-spacing: -.018em;
-  color: var(--ink-2);
-}
-
-/* --ink-2 is the paper surface's secondary text and is 1.6:1 on ink. On the
-   dark chapter the secondary step is --muted-on-ink, at 6.9:1. */
-:global(.surface-ink) .lede {
+  /* --ink-2 is the paper surface's secondary step and fails on ink. The dark
+     chapter's secondary step is --muted-on-ink, at 6.9:1. */
   color: var(--muted-on-ink);
 }
 
 .list {
-  grid-column: 1 / -1;
   margin: 64px 0 0;
   padding: 0;
   list-style: none;
 }
 
 /* Rail on the left, content on the right. The rail column is sized to the
-   node so the copy column takes everything else — no width is reserved for a
-   value that may never exist. */
+   node so the copy column takes everything else. */
 .milestone {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   column-gap: 24px;
 }
 
+/* The spine. The node sits at the top of the cell; the connecting segment is
+   drawn on the cell itself (below), absolutely positioned, so it spans the
+   full row height — body padding included — instead of stopping wherever a
+   nested flex box happened to end. */
 .rail {
+  position: relative;
   display: flex;
   justify-content: center;
   /* Pulls the node down onto the label's optical centre. */
   padding-top: 6px;
 }
 
-/* Lets the connecting segment inside the primitive grow to the row height
-   rather than sitting at its minimum. */
-.railNode {
-  flex: 1;
-  align-items: center;
+/* The segment runs from 8px below this node to 8px above the next one. Top:
+   6px alignment + 12px dot + 8px clearance. Bottom: the next dot starts 6px
+   into the next row, so ending 2px inside this one leaves the same 8px.
+   --rule resolves to --rule-on-ink inside the ink surface. */
+.milestone:not(:last-child) .rail::after {
+  content: "";
+  position: absolute;
+  top: 26px;
+  bottom: 2px;
+  left: calc(50% - .5px);
+  width: 1px;
+  background: var(--rule);
 }
 
 .body {
   padding-bottom: 56px;
-}
-
-/* Compact reuse: the same content, less air between milestones. */
-.listCompact {
-  margin-top: 40px;
-}
-
-.listCompact .body {
-  padding-bottom: 36px;
-}
-
-.listCompact .label {
-  font-size: var(--fs-lead);
-  letter-spacing: -.018em;
 }
 
 .milestone:last-child .body {
@@ -118,12 +91,10 @@
 .fieldLabel {
   margin: 0;
   font-size: var(--fs-small);
-  /* Data label: --fs-small, --muted, weight 400 — CLAUDE.md typography. */
+  /* Data label: --fs-small, weight 400 — CLAUDE.md typography. This section
+     is always the ink chapter, so the muted step is --muted-on-ink by name:
+     plain --muted is 3.6:1 on ink and fails AA. */
   font-weight: 400;
-  color: var(--muted);
-}
-
-:global(.surface-ink) .fieldLabel {
   color: var(--muted-on-ink);
 }
 
@@ -162,242 +133,4 @@
   .field + .field {
     padding-top: 12px;
   }
-
-  .fieldValue {
-    font-size: var(--fs-body);
-  }
-}
-
-/* ---------------------------------------------------------------------------
-   The sticky desktop composition.
-
-   Everything below applies ONLY at desktop width, ONLY when the document is
-   scripted, and ONLY when the visitor has not asked for reduced motion.
-   Outside those three conditions none of it exists and the section is the
-   static vertical progression above — which is exactly what §17 requires for
-   mobile and reduced motion.
-   --------------------------------------------------------------------------- */
-
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  :global(html.js) .sticky .scroller {
-    position: relative;
-    /* Section scroll length. §17 puts it at 320vh; this is shorter, on the
-       owner's instruction — five milestones at 320vh is 64vh of scrolling each,
-       which is more travel than a two-line question and a three-row object
-       needs. Normal document scrolling: the page is simply tall, and nothing
-       intercepts the wheel. */
-    height: 260vh;
-  }
-
-  /* Empty blocks whose only job is to be intersected. They carry no content,
-     so nothing is duplicated and nothing is read twice.
-
-     The strip is a grid of equal rows, which is what gives each sentinel its
-     height — they carry no class of their own and need none. */
-  :global(html.js) .sticky .sentinels {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    grid-auto-rows: 1fr;
-  }
-
-  :global(html.js) .sticky .panel {
-    position: sticky;
-    top: var(--nav-h-total, 64px);
-    height: calc(100svh - var(--nav-h-total, 64px));
-    display: flex;
-    flex-direction: column;
-    padding-block: 28px 32px;
-  }
-
-  /* Content and its action, centred together in the height the header leaves.
-     Grouping them is what closed the gap between the two: the action used to
-     be a flex child of the panel itself, pinned under the milestone's centred
-     block with all the slack falling between them. */
-  :global(html.js) .sticky .stage {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 40px;
-    min-height: 0;
-  }
-
-  :global(html.js) .sticky .panelInner {
-    /* The detail panels are stacked; only the active one is shown. */
-    position: relative;
-  }
-
-  :global(html.js) .sticky .list {
-    margin: 0;
-    width: 100%;
-    display: grid;
-  }
-
-  /* Detail crossfade with 10px of copy travel — motion-tokens distance.copy.
-     The outgoing panel fades on the shorter duration so the two do not both
-     sit at half opacity in the middle of the exchange. */
-  /* Label and detail on the left five columns at a proper measure; the
-     obligation object on the right six. Previously the whole milestone sat in
-     one narrow column with about 925px of empty panel beside it. */
-  :global(html.js) .sticky .milestone {
-    grid-area: 1 / 1;
-    grid-template-columns:
-      calc((100% * 5 - 1 * var(--grid-gap)) / 12)
-      minmax(0, 1fr);
-    column-gap: var(--grid-gap);
-    opacity: 0;
-    transform: translateY(10px);
-    pointer-events: none;
-    transition:
-      opacity var(--motion-normal) var(--ease-system),
-      transform var(--motion-normal) var(--ease-system);
-  }
-
-  :global(html.js) .sticky .milestoneActive {
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
-    transition:
-      opacity var(--motion-slow) var(--ease-reveal),
-      transform var(--motion-slow) var(--ease-reveal);
-  }
-
-  /* The vertical rail belongs to the stacked version only. */
-  :global(html.js) .sticky .rail {
-    display: none;
-  }
-
-  :global(html.js) .sticky .body {
-    padding-bottom: 0;
-    max-width: none;
-  }
-
-  /* Cols 7-12: the object is the right half of the composition. It is centred
-     against the copy rather than stretched to it: stretching grew the card by
-     opening a void between its title rule and its first row, which is exactly
-     the emptiness this section was compacted to remove. */
-  :global(html.js) .sticky .record {
-    display: block;
-    grid-column: 2;
-    align-self: center;
-    width: 100%;
-  }
-
-  /* The object fills the six columns it was given rather than sitting at the
-     420px it takes in a hero, where it would leave half the cell empty. */
-  :global(html.js) .sticky .record > :global(figure) {
-    max-width: none;
-  }
-
-  /* A step below the chapter heading. The milestone label used to be set at
-     --fs-h2 while the section's own heading sat at --fs-h3 above it, so the
-     content outranked the thing naming it. */
-  :global(html.js) .sticky .label {
-    font-size: var(--fs-h3);
-    line-height: 1.12;
-    letter-spacing: -.028em;
-    max-width: 20ch;
-  }
-
-  /* A two-column ruled record, the same shape as the incoming payment object:
-     a fixed label column on the left, values on the right, one rule between
-     rows. Stacked, the two read as equal blocks and neither is subordinate.
-
-     gap is 0 and the spacing is padding: a column gap here would leave each
-     row's rule broken in two with a gap between the halves, which is the shape
-     the rule-system guardrail rejects. */
-  :global(html.js) .sticky .fields {
-    margin-top: 32px;
-    grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
-    gap: 0;
-    max-width: none;
-  }
-
-  :global(html.js) .sticky .field dt,
-  :global(html.js) .sticky .field dd {
-    padding-block: 20px;
-  }
-
-  :global(html.js) .sticky .field dt {
-    padding-right: 24px;
-  }
-
-  /* One rule between rows. Both halves carry it, so it runs unbroken. */
-  :global(html.js) .sticky .field + .field dt,
-  :global(html.js) .sticky .field + .field dd {
-    border-top: 1px solid var(--rule);
-  }
-
-  :global(html.js) .sticky .fieldValue {
-    max-width: none;
-  }
-
-  /* The chapter header: the section's own headline and lede, at the top of the
-     panel and above the axis, so the copy introduces the axis instead of
-     occupying a screen of its own before it. It is quieter than a milestone
-     label on purpose — it is the frame, and the milestone is the content. */
-  :global(html.js) .sticky .chapter {
-    flex: none;
-    padding-block: 0 22px;
-  }
-
-  /* The axis is the panel's header: a persistent position indicator directly
-     under the nav, above the content it describes. It is closed by a rule
-     rather than opened by one, because the nav's own rule is already the line
-     above it. */
-  :global(html.js) .sticky .axisHeader {
-    flex: none;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--rule);
-  }
-
-  :global(html.js) .sticky .axis {
-    display: block;
-    width: 100%;
-  }
-
-  :global(html.js) .sticky .action {
-    flex: none;
-  }
-}
-
-/* Outside the sticky treatment neither the axis strip nor the object exists:
-   the static vertical progression is the whole section there. */
-.axis,
-.record {
-  display: none;
-}
-
-/* Only the sticky composition has a panel foot to hang this on. */
-.action {
-  margin-top: 32px;
-}
-
-/* The one place depth is permitted on this page: an information object sitting
-   on top of a colour block. Scoped to the ink surface rather than applied by
-   class alone, so the same component on the compact paper reuse elsewhere stays
-   flat — objects on paper take no shadow. Radius comes from the object token,
-   which the amended scale puts at 8px. */
-:global(.surface-ink) .recordSurface {
-  box-shadow: var(--shadow-object);
-}
-
-/* ---------------------------------------------------------------------------
-   The axis's own motion — the acid fill, the node fill, the 1.18 scale and the
-   pulse ring — now lives with the axis, in NodeAxis.module.css, so every use of
-   the primitive behaves the same way and the timings are stated once.
-
-   What is left here is the part that belongs to this section: the crossfade
-   between one milestone's detail and the next, which is above, and nothing
-   else. The chapter's background is not animated at all — §28 asks for a
-   full-viewport colour change to be instant, and globals.css holds every
-   surface class at `transition-property: none` so it cannot become otherwise.
-   --------------------------------------------------------------------------- */
-
-/* The section mark, on the static reuse. It sits above the heading rather than
-   in a column of its own: the ruled blocks below set the column lines, and
-   giving the mark a column would move them. */
-.plate {
-  margin-bottom: 28px;
 }

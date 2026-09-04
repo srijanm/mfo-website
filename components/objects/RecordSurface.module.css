@@ -30,13 +30,13 @@
   max-width: 420px;
 }
 
+/* Sentence case: the record's name is a data label, and the typography rules
+   keep every label off the tracked-uppercase register. */
 .title {
   margin: 0;
   padding: var(--record-inset) var(--record-inset) 0;
   font-size: var(--fs-small);
   font-weight: 500;
-  letter-spacing: .06em;
-  text-transform: uppercase;
   color: var(--muted);
 }
 

@@ -273,7 +273,7 @@ export type IncomeAxisMilestone = {
 export const incomeAxis = {
   headline: "Your obligations change as your income and setup change.",
   intro:
-    "You don’t need to memorise every rule. Rather have someone who know’s what comes next.",
+    "You don’t need to memorise every rule. Rather have someone who knows what comes next.",
 
   /* Field names taken from §17 rather than invented. Kept here so the copy
      owner can change the wording without touching a component. */
@@ -439,9 +439,10 @@ export const trustLedger = {
         "The messages come to your phone, not to an office you have never been to.",
     },
     {
-      id: "named-signatory",
-      whatWeDo: "A named professional signs the return.",
-      whyItMatters: "There is a person on the other end of it, and you know their name.",
+      id: "who-signs",
+      whatWeDo: "You’ll know who signs your return.",
+      whyItMatters:
+        "An ICAI-registered chartered accountant signs it, and you’ll know who before anything is filed.",
     },
     {
       id: "support-upfront",
@@ -456,6 +457,16 @@ export const trustLedger = {
         "We would rather tell you that now than sell you something you will not use.",
     },
   ],
+
+  /**
+   * The filing sequence, moved here from /how-it-works when that page was
+   * deleted. Four states of one return, in order. Labels only — no dates and
+   * nothing about what falls due when.
+   */
+  filingSequence: {
+    label: "Before anything is filed",
+    states: ["Draft", "Sent to you", "Approved", "Filed"],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ H12 */

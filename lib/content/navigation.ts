@@ -16,12 +16,28 @@ export type NavItem = {
   label: string;
 };
 
-export const primaryNav: readonly NavItem[] = [
-  { href: "/how-it-works", label: "How it works" },
-  { href: "/who-its-for", label: "Who it's for" },
+export type NavEntry = NavItem | { label: string; children: readonly NavItem[] };
+
+export function isNavGroup(entry: NavEntry): entry is { label: string; children: readonly NavItem[] } {
+  return "children" in entry;
+}
+
+/** The three audience pages, at their top-level URLs. */
+export const audienceNav: readonly NavItem[] = [
+  { href: "/paid-from-abroad", label: "Paid from abroad" },
+  { href: "/freelancers", label: "Freelancers and consultants" },
+  { href: "/creators", label: "Creators" },
+] as const;
+
+/**
+ * Final nav: Who it's for (dropdown, 3 items) · Pricing · How we work, then
+ * the primary CTA. Guides stays built but out of the nav until it has real
+ * content.
+ */
+export const primaryNav: readonly NavEntry[] = [
+  { label: "Who it's for", children: audienceNav },
   { href: "/pricing", label: "Pricing" },
-  { href: "/guides", label: "Guides" },
-  { href: "/about", label: "About" },
+  { href: "/how-we-work", label: "How we work" },
 ] as const;
 
 export type FooterColumn = {
@@ -35,7 +51,6 @@ export const footerColumns: readonly FooterColumn[] = [
     id: "product",
     title: "Product",
     links: [
-      { href: "/how-it-works", label: "How it works" },
       { href: "/pricing", label: "Pricing" },
       { href: primaryCta.href, label: "Get started" },
     ],
@@ -43,23 +58,13 @@ export const footerColumns: readonly FooterColumn[] = [
   {
     id: "audience",
     title: "Who it's for",
-    links: [
-      { href: "/who-its-for/foreign-income", label: "Paid from abroad" },
-      { href: "/who-its-for/freelancers-consultants", label: "Freelancers and consultants" },
-      { href: "/who-its-for/creators", label: "Creators" },
-      { href: "/who-its-for/independent-professionals", label: "Independent professionals" },
-    ],
-  },
-  {
-    id: "learn",
-    title: "Learn",
-    links: [{ href: "/guides", label: "Guides" }],
+    links: audienceNav,
   },
   {
     id: "company",
     title: "Company",
     links: [
-      { href: "/about", label: "About" },
+      { href: "/how-we-work", label: "How we work" },
       { href: "/contact", label: "Contact" },
     ],
   },
@@ -85,16 +90,15 @@ export const copyrightSince = 2026;
 /**
  * The homepage's own index, for the page rail.
  *
- * Each id is a DOM id a section already carries, and each label is the name of
- * the idea that section states in words. The rail renders only on pages that
- * declare an index, so it never appears somewhere these ids do not exist.
+ * Each id is a DOM id a section on the homepage actually declares, and each
+ * label is the name of the idea that section states in words. The rail renders
+ * only on pages that declare an index, so it never appears somewhere these ids
+ * do not exist.
  */
 export const sectionIndex = [
   { id: "latent-problem", label: "What goes wrong" },
   { id: "structural-mismatch", label: "The mismatch" },
   { id: "income-axis", label: "As things change" },
-  { id: "operating-model", label: "How we work" },
-  { id: "temporal-ledger", label: "The year" },
   { id: "core-scope-headline", label: "What we run" },
   { id: "trust-ledger", label: "Before we file" },
   { id: "pricing", label: "Pricing" },

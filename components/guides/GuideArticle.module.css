@@ -29,6 +29,14 @@
   }
 }
 
+/* Stacked below desktop the rail would render after the whole article, where
+   a table of contents is no navigation at all — it comes out instead. */
+@media (max-width: 1023px) {
+  .rail {
+    display: none;
+  }
+}
+
 /* The placeholder notice. Deliberately the first thing in the document and
    deliberately not styled as a warning — §4 keeps red functional. It reads as
    a ruled statement of fact about the page.
@@ -46,8 +54,6 @@
   margin: 0;
   font-size: var(--fs-small);
   font-weight: 500;
-  letter-spacing: .06em;
-  text-transform: uppercase;
 }
 
 .placeholderBody {

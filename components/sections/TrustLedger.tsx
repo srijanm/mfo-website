@@ -1,7 +1,5 @@
 import { Container, Grid, Section } from "@/components/foundation";
-import { RecordStates } from "@/components/illustration";
 import { Reveal } from "@/components/motion";
-import { Plate } from "@/components/plates";
 import { trustLedger } from "@/lib/content/homepage";
 
 import { cx } from "@/lib/cx";
@@ -13,22 +11,21 @@ import styles from "./TrustLedger.module.css";
  *
  * Ruled two-column rows, per §21. No ticks, no cards and no green: the
  * behaviours are stated plainly and the rules do the structuring.
+ *
+ * The filing sequence beneath the rows is the concrete version of the same
+ * promise: four states of one return, in the order they happen. Real text in
+ * a real list — it is the information, not a marking beside it.
  */
 export function TrustLedger() {
-  const { columnHeadings, rows } = trustLedger;
+  const { columnHeadings, rows, filingSequence } = trustLedger;
 
   return (
     <Section labelledBy="trust-ledger">
       <Container>
         <Grid>
-          <Plate kind="trust" className={styles.plate} />
           <h2 id="trust-ledger" className={cx("section-headline", styles.headline)}>
             {trustLedger.headline}
           </h2>
-
-          {/* One record resolving a state at a time — what the rows below
-              describe, as a shape. It names no filing. */}
-          <RecordStates className={styles.mark} />
 
           <Reveal as="ul" variant="rows" className={styles.rows}>
             {rows.map((row) => (
@@ -45,6 +42,18 @@ export function TrustLedger() {
               </li>
             ))}
           </Reveal>
+
+          <div className={styles.sequence}>
+            <p className={styles.sequenceLabel}>{filingSequence.label}</p>
+            <ol className={styles.states}>
+              {filingSequence.states.map((state) => (
+                <li key={state} className={styles.state}>
+                  <span aria-hidden="true" className={styles.node} />
+                  {state}
+                </li>
+              ))}
+            </ol>
+          </div>
         </Grid>
       </Container>
     </Section>

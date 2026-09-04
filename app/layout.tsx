@@ -67,8 +67,11 @@ const MARK_SCRIPTED = `document.documentElement.classList.add("js")`;
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  /* suppressHydrationWarning: the inline head script above adds "js" to the
+     class list before React hydrates, which is the one attribute allowed to
+     differ between server and client. */
   return (
-    <html lang="en-IN" className={geist.variable}>
+    <html lang="en-IN" className={geist.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: MARK_SCRIPTED }} />
       </head>

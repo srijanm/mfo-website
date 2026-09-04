@@ -3,12 +3,25 @@
 import { useEffect, useId, useRef, useState } from "react";
 
 import { cx } from "@/lib/cx";
-import { incomeField } from "@/lib/content/field";
+import { incomeField, type FieldCell } from "@/lib/content/field";
 
 import styles from "./EventField.module.css";
 
 /** How long each shape holds before the crossfade to the other one. */
 const HOLD_MS = 5000;
+
+/**
+ * Two weeks folded into one cell, for the phone-width grid. A fortnight that
+ * needed attention reads "todo" — the acid marks are what the drawing is about
+ * and there are few of them — and otherwise one arrival is enough to mark it
+ * "payment". The same year, at half the resolution: fewer, larger cells, and
+ * every row still one unwrapped line.
+ */
+function foldPair(a?: FieldCell, b?: FieldCell): FieldCell {
+  if (a === "todo" || b === "todo") return "todo";
+  if (a === "payment" || b === "payment") return "payment";
+  return "none";
+}
 
 /**
  * Item 15. A year of income, as a field of weeks.
@@ -149,6 +162,28 @@ export function EventField({ className }: { className?: string }) {
                 )}
               />
             )),
+          )}
+        </div>
+
+        {/* The same field at fortnight resolution, for phone widths. Which of
+            the two renders is CSS's decision, not a script's, so the server
+            and the client always agree on the markup. Decorative like the grid
+            above — the caption below carries the accessible text for both. */}
+        <div aria-hidden="true" className={styles.gridMobile}>
+          {shape.cells.map((row, rowIndex) =>
+            Array.from({ length: Math.ceil(row.length / 2) }, (_, pairIndex) => {
+              const cell = foldPair(row[pairIndex * 2], row[pairIndex * 2 + 1]);
+              return (
+                <span
+                  key={`${rowIndex}-${pairIndex}`}
+                  className={cx(
+                    styles.cell,
+                    cell === "payment" && styles.cellPayment,
+                    cell === "todo" && styles.cellTodo,
+                  )}
+                />
+              );
+            }),
           )}
         </div>
       </div>

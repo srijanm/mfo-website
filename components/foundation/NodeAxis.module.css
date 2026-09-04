@@ -32,6 +32,12 @@
   transform-origin: left center;
 }
 
+/* Acid on acid is invisible: on the acid surface the passed portion fills ink,
+   the same rebind the node itself makes. Paper and white are untouched. */
+:global(.surface-acid) .filled {
+  background: var(--ink);
+}
+
 .stop {
   position: absolute;
   top: 0;
@@ -171,6 +177,12 @@
     border-radius: 50%;
     pointer-events: none;
     animation: nodePulseRing var(--motion-pulse) var(--ease-system) 1 both;
+  }
+
+  /* The ring is drawn in the state's own colour per surface: acid everywhere
+     acid is visible, ink on the acid field. */
+  :global(html.js) :global(.surface-acid) .axis:not(.quiet) .stop:has(:global(span[class*="dotActive"]))::after {
+    border-color: var(--ink);
   }
 
   /* The end nodes are pulled inside the line, so their ring follows them. */

@@ -1,226 +1,82 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-
-import { Button, Container, Grid, NodeAxis, Section, ThresholdNode } from "@/components/foundation";
-import { Plate } from "@/components/plates";
-import { DeadlineRecord } from "@/components/objects";
+import { Container, Grid, Section, ThresholdNode } from "@/components/foundation";
+import { Reveal } from "@/components/motion";
 import { incomeAxis } from "@/lib/content/homepage";
-import { primaryCta } from "@/lib/content/navigation";
 import { factValue } from "@/lib/content/reviewed";
-import { cx } from "@/lib/cx";
 
 import styles from "./IncomeAxis.module.css";
 
-type IncomeAxisProps = {
-  /**
-   * Tighter spacing, no lede, and never sticky. Used where the section is
-   * reused inside a page that has already introduced the idea.
-   */
-  compact?: boolean;
-};
-
 /**
- * H05 — the Income Axis.
+ * H05 — the Income Axis. The one ink chapter on the homepage.
  *
- * There is one copy of the content, and it is ordinary HTML at every stage.
- * The sticky desktop composition is a CSS treatment of that same markup plus a
- * strip of empty scroll sentinels; nothing is duplicated, nothing is unmounted,
- * and no text exists only inside a canvas.
+ * A static vertical progression: the section headline and lede, then the five
+ * milestones in order, each a node on a continuous spine with its label, the
+ * question someone actually asks there, and what MyFinanceOfficer does about
+ * it. This is the whole composition at every viewport and motion preference —
+ * the former sticky scroll-scrub treatment is gone, and nothing here pins,
+ * scrubs, or changes with scroll position.
  *
- * The sticky behaviour applies only on desktop, only when the document is
- * scripted, and only when the visitor has not asked for reduced motion. In any
- * other case — mobile, no JavaScript, reduced motion, or the compact reuse —
- * this renders exactly the static vertical progression it always did.
- *
- * Scrolling only ever changes which milestone is marked active. It never moves
- * the page, never captures the wheel, and never takes focus.
+ * The only motion is the shared first-entrance reveal on the list, which is
+ * gated behind `html.js` and `prefers-reduced-motion: no-preference` inside
+ * the motion module — so with scripting off or reduced motion on, the content
+ * is simply present.
  */
-export function IncomeAxis({ compact = false }: IncomeAxisProps) {
+export function IncomeAxis() {
   const { fieldLabels, milestones } = incomeAxis;
-  const sticky = !compact;
-
-  const [active, setActive] = useState(0);
-  const sentinelsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!sticky) return;
-
-    const container = sentinelsRef.current;
-    if (!container || typeof IntersectionObserver === "undefined") return;
-
-    /* The sentinels are empty blocks whose only job is to be intersected. The
-       last one to cross the midpoint of the viewport names the active
-       milestone. */
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const index = Number((entry.target as HTMLElement).dataset.index);
-          if (Number.isInteger(index)) setActive(index);
-        }
-      },
-      { rootMargin: "-50% 0px -50% 0px", threshold: 0 },
-    );
-
-    for (const child of container.children) observer.observe(child);
-    return () => observer.disconnect();
-  }, [sticky]);
 
   return (
-    <Section
-      dense={compact}
-      labelledBy="income-axis"
-      /* The one dark section on the page. It spans the full viewport; the
-         content inside it stays on the container grid. Only the sticky
-         composition takes it — the compact reuse on other pages is an
-         ordinary paper section, and a page carries at most one ink block. */
-      className={cx(sticky && styles.sticky, sticky && "surface-ink")}
-    >
-      {/* Outside the sticky composition this introduces the section in the
-          ordinary way. Inside it, the same copy is the chapter's header and
-          lives in the panel below, so it introduces the axis rather than
-          occupying a screen of its own before it. */}
-      {sticky ? null : (
-        <Container>
-          <Grid>
-            <div className={styles.intro}>
-              <Plate kind="incomeAxis" className={styles.plate} />
-              <h2 id="income-axis" className="section-headline section-headline--wide">
-                {incomeAxis.headline}
-              </h2>
-            </div>
-          </Grid>
-        </Container>
-      )}
-
-      <div className={styles.scroller}>
-        {/* Empty, aria-hidden, and display:none outside the sticky treatment. */}
-        {sticky ? (
-          <div ref={sentinelsRef} aria-hidden="true" className={styles.sentinels}>
-            {milestones.map((milestone, index) => (
-              <div key={milestone.id} data-index={index} />
-            ))}
+    <Section labelledBy="income-axis" className="surface-ink">
+      <Container>
+        <Grid>
+          <div className={styles.intro}>
+            {/* The page rail anchors to this id. */}
+            <h2 id="income-axis" className="section-headline section-headline--wide">
+              {incomeAxis.headline}
+            </h2>
+            <p className={styles.lede}>{incomeAxis.intro}</p>
           </div>
-        ) : null}
+        </Grid>
 
-        <div className={styles.panel}>
-          {/* The axis is the panel's header, not its footer. Below the content
-              it describes, the reader saw the detail change before they could
-              see where they were; at the top it is a persistent position
-              indicator, visible on the first milestone and every one after.
+        <Reveal as="ol" variant="rows" className={styles.list}>
+          {milestones.map((milestone) => (
+            <li key={milestone.id} className={styles.milestone}>
+              {/* The spine is decorative — the ordered list already carries
+                  the sequence — so the whole rail cell is out of the
+                  accessibility tree. The connecting segment between nodes is
+                  drawn by the stylesheet on the cell itself. */}
+              <div aria-hidden="true" className={styles.rail}>
+                <ThresholdNode orientation="vertical" />
+              </div>
 
-              MASTER_BUILD_SPEC.md §17 places it in the panel's lower portion.
-              This deviates from that on the owner's instruction. Decorative:
-              every label it marks is in the list below. */}
-          {sticky ? (
-            <Container className={styles.chapter}>
-              <h2
-                id="income-axis"
-                className="section-headline section-headline--wide"
-              >
-                {incomeAxis.headline}
-              </h2>
-              <p className={styles.chapterLede}>{incomeAxis.intro}</p>
-            </Container>
-          ) : null}
+              <div className={styles.body}>
+                <h3 className={styles.label}>{milestone.label}</h3>
 
-          {sticky ? (
-            /* The header holds nothing but the axis, and the axis is
-               decorative — every label on it is the milestone list below — so
-               the whole band is out of the accessibility tree. Written as a
-               plain container div because Container takes no ARIA props. */
-            <div aria-hidden="true" className={cx("container", styles.axisHeader)}>
-              <NodeAxis
-                className={styles.axis}
-                stops={milestones.map((milestone) => ({
-                  id: milestone.id,
-                  label: milestone.label,
-                }))}
-                activeIndex={active}
-              />
-            </div>
-          ) : null}
+                <dl className={styles.fields}>
+                  <div className={styles.field}>
+                    <dt className={styles.fieldLabel}>{fieldLabels.question}</dt>
+                    <dd className={styles.fieldValue}>{milestone.question}</dd>
+                  </div>
 
-          {/* The stage. Content and the action that follows it are one group,
-              centred together in whatever height the panel has left over.
-              Previously the action was pinned to the panel's foot while the
-              content centred above it, which opened a couple of hundred pixels
-              of empty ink between them on every milestone. */}
-          <div className={styles.stage}>
-            <Container className={styles.panelInner}>
-              <ol className={cx(styles.list, compact && styles.listCompact)}>
-                {milestones.map((milestone, index) => (
-                  <li
-                    key={milestone.id}
-                    className={cx(styles.milestone, index === active && styles.milestoneActive)}
-                  >
-                    <div className={styles.rail}>
-                      <ThresholdNode
-                        className={styles.railNode}
-                        orientation="vertical"
-                        lineAfter={index < milestones.length - 1}
-                      />
+                  {/* Null until a CA writes and reviews the consequence — the
+                      layout must not depend on it appearing. */}
+                  {milestone.whatChanges ? (
+                    <div className={styles.field}>
+                      <dt className={styles.fieldLabel}>{fieldLabels.whatChanges}</dt>
+                      <dd className={styles.fieldValue}>
+                        {factValue(milestone.whatChanges)}
+                      </dd>
                     </div>
+                  ) : null}
 
-                    <div className={styles.body}>
-                      <h3 className={styles.label}>{milestone.label}</h3>
-
-                      <dl className={styles.fields}>
-                        <div className={styles.field}>
-                          <dt className={styles.fieldLabel}>{fieldLabels.question}</dt>
-                          <dd className={styles.fieldValue}>{milestone.question}</dd>
-                        </div>
-
-                        {milestone.whatChanges ? (
-                          <div className={styles.field}>
-                            <dt className={styles.fieldLabel}>{fieldLabels.whatChanges}</dt>
-                            <dd className={styles.fieldValue}>
-                              {factValue(milestone.whatChanges)}
-                            </dd>
-                          </div>
-                        ) : null}
-
-                        <div className={styles.field}>
-                          <dt className={styles.fieldLabel}>{fieldLabels.mfo}</dt>
-                          <dd className={styles.fieldValue}>{milestone.mfo}</dd>
-                        </div>
-                      </dl>
-                    </div>
-
-                    {/* The right half of the sticky composition. It names the
-                        milestone and states that MyFinanceOfficer is watching
-                        it. No date, no threshold, no tax conclusion: the status
-                        is a value from the approved union, and the date row is
-                        left out entirely rather than printing a permanent empty
-                        marker on every milestone. */}
-                    <div className={styles.record}>
-                      <DeadlineRecord
-                        className={styles.recordSurface}
-                        what={milestone.label}
-                        when={null}
-                        status={milestone.tracking}
-                      />
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </Container>
-
-            {/* The chapter's way out, directly under the content rather than at
-                the foot of a viewport-tall panel. A button, like every other
-                call to action on the site; outlined in paper because the one
-                acid control on this screen is the header's. */}
-            {sticky ? (
-              <Container className={styles.action}>
-                <Button href={primaryCta.href} tone="secondary">
-                  {primaryCta.label}
-                </Button>
-              </Container>
-            ) : null}
-          </div>
-        </div>
-      </div>
+                  <div className={styles.field}>
+                    <dt className={styles.fieldLabel}>{fieldLabels.mfo}</dt>
+                    <dd className={styles.fieldValue}>{milestone.mfo}</dd>
+                  </div>
+                </dl>
+              </div>
+            </li>
+          ))}
+        </Reveal>
+      </Container>
     </Section>
   );
 }
