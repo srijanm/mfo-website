@@ -154,11 +154,24 @@
     display: inline-block;
     overflow: hidden;
     vertical-align: bottom;
+
+    /* The display sizes run at line-height .96, so the inline-block box the
+       mask clips to is *shorter* than the glyphs it contains: descenders (the
+       y in "you", the y in "family's") were cut off, and a tall diacritic
+       would be too. The box grows past the text at both edges and the growth
+       is pulled straight back out of the layout, so the line box, the
+       baseline and the acid band are all exactly where they were. */
+    --mask-over: .18em;
+    --mask-under: .26em;
+    padding-block: var(--mask-over) var(--mask-under);
+    margin-block: calc(var(--mask-over) * -1) calc(var(--mask-under) * -1);
   }
 
   :global(html.js) .wordInner {
     display: inline-block;
-    transform: translateY(100%);
+    /* 100% is the word's own height; the extra clears the descender room added
+       above, so the word still starts fully outside the mask. */
+    transform: translateY(calc(100% + var(--mask-under)));
     transition: transform var(--motion-headline) var(--ease-reveal);
     transition-delay: calc(
       var(--word-line, 0) * var(--stagger-word) +

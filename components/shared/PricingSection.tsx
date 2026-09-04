@@ -1,4 +1,4 @@
-import { Container, Grid, Section, TextLink } from "@/components/foundation";
+import { Button, Container, Grid, Section } from "@/components/foundation";
 import { formatAnnualPrice, type PricingContent } from "@/lib/content/pricing";
 import { approvedPlanScope } from "@/lib/content/pricing-scope";
 import { primaryCta } from "@/lib/content/navigation";
@@ -23,9 +23,11 @@ type PricingSectionProps = {
  * no inclusion claims. The comparison matrix is wired but never mounted in that
  * state, so revealing it later is a data change rather than a redesign.
  *
- * Each tier's action is a text link rather than an acid button: three acid
- * buttons in one viewport would break the rule in §10 that only one dominant
- * acid call to action appears at a time, and all three lead to the same place.
+ * Every action here is a button. The three tier actions are outlined rather
+ * than acid — three acid buttons in one viewport would break the rule in §10
+ * that only one dominant acid call to action appears at a time, and all three
+ * lead to the same place — and the section's own closing action is the acid
+ * one, because that is the action the section is asking for.
  */
 export function PricingSection({ content, id = "pricing" }: PricingSectionProps) {
   return (
@@ -33,7 +35,7 @@ export function PricingSection({ content, id = "pricing" }: PricingSectionProps)
       <Container>
         <Grid>
           {content.headline ? (
-            <h2 id={`${id}-headline`} className={styles.headline}>
+            <h2 id={`${id}-headline`} className={cx("section-headline", styles.headline)}>
               {content.headline}
             </h2>
           ) : null}
@@ -47,9 +49,22 @@ export function PricingSection({ content, id = "pricing" }: PricingSectionProps)
                   <span className={styles.perYear}>{content.perYear}</span>
                 </p>
                 <p className={styles.planLabel}>{content.planLabel}</p>
-                <p className={styles.scopeLine}>{content.scopeLine}</p>
+                {/* A marked slot, not copy. It renders as a placeholder because
+                    the tier's inclusions are exactly the thing CLAUDE.md rule 2
+                    forbids writing without a reviewed mapping — so it has to be
+                    impossible to mistake for finished text. */}
+                <p
+                  className={cx(
+                    styles.scopeLine,
+                    content.scopePlaceholder && styles.scopePlaceholder,
+                  )}
+                >
+                  {content.scopeLine}
+                </p>
                 <div className={styles.action}>
-                  <TextLink href={content.cta.href}>{content.cta.label}</TextLink>
+                  <Button href={content.cta.href} tone="secondary">
+                    {content.cta.label}
+                  </Button>
                 </div>
               </li>
             ))}
@@ -65,7 +80,7 @@ export function PricingSection({ content, id = "pricing" }: PricingSectionProps)
             <p className={styles.closingText}>{content.closing}</p>
 
             <div className={styles.sectionAction}>
-              <TextLink href={primaryCta.href}>{primaryCta.label}</TextLink>
+              <Button href={primaryCta.href}>{primaryCta.label}</Button>
             </div>
           </div>
         </Grid>

@@ -99,10 +99,14 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* The crossfade between the two shapes, and the tab mark following it. One
-     pass: the component performs itself once and then never moves on its own. */
+  /* The crossfade between the two shapes, and the tab mark following it.
+
+     Deliberately long. The field alternates on a five-second beat, so the
+     change has four and a bit seconds of stillness either side of it — a fast
+     swap on that cadence reads as a flicker in peripheral vision, a slow one
+     reads as the same year being redrawn. */
   :global(html.js) .cell {
-    transition: background var(--motion-slow) var(--ease-system);
+    transition: background 900ms var(--ease-system);
   }
 
   :global(html.js) .tab,

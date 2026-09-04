@@ -2,41 +2,46 @@ import { Container, Section } from "@/components/foundation";
 import { EventField, Plate } from "@/components/plates";
 import { recognitionClosing, recognitionLead } from "@/lib/content/homepage";
 import { recognition } from "@/lib/content/site-content";
-import { cx } from "@/lib/cx";
 
 import styles from "./RecognitionStrip.module.css";
 
 /**
  * H02 — recognition.
  *
- * One object: a line that says what the reader is looking at, the four labels,
- * and the conclusion, inside a single bounded rule structure. Every rule in it
- * belongs to the block, so nothing floats above or below it.
+ * A header row, four cards, and the conclusion beneath them.
  *
- * The lead line is a placeholder — the copy doc supplies the labels and the
- * closing row and nothing to introduce them. See lib/content/homepage.ts.
+ * The section mark used to sit on its own above a body-sized lead line, which
+ * left it floating with nothing to belong to. It is now part of the header row:
+ * mark and heading on one line, one rule under both. And the lead is the
+ * section's heading — it takes the same `.section-headline` every other section
+ * on the site does, so the four labels below it are visibly subordinate to it
+ * rather than the same size.
+ *
+ * The four ways money arrives are cards rather than cells of a ruled grid: each
+ * one is a separate thing the reader might be, so each gets its own object with
+ * its own hover state.
  */
 export function RecognitionStrip() {
   return (
-    <Section dense>
+    <Section dense labelledBy="recognition-headline">
       <Container>
-        <Plate kind="recognition" className={styles.plate} />
+        <div className={styles.header}>
+          <Plate kind="recognition" className={styles.plate} />
+          <h2 id="recognition-headline" className="section-headline">
+            {recognitionLead}
+          </h2>
+        </div>
 
-        {/* The lead sits inside the block, above its first rule, so the labels
-            arrive with something in front of them. */}
-        <p className={styles.lead}>{recognitionLead}</p>
-
-        <ul className={cx("rule-grid", "rule-grid--continues", styles.cells)}>
+        <ul className={styles.cards}>
           {recognition.map((label) => (
-            <li key={label} className={styles.cell}>
-              {label}
+            <li key={label} className={styles.card}>
+              <span aria-hidden="true" className={styles.node} />
+              <span className={styles.cardLabel}>{label}</span>
             </li>
           ))}
         </ul>
-        {/* The closing row is the second row of the same bounded structure: the
-            cells above draw no bottom rule, so the rule at the top of this row
-            is the one that separates them, and this row closes the block. */}
-        <div className={cx("rule-grid", styles.closing)}>
+
+        <div className={styles.closing}>
           <p className={styles.closingText}>{recognitionClosing}</p>
         </div>
 

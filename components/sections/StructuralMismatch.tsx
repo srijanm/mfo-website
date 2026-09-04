@@ -26,11 +26,17 @@ export function StructuralMismatch() {
       <Container>
         <div className={cx("rule-grid", "rule-grid--5-7", styles.split)}>
           <div className={styles.copy}>
-            <Plate kind="mismatch" className={styles.plate} />
-            <h2 id="structural-mismatch" className={styles.headline}>
-              {structuralMismatch.headline}
-            </h2>
-            <p className={styles.body}>{structuralMismatch.body}</p>
+            <div className={styles.copyHead}>
+              <Plate kind="mismatch" className={styles.plate} />
+              <h2 id="structural-mismatch" className="section-headline">
+                {structuralMismatch.headline}
+              </h2>
+            </div>
+            {structuralMismatch.body.map((paragraph) => (
+              <p key={paragraph} className={styles.body}>
+                {paragraph}
+              </p>
+            ))}
           </div>
 
           <div className="rule-grid-flush">

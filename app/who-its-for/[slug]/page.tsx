@@ -5,6 +5,10 @@ import { AudiencePage } from "@/components/templates/AudiencePage";
 import { audienceBySlug, audiences } from "@/lib/content/audiences";
 import { pageMetadata } from "@/lib/metadata";
 
+/* One audience page renders the same dated example payment the homepage hero
+   does, so like the homepage this cannot keep its build date forever. */
+export const revalidate = 3600;
+
 type PageProps = {
   params: Promise<{ slug: string }>;
 };

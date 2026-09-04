@@ -18,6 +18,8 @@ type CountUpProps = {
    * function cannot be handed across that boundary.
    */
   format: AmountFormatterName;
+  /** How long the count takes, in ms. §28 gives the hero 800ms by default. */
+  durationMs?: number;
   className?: string;
 };
 
@@ -28,7 +30,13 @@ type CountUpProps = {
  * zeroed state, so nothing is missing before the animation runs or if it never
  * runs at all.
  */
-export function CountUp({ children, to, format, className }: CountUpProps) {
+export function CountUp({
+  children,
+  to,
+  format,
+  durationMs = 640,
+  className,
+}: CountUpProps) {
   const formatValue = amountFormatters[format];
   const { ref, revealed } = useRevealOnce<HTMLSpanElement>();
   const done = useRef(false);
@@ -41,10 +49,11 @@ export function CountUp({ children, to, format, className }: CountUpProps) {
 
     const start = performance.now();
     const tick = (now: number) => {
-      /* 640ms, so the figure has settled inside the 800ms §28 gives the hero.
-         The loop ends when t reaches 1 and is never restarted — `done` latches
-         on the first run, so this is a finite count, not a frame loop. */
-      const t = Math.min(1, (now - start) / 640);
+      /* 640ms by default, so the figure settles inside the 800ms §28 gives the
+         hero; a caller can ask for a slower count. The loop ends when t reaches
+         1 and is never restarted — `done` latches on the first run, so this is
+         a finite count, not a frame loop. */
+      const t = Math.min(1, (now - start) / durationMs);
       if (t < 1) {
         el.textContent = formatValue(to * (1 - Math.pow(1 - t, 3)));
         requestAnimationFrame(tick);
@@ -57,7 +66,7 @@ export function CountUp({ children, to, format, className }: CountUpProps) {
       el.textContent = children;
     };
     requestAnimationFrame(tick);
-  }, [revealed, to, formatValue, children, ref]);
+  }, [revealed, to, formatValue, children, durationMs, ref]);
 
   return (
     <span ref={ref} className={className}>

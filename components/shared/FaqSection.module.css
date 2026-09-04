@@ -21,12 +21,9 @@
 /* Defined here because the component references it. Without this the heading
    fell back to the browser default: 700 weight, which the type system does not
    permit, and an arbitrary size. */
+/* Type comes from the canonical .section-headline; this only spaces it. */
 .headline {
-  margin: 0 0 32px;
-  font-size: var(--fs-h3);
-  font-weight: 400;
-  line-height: 1.12;
-  letter-spacing: -.028em;
+  margin: 0 0 36px;
 }
 
 /* The last row closes the block, so the accordion reads as one ruled object

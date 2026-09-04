@@ -38,7 +38,7 @@ export function FinalCtaSection({ content }: FinalCtaSectionProps) {
               is somewhere a reader arrives at and stops, so anything that kept
               moving here would be moving in front of a decision. */}
           <Reveal variant="rows" className={styles.statement}>
-            <h2 id="final-cta" className={styles.headline}>
+            <h2 id="final-cta" className={cx("section-headline", styles.headline)}>
               {content.headline}
             </h2>
             <p className={styles.support}>{content.support}</p>

@@ -25,6 +25,8 @@ type IncomingPaymentRecordProps = {
   indianPayroll?: string | null;
   indiaSideSetup?: string | null;
   note?: ReactNode;
+  /** Passed through to the record surface — see RecordSurface. */
+  pace?: "default" | "slow";
   className?: string;
 };
 
@@ -46,6 +48,7 @@ export function IncomingPaymentRecord({
   indianPayroll = null,
   indiaSideSetup = null,
   note,
+  pace,
   className,
 }: IncomingPaymentRecordProps) {
   const source: RecordRow[] = [
@@ -70,6 +73,7 @@ export function IncomingPaymentRecord({
       amountFormat={amountFormat}
       groups={[source, indiaSide]}
       note={note}
+      pace={pace}
       className={className}
     />
   );

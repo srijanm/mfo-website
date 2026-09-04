@@ -1,6 +1,7 @@
 // Homepage copy, verbatim from docs/HOMEPAGE_COPY_AND_CONTENT.md.
 // Components read from here so no proposition is written into JSX.
 
+import { formatRecordDate } from "./format";
 import { unreviewed, type ReviewedFact } from "./reviewed";
 import { primaryCta } from "./navigation";
 import { additionalSupport, coreScope, defaultMilestones } from "./site-content";
@@ -15,7 +16,7 @@ export const hero = {
   headlineEmphasis: "you do",
 
   subhead:
-    "MyFinanceOfficer is a modern CA firm for freelancers, creators, consultants and professionals paid by Indian or overseas businesses. We set up and run the India-side tax and compliance, so you know what needs doing before you need to ask.",
+    "MyFinanceOfficer is a modern CA firm for freelancers, creators, consultants and professionals working in both global & Indian firms. We set up and run all your India-side tax and compliance, so you know what needs to be done before you need to ask.",
 
   primaryCta,
 
@@ -32,11 +33,20 @@ export const hero = {
        The string is what renders at rest; this only formats the frames. */
     amountValue: 5000,
     from: "Overseas company",
-    received: "03 Sep 2026",
+    /* Today, in Asia/Kolkata. The object illustrates a payment arriving now, so
+       a fixed string ages into a date in the past.
+
+       A function rather than a value, and deliberately not a getter: this
+       object is spread into lib/content/audiences.ts at module scope, and a
+       getter would be *read* there — freezing the date at the moment the module
+       was first imported, which in a static build is build time. A function
+       reference survives the spread and every caller evaluates it as it
+       renders. */
+    received: formatRecordDate,
     into: "Indian bank account",
     frequency: "Monthly",
     indianPayroll: "Not handled here",
-    indiaSideSetup: "Needs its own answer",
+    indiaSideSetup: "Needs specific compliance",
   },
 
   /**
@@ -59,10 +69,10 @@ export const hero = {
  * reader was looking at. This fills that hole. Replace it or delete it, but do
  * not treat it as signed-off copy.
  */
-export const recognitionLead = "However the money reaches you:";
+export const recognitionLead = "How your money reaches you";
 
 export const recognitionClosing =
-  "Different jobs. Same problem: the income does not always fit neatly into the system a salaried employee gets automatically.";
+  "Different sources of income. Same problem. Your compliance doesn’t fit into the system a salaried employee or a business owner needs.";
 
 /* ------------------------------------------------------------------ H03 */
 
@@ -178,8 +188,13 @@ export type StructuralAlternative = {
 
 export const structuralMismatch = {
   headline: "Your work changed. Most CA practices were built around a different kind of client.",
-  body:
-    "A few recurring invoices. A contract with a company abroad. Deel or Wise. Creator payments. Barter. Consulting income. The work is not necessarily complicated, but it is different enough that generic advice becomes expensive.",
+  /* Two paragraphs, split at the break the copy owner wrote it on. An array
+     rather than one string with a newline in it: the component renders one
+     <p> per entry, so the break is a paragraph break and not a <br>. */
+  body: [
+    "A few recurring invoices. A contract with a company abroad. Deel or Wise payouts. Creator payments. Consulting income.",
+    "The work is not necessarily complicated, but it is different enough that generic advice becomes expensive in the long term.",
+  ] as readonly string[],
 
   columnHeadings: {
     helps: "Where it helps",
@@ -258,12 +273,12 @@ export type IncomeAxisMilestone = {
 export const incomeAxis = {
   headline: "Your obligations change as your income and setup change.",
   intro:
-    "The point is not to memorise every rule. The point is to have someone watching what comes next.",
+    "You don’t need to memorise every rule. Rather have someone who know’s what comes next.",
 
   /* Field names taken from §17 rather than invented. Kept here so the copy
      owner can change the wording without touching a component. */
   fieldLabels: {
-    question: "Customer question",
+    question: "Your question",
     whatChanges: "What changes",
     mfo: "What MyFinanceOfficer does",
   },
@@ -399,10 +414,6 @@ if (leakedIntoCoreScope.length > 0) {
 
 export const coreScopeSection = {
   headline: "The CA and compliance work we are built to run.",
-  columnHeadings: {
-    area: "Area",
-    handled: "What we handle",
-  },
   items: coreScope,
 } as const;
 

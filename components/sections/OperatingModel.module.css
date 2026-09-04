@@ -1,14 +1,11 @@
 /* H06, §18. Three columns on the bounded rule grid. No icons, no cards — the
    rules and the whitespace do the grouping. */
 
+/* Type comes from the canonical .section-headline; this only places it. */
 .headline {
   grid-column: 1 / span 8;
   margin: 0;
   max-width: 20ch;
-  font-size: var(--fs-h2);
-  font-weight: 400;
-  line-height: 1.02;
-  letter-spacing: -.035em;
 }
 
 /* Cols 9-12, beside the headline, which had nothing in them. */

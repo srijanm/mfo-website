@@ -14,13 +14,23 @@ export type PricingContent = {
   points: readonly number[];
   perYear: string;
   planLabel: string;
+  /**
+   * What the tier includes.
+   *
+   * PLACEHOLDER — NEEDS OWNER SIGN-OFF. Rule 2 of CLAUDE.md keeps
+   * `approvedPlanScope` null and forbids stating which tier includes which
+   * feature, so nothing here may be filled in without a reviewed mapping. The
+   * copy owner asked for a visible marker in the meantime; `scopePlaceholder`
+   * is what makes it render as one rather than as finished copy.
+   */
   scopeLine: string;
+  scopePlaceholder?: boolean;
   cta: { href: string; label: string };
   closing: string;
 };
 
 export const pricing = {
-  headline: "The price is on the site before we speak.",
+  headline: "Transparent pricing without any nasty surprises.",
   intro:
     "There are three annual price points. The right one depends on the CA and compliance work you need and whether broader financial support is relevant.",
 
@@ -29,7 +39,8 @@ export const pricing = {
 
   perYear: "/ year",
   planLabel: "Annual plan",
-  scopeLine: "Your exact scope is confirmed before you sign up.",
+  scopeLine: "Placeholder — what needs to be included",
+  scopePlaceholder: true,
 
   cta: { href: primaryCta.href, label: "Find the right plan" },
 
@@ -71,6 +82,7 @@ export const pricingPage = {
     perYear: pricing.perYear,
     planLabel: pricing.planLabel,
     scopeLine: pricing.scopeLine,
+    scopePlaceholder: pricing.scopePlaceholder,
     cta: pricing.cta,
     closing: pricing.closing,
   } satisfies PricingContent,

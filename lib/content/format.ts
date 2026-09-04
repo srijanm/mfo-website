@@ -48,3 +48,26 @@ export const amountFormatters = {
 } as const;
 
 export type AmountFormatterName = keyof typeof amountFormatters;
+
+/**
+ * The date the hero's example payment landed on, which is today.
+ *
+ * The object is an illustration of a payment arriving now, so a fixed string
+ * ages into a date in the past — and eventually into one that predates the
+ * reader. It is formatted in Asia/Kolkata because that is the timezone every
+ * India-side obligation is reckoned in, and it is computed per render rather
+ * than at module load so a long-lived server process does not freeze it.
+ *
+ * This is not a tax date and nothing on the site is calculated from it — it is
+ * the "Received" line on an example record.
+ */
+const recordDateFormat = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Asia/Kolkata",
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+});
+
+export function formatRecordDate(date: Date = new Date()): string {
+  return recordDateFormat.format(date);
+}

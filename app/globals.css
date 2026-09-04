@@ -32,6 +32,17 @@
      this is 6.9:1. Never use --muted on ink. */
   --muted-on-ink: #9A9E96;
 
+  /* Paper grain.
+
+     One tiling SVG of fractal noise, desaturated and held at a very low alpha.
+     It is a background *image*, so every surface keeps its own background
+     colour underneath and composites the grain over it with `multiply` — the
+     surface classes below do that, and nothing here introduces a gradient, a
+     shadow or a colour outside the locked palette.
+
+     180px tile, `stitchTiles` so the seams do not show. */
+  --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='0.06'/%3E%3C/svg%3E");
+
   /* Rules, one per surface. `--rule` and `--rule-strong` always mean "the rule
      colour of the surface I am on" — the surface classes below rebind them, so
      a nested component never has to know which surface it landed on. */
@@ -125,7 +136,9 @@ html {
 
 body {
   margin: 0;
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image: var(--texture);
+  background-blend-mode: multiply;
   color: var(--ink);
   font-size: var(--fs-body);
   line-height: 1.52;
@@ -193,6 +206,54 @@ body {
   letter-spacing: -.04em;
 }
 
+/* ---------------------------------------------------------------------------
+   One heading scale.
+
+   Every section on the site names itself at the same size, weight and leading.
+   Before this each section carried its own headline rule — one at --fs-display-2,
+   one at --fs-h2, one at --fs-h3 with a different tracking — and the page read
+   as a stack of unrelated documents. The hero keeps `.display-1`, because it is
+   the page's title and there is exactly one of it; everything below it is a
+   section heading and takes this.
+
+   `.section-lede` is the paragraph directly under a section heading, and
+   `.section-eyebrow` the small label occasionally above one.
+   --------------------------------------------------------------------------- */
+
+.section-headline {
+  margin: 0;
+  max-width: 20ch;
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -.035em;
+  text-wrap: balance;
+}
+
+/* A heading that has to carry a longer sentence. Same type, wider measure —
+   never a different size, which is what broke the rhythm before. */
+.section-headline--wide {
+  max-width: 30ch;
+}
+
+.section-lede {
+  margin: 20px 0 0;
+  max-width: 58ch;
+  font-size: var(--fs-lead);
+  line-height: 1.44;
+  letter-spacing: -.018em;
+  color: var(--ink-2);
+}
+
+.section-eyebrow {
+  margin: 0 0 18px;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
 .data-number {
   font-variant-numeric: tabular-nums lining-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
@@ -214,15 +275,26 @@ body {
    surfaces so the ones that assume paper are visible before they ship.
    --------------------------------------------------------------------------- */
 
+.surface-paper,
+.surface-white,
+.surface-acid {
+  /* The grain is a background image over the surface's own colour, composited
+     with `multiply` so the hue is the palette's and only the value moves. Ink
+     is deliberately left flat: grain on a near-black field reads as noise in a
+     photograph rather than as paper. */
+  background-image: var(--texture);
+  background-blend-mode: multiply;
+}
+
 .surface-paper {
-  background: var(--paper);
+  background-color: var(--paper);
   color: var(--ink);
   --rule: rgba(17, 19, 15, 0.16);
   --rule-strong: rgba(17, 19, 15, 0.34);
 }
 
 .surface-white {
-  background: var(--white);
+  background-color: var(--white);
   color: var(--ink);
   --rule: rgba(17, 19, 15, 0.16);
   --rule-strong: rgba(17, 19, 15, 0.34);
@@ -236,10 +308,33 @@ body {
 }
 
 .surface-acid {
-  background: var(--acid);
+  background-color: var(--acid);
   color: var(--ink);
   --rule: var(--rule-on-acid);
   --rule-strong: var(--rule-on-acid);
+}
+
+/* ---------------------------------------------------------------------------
+   Alternating surfaces down a page.
+
+   Every section carried the same paper background separated only by a hairline,
+   so consecutive sections read as one undifferentiated column. Paper and white
+   now alternate down every page, which gives each boundary a real edge instead
+   of a 1px line.
+
+   Declared here, on position, rather than as a prop on each section component:
+   the same components appear at different points on different pages, and which
+   surface a section takes is a fact about where it sits, not about what it is.
+
+   `:not([class*="surface-"])` keeps the sections that have already declared a
+   surface — the ink chapter, the acid close — out of the alternation entirely,
+   so the rule can never repaint one of them.
+   --------------------------------------------------------------------------- */
+
+main > section:nth-of-type(even):not([class*="surface-"]) {
+  background-color: var(--white);
+  background-image: var(--texture);
+  background-blend-mode: multiply;
 }
 
 /* A chapter break is a change of surface, not an event. §28 asks for the
@@ -370,25 +465,52 @@ body {
   }
 }
 
-.button-primary {
+/* ---------------------------------------------------------------------------
+   Actions.
+
+   Every call to action on the site is a button. `.button-primary` is the acid
+   one and there is at most one per viewport — §10; `.button-secondary` is the
+   same object outlined, for the second action beside it and for every
+   section-ending action that used to be a bare text link. Both are 48px tall,
+   2px radius, 1px ink border: the difference between them is fill, not shape,
+   so a row of actions still reads as one family.
+   --------------------------------------------------------------------------- */
+
+.button-primary,
+.button-secondary {
   min-height: 48px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding-inline: 18px;
+  gap: 10px;
+  padding-inline: 22px;
   border: 1px solid var(--ink);
   border-radius: var(--radius-button);
-  background: var(--acid);
-  color: var(--ink);
   font: 500 var(--fs-ui)/1 var(--font-sans);
   text-decoration: none;
   transition:
     background var(--motion-fast) var(--ease-system),
-    color var(--motion-fast) var(--ease-system);
+    color var(--motion-fast) var(--ease-system),
+    border-color var(--motion-fast) var(--ease-system);
+}
+
+.button-primary {
+  background: var(--acid);
+  color: var(--ink);
+}
+
+.button-secondary {
+  background: transparent;
+  color: var(--ink);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .button-primary:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .button-secondary:hover {
     background: var(--ink);
     color: var(--paper);
   }

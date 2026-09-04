@@ -1,6 +1,8 @@
 import { Container, Disclosure, Grid, Section } from "@/components/foundation";
 import type { FaqItem } from "@/lib/content/homepage";
 
+import { cx } from "@/lib/cx";
+
 import styles from "./FaqSection.module.css";
 
 type FaqSectionProps = {
@@ -31,7 +33,7 @@ export function FaqSection({ items, headline }: FaqSectionProps) {
         <Grid>
           <div className={styles.list}>
             {headline ? (
-              <h2 id="faq-headline" className={styles.headline}>
+              <h2 id="faq-headline" className={cx("section-headline", styles.headline)}>
                 {headline}
               </h2>
             ) : null}

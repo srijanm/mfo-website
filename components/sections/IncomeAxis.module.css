@@ -7,29 +7,12 @@
   grid-column: 1 / span 7;
 }
 
-.headline {
-  margin: 0;
-  max-width: 20ch;
-  font-size: var(--fs-h2);
-  font-weight: 400;
-  line-height: 1.02;
-  letter-spacing: -.035em;
-}
-
-/* The chapter header. Styled unconditionally: the sticky block below is gated
-   on script and motion, and with neither of those an unstyled h2 falls back to
-   the browser's bold 700 default, which the type system does not permit. */
-.chapterHeadline {
-  margin: 0;
-  max-width: 34ch;
-  font-size: var(--fs-h3);
-  font-weight: 400;
-  line-height: 1.12;
-  letter-spacing: -.028em;
-}
-
+/* The chapter header's lede. Its heading takes the canonical
+   `.section-headline` from the token sheet, like every other section on the
+   site — including here, where the h2 renders on the dark chapter and where an
+   unstyled one would otherwise fall back to the browser's bold 700 default. */
 .chapterLede {
-  margin: 8px 0 0;
+  margin: 14px 0 0;
   max-width: 62ch;
   font-size: var(--fs-ui);
   line-height: 1.45;
@@ -198,9 +181,12 @@
 @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
   :global(html.js) .sticky .scroller {
     position: relative;
-    /* Section scroll length, §17. Normal document scrolling: the page is
-       simply tall, and nothing intercepts the wheel. */
-    height: 320vh;
+    /* Section scroll length. §17 puts it at 320vh; this is shorter, on the
+       owner's instruction — five milestones at 320vh is 64vh of scrolling each,
+       which is more travel than a two-line question and a three-row object
+       needs. Normal document scrolling: the page is simply tall, and nothing
+       intercepts the wheel. */
+    height: 260vh;
   }
 
   /* Empty blocks whose only job is to be intersected. They carry no content,
@@ -221,13 +207,23 @@
     height: calc(100svh - var(--nav-h-total, 64px));
     display: flex;
     flex-direction: column;
-    padding-block: 36px 56px;
+    padding-block: 28px 32px;
+  }
+
+  /* Content and its action, centred together in the height the header leaves.
+     Grouping them is what closed the gap between the two: the action used to
+     be a flex child of the panel itself, pinned under the milestone's centred
+     block with all the slack falling between them. */
+  :global(html.js) .sticky .stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 40px;
+    min-height: 0;
   }
 
   :global(html.js) .sticky .panelInner {
-    flex: 1;
-    display: flex;
-    align-items: center;
     /* The detail panels are stacked; only the active one is shown. */
     position: relative;
   }
@@ -277,7 +273,10 @@
     max-width: none;
   }
 
-  /* Cols 7-12: the object is the right half of the composition. */
+  /* Cols 7-12: the object is the right half of the composition. It is centred
+     against the copy rather than stretched to it: stretching grew the card by
+     opening a void between its title rule and its first row, which is exactly
+     the emptiness this section was compacted to remove. */
   :global(html.js) .sticky .record {
     display: block;
     grid-column: 2;
@@ -291,14 +290,14 @@
     max-width: none;
   }
 
-  /* The H2 step, not display: a milestone label is a sub-heading inside the
-     section, and at display scale it was louder than every proposition on the
-     page. */
+  /* A step below the chapter heading. The milestone label used to be set at
+     --fs-h2 while the section's own heading sat at --fs-h3 above it, so the
+     content outranked the thing naming it. */
   :global(html.js) .sticky .label {
-    font-size: var(--fs-h2);
-    line-height: 1.02;
-    letter-spacing: -.035em;
-    max-width: 18ch;
+    font-size: var(--fs-h3);
+    line-height: 1.12;
+    letter-spacing: -.028em;
+    max-width: 20ch;
   }
 
   /* A two-column ruled record, the same shape as the incoming payment object:
@@ -309,7 +308,7 @@
      row's rule broken in two with a gap between the halves, which is the shape
      the rule-system guardrail rejects. */
   :global(html.js) .sticky .fields {
-    margin-top: 36px;
+    margin-top: 32px;
     grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
     gap: 0;
     max-width: none;
@@ -317,7 +316,7 @@
 
   :global(html.js) .sticky .field dt,
   :global(html.js) .sticky .field dd {
-    padding-block: 15px;
+    padding-block: 20px;
   }
 
   :global(html.js) .sticky .field dt {
@@ -340,7 +339,7 @@
      label on purpose — it is the frame, and the milestone is the content. */
   :global(html.js) .sticky .chapter {
     flex: none;
-    padding-block: 0 20px;
+    padding-block: 0 22px;
   }
 
   /* The axis is the panel's header: a persistent position indicator directly
@@ -349,7 +348,7 @@
      above it. */
   :global(html.js) .sticky .axisHeader {
     flex: none;
-    padding-bottom: 28px;
+    padding-bottom: 24px;
     border-bottom: 1px solid var(--rule);
   }
 
@@ -360,7 +359,6 @@
 
   :global(html.js) .sticky .action {
     flex: none;
-    padding-top: 24px;
   }
 }
 
@@ -397,9 +395,9 @@
    surface class at `transition-property: none` so it cannot become otherwise.
    --------------------------------------------------------------------------- */
 
-/* The section mark. It sits above the heading rather than in a column of its
-   own: the ruled blocks below set the column lines, and giving the mark a
-   column would move them. */
+/* The section mark, on the static reuse. It sits above the heading rather than
+   in a column of its own: the ruled blocks below set the column lines, and
+   giving the mark a column would move them. */
 .plate {
   margin-bottom: 28px;
 }

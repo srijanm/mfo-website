@@ -1,156 +1,112 @@
-/* H08, §20. A ruled matrix of the core CA relationship. Layer A only —
+/* H08, §20. The core CA relationship, as a grid of areas. Layer A only —
    FX, insurance, loans, wealth planning and MIS are not part of this section
    under any circumstances. */
 
-.headline {
-  grid-column: 1 / span 8;
-  margin: 0;
-  max-width: 20ch;
-  font-size: var(--fs-h2);
-  font-weight: 400;
-  line-height: 1.02;
-  letter-spacing: -.035em;
-}
-
-/* The column labels sit inside the ruled block, below its opening rule, so this
-   matrix and the trust ledger read the same way rather than one placing its
-   headings above the first rule and the other below it. */
-.matrix {
-  grid-column: 1 / -1;
-  margin: 64px 0 0;
-  padding: 20px 0 0;
-  border-top: 1px solid var(--rule);
-  list-style: none;
-}
-
-.headRow,
-.row {
-  display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr);
-  gap: var(--grid-gap-desktop);
-}
-
-.headRow {
-  padding-bottom: 8px;
-}
-
-.heading {
-  margin: 0;
-  font-size: var(--fs-small);
-  /* Data label: --fs-small, --muted, weight 400 — CLAUDE.md typography. */
-  font-weight: 400;
-  color: var(--muted);
-}
-
-.row {
-  position: relative;
-  padding: 22px 0;
-  border-top: 1px solid var(--rule);
-}
-
-/* The header already opened the block, so the first row does not repeat it. */
-.headRow + .row {
-  border-top: 0;
-  padding-top: 0;
-}
-
-.row:last-child {
+/* Mark and heading on one line, closed by a rule. */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 28px;
   border-bottom: 1px solid var(--rule);
 }
 
-.area {
+.plate {
+  flex: none;
+}
+
+/* Four across, two rows. The old form was eight ruled rows of Area / What we
+   handle, which read as a table to be worked through top to bottom; these are
+   eight independent areas, so they are laid out as a field the reader can
+   enter anywhere. */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--grid-gap);
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-object);
+  background: var(--white);
+}
+
+/* Row title: --fs-body, weight 500, --ink — CLAUDE.md typography. */
+.cardTitle {
   margin: 0;
   font-size: var(--fs-body);
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.32;
+  letter-spacing: -.014em;
 }
 
-.handled {
+/* Row description: --fs-body, weight 400, --ink-2 — CLAUDE.md typography.
+   Set at --fs-ui here: eight of these side by side at body size crowd the
+   card, and the title above it is the line that has to carry. */
+.cardBody {
   margin: 0;
-  max-width: 62ch;
-  font-size: var(--fs-body);
-  line-height: 1.5;
+  font-size: var(--fs-ui);
+  line-height: 1.45;
   color: var(--ink-2);
 }
 
-@media (max-width: 1023px) {
-  .headline {
-    grid-column: 1 / -1;
+/* Section-ending action, under the grid. */
+.action {
+  margin-top: 36px;
+}
+
+@media (max-width: 1199px) {
+  .cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 899px) {
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 599px) {
+  .header {
+    align-items: flex-start;
+    gap: 18px;
   }
 
-  .matrix {
-    margin-top: 48px;
-  }
-
-  /* Stacked, the area name reads as the label for the line under it, so the
-     header row is no longer doing any work — §29. */
-  .headRow {
-    display: none;
-  }
-
-  .row {
+  .cards {
     grid-template-columns: minmax(0, 1fr);
-    gap: 6px;
+  }
+
+  .card {
+    padding: 20px;
   }
 }
 
 /* ---------------------------------------------------------------------------
-   The matrix as an instrument.
+   The cards as instruments.
 
    Fine pointers only, and only where motion is welcome. Touch never reaches
-   this, and with reduced motion the rows are exactly as they were — no state is
-   carried by the hover, so nothing is lost by not having it. 2px of travel,
-   matching the record surface's own lift.
+   this, and under reduced motion the cards are exactly what they are at rest —
+   no state is carried by the hover, so nothing is lost by not having it. 2px
+   of travel, the ceiling §28 allows a pointer to cause.
    --------------------------------------------------------------------------- */
 
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .row {
+  .card {
     transition:
-      background var(--motion-normal) var(--ease-system),
       transform var(--motion-normal) var(--ease-system),
       border-color var(--motion-normal) var(--ease-system);
   }
 
-  .row:hover {
-    background: var(--white);
-    transform: translateY(-2px);
-    border-top-color: var(--rule-strong);
+  .card:hover {
+    transform: translateY(var(--lift-hover));
+    border-color: var(--ink);
   }
-
-  /* The gutter node. Hollow is the resting state and it is not drawn at all
-     until the row is pointed at, so it never reads as a permanent mark. */
-  .row::before {
-    content: "";
-    position: absolute;
-    left: -14px;
-    top: 26px;
-    width: 10px;
-    height: 10px;
-    border: 1px solid var(--ink);
-    border-radius: 50%;
-    background: transparent;
-    opacity: 0;
-    transition:
-      opacity var(--motion-normal) var(--ease-system),
-      background var(--motion-normal) var(--ease-system);
-  }
-
-  .row:hover::before {
-    opacity: 1;
-    background: var(--acid);
-  }
-}
-
-/* The section mark. Placed as a grid child, it spans the row so it cannot
-   claim a column and shift the ruled block below it out of alignment. */
-.plate {
-  grid-column: 1 / -1;
-  margin-bottom: 28px;
-}
-
-/* Section-ending action. Sits under the matrix's closing rule, so the section
-   punctuates rather than simply stopping. */
-.action {
-  grid-column: 1 / -1;
-  margin-top: 28px;
 }
