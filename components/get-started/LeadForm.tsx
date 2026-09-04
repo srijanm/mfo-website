@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useId, useRef, useState } from "react";
 
-import { Button, TextLink, ThresholdNode } from "@/components/foundation";
+import { Button, ThresholdNode } from "@/components/foundation";
 import { detailsStep, getStarted, intakeSteps } from "@/lib/content/get-started";
 import { cx } from "@/lib/cx";
 import { HONEYPOT_FIELD, type FieldErrors, type LeadPayload } from "@/lib/leads/types";
@@ -341,13 +341,14 @@ export function LeadForm() {
         ) : null}
       </div>
 
-      {/* The link sits on its own row rather than inline in the sentence, so it
-          clears the project's 44px target minimum. */}
+      {/* The action sits on its own row rather than inline in the sentence, so
+          it clears the project's 44px target minimum. Outlined: the acid
+          control on this screen is the form's own Continue. */}
       <div className={styles.alternative}>
         <p className={styles.alternativePrompt}>{getStarted.alternative.prompt}</p>
-        <TextLink href={getStarted.alternative.href}>
+        <Button href={getStarted.alternative.href} tone="secondary">
           {getStarted.alternative.label}
-        </TextLink>
+        </Button>
       </div>
       </div>
     </form>

@@ -3,8 +3,8 @@
 export const pricingPoints = [19999, 24999, 34999] as const;
 
 export const recognition = [
-  "Paid by an overseas company",
-  "Consulting for a few clients",
+  "Remote pay by a global enterprise",
+  "Consulting",
   "Creator or brand income",
   "Independent professional income",
 ] as const;

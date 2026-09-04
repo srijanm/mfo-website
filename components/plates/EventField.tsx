@@ -2,14 +2,13 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 
-import { useRevealOnce } from "@/components/motion";
 import { cx } from "@/lib/cx";
 import { incomeField } from "@/lib/content/field";
 
 import styles from "./EventField.module.css";
 
-/** How long the first shape holds before the one-off crossfade. */
-const HOLD_MS = 1200;
+/** How long each shape holds before the crossfade to the other one. */
+const HOLD_MS = 5000;
 
 /**
  * Item 15. A year of income, as a field of weeks.
@@ -18,19 +17,27 @@ const HOLD_MS = 1200;
  * a panel that names which tab describes it. Both states are complete at rest,
  * so nothing here has a hidden resting state.
  *
- * It performs itself exactly once. The first time it is scrolled into view it
- * holds the salaried year for 1.2s and crossfades to the other, and then it
- * never moves again on its own — no loop, and no second run on re-entry. A
+ * It alternates between the two shapes every five seconds, crossfading slowly,
+ * on the owner's instruction. Three things bound that loop, because a
  * comparison that keeps flipping while someone is reading it is worse than one
- * that never moves.
+ * that never moves:
  *
- * Under reduced motion it lands on the second shape immediately with no
- * transition, which is the state the sequence was going to end on anyway.
+ *  - it runs only while the field is actually on screen, so nothing animates in
+ *    a tab nobody is looking at;
+ *  - a deliberate choice — clicking or arrowing to a tab — stops it for good,
+ *    so the reader can hold the shape they want to read;
+ *  - under reduced motion it never starts at all and lands on the second shape
+ *    immediately, which is the state the sequence would have ended on.
  */
 export function EventField({ className }: { className?: string }) {
   const [shapeIndex, setShapeIndex] = useState(0);
-  const { ref, revealed } = useRevealOnce<HTMLElement>();
-  const performed = useRef(false);
+  /* Whether the field is on screen right now. Unlike the site's one-shot
+     reveal observer this does not latch: the loop has to stop again when the
+     field scrolls away, not merely start when it first arrives. */
+  const [onScreen, setOnScreen] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+  /* Latches the moment the reader takes over, and never unlatches. */
+  const chosen = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
   const panelId = useId();
   const shape = incomeField.shapes[shapeIndex];
@@ -38,7 +45,7 @@ export function EventField({ className }: { className?: string }) {
   /* Roving tabindex means only the selected tab is in the tab order, so the
      other one is reachable by arrow key or not at all. */
   const select = (index: number) => {
-    performed.current = true;
+    chosen.current = true;
     setShapeIndex(index);
     const tabs = listRef.current?.querySelectorAll<HTMLButtonElement>("[role=tab]");
     tabs?.[index]?.focus();
@@ -59,23 +66,40 @@ export function EventField({ className }: { className?: string }) {
   };
 
   useEffect(() => {
-    if (performed.current) return;
+    const node = ref.current;
+    if (!node || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setOnScreen(entry.isIntersecting),
+      { threshold: 0.2 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (chosen.current) return;
 
     /* Reduced motion gets the destination, not the journey. */
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      performed.current = true;
+      chosen.current = true;
       setShapeIndex(incomeField.shapes.length - 1);
       return;
     }
 
-    if (!revealed) return;
-    performed.current = true;
-    const timer = window.setTimeout(
-      () => setShapeIndex(incomeField.shapes.length - 1),
-      HOLD_MS,
-    );
-    return () => window.clearTimeout(timer);
-  }, [revealed]);
+    /* Only while it is on screen — and the interval is torn down again the
+       moment it is not, so nothing animates in a tab nobody is looking at. */
+    if (!onScreen) return;
+
+    const timer = window.setInterval(() => {
+      /* Checked inside the tick as well as outside: the interval outlives the
+         click that ends the loop by up to five seconds. */
+      if (chosen.current) return;
+      setShapeIndex((current) => (current + 1) % incomeField.shapes.length);
+    }, HOLD_MS);
+
+    return () => window.clearInterval(timer);
+  }, [onScreen]);
 
   return (
     <figure ref={ref} className={cx(styles.field, className)}>

@@ -18,7 +18,13 @@ type DeadlineRecordProps = {
    * by name. Anything that states an obligation must still be a ReviewedFact.
    */
   what: ReviewedFact | string | null;
-  /** Null until a CA supplies and reviews a date; renders the empty marker. */
+  /**
+   * Null until a CA supplies and reviews a date. §11 renders a null field as
+   * the empty marker, and a field that is *sometimes* absent should still hold
+   * its place — but a row that is null in every instance on the site is not a
+   * pending value, it is a row the object does not have. So a null `when`
+   * leaves the row out entirely rather than printing a permanent em dash.
+   */
   when: ReviewedFact | null;
   /** Marketing status, e.g. "MFO tracks". Not a tax fact. */
   status: string;
@@ -42,7 +48,7 @@ export function DeadlineRecord({
 }: DeadlineRecordProps) {
   const rows: RecordRow[] = [
     { label: "What", value: typeof what === "string" ? what : what && factValue(what) },
-    { label: "When", value: when && factValue(when) },
+    ...(when ? [{ label: "When", value: factValue(when) }] : []),
     { label: "Status", value: status },
   ];
 

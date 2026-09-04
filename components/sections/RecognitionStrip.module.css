@@ -1,62 +1,110 @@
-/* H02, §14. Four equal cells on the bounded rule grid, then the closing row
-   beneath them inside the same bounded structure.
+/* H02, §14.
 
-   The strip used to end at the cells' bottom rule with the closing sentence
-   floating 32px below it, attached to nothing. The cells now draw no bottom of
-   their own: the closing row's top rule is the single rule between the two, and
-   the closing row closes the block. The four dividers therefore terminate on a
-   horizontal at both ends. */
+   Header row, four cards, closing statement, drawn field.
 
-/* Section intro: --fs-lead, --ink-2, above the first rule — CLAUDE.md. */
-.lead {
-  margin: 0 0 20px;
-  max-width: 48ch;
-  font-size: var(--fs-lead);
-  line-height: 1.44;
-  letter-spacing: -.018em;
-  color: var(--ink-2);
+   The four labels were cells of a bounded rule grid, which made them read as
+   one table with four columns rather than as four separate things a reader
+   might be. They are objects now: a card each, on the white document surface,
+   with a hover state that answers the pointer. */
+
+/* ------------------------------------------------------------- header */
+
+/* Mark and heading on one line. The mark is no longer a block of its own above
+   the copy, so it has something to belong to. */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--rule);
 }
 
-.cells {
-  --rule-grid-pad-block: 40px;
-  margin: 0;
-  --rule-grid-pad-inline: 28px;
+/* The mark sits at a fixed size in a fixed column, so the heading beside it
+   starts on the same line whatever the heading wraps to. */
+.plate {
+  flex: none;
 }
 
-@media (min-width: 1024px) {
-  .cells {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
+/* -------------------------------------------------------------- cards */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--grid-gap);
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-/* Cells are stretched to a common height by the primitive, so the four labels
-   already start on one line; this keeps them there by giving every cell the
-   same leading regardless of how many lines it runs to. */
-.cell {
-  font-size: var(--fs-lead);
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 132px;
+  padding: 22px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-object);
+  background: var(--white);
+}
+
+/* The state marker. Hollow at rest and filled when the card is pointed at —
+   the one meaning §6 allows for the node: something changes here. */
+.node {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: transparent;
+}
+
+/* Row title: --fs-body, weight 500, --ink — CLAUDE.md typography. Pushed to
+   the foot of the card so all four labels sit on one line regardless of how
+   many lines each runs to. */
+.cardLabel {
+  margin-top: auto;
+  font-size: var(--fs-body);
+  font-weight: 500;
   line-height: 1.32;
   letter-spacing: -.018em;
 }
 
+/* ------------------------------------------------------------ closing */
+
+/* The rule that closes the block the header opened. It is on the wrapper, not
+   on the paragraph: a border and a reading measure never share an element, or
+   the rule stops where the text does instead of at the container edge. */
 .closing {
-  --rule-grid-pad-block: 32px;
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid var(--rule);
 }
 
+/* Section intro register: --fs-lead, --ink-2 — CLAUDE.md typography. */
 .closingText {
   margin: 0;
   max-width: 72ch;
   font-size: var(--fs-lead);
   line-height: 1.44;
   letter-spacing: -.018em;
+  color: var(--ink-2);
 }
 
+/* The field sits under the closing line it illustrates. */
+.field {
+  margin-top: 48px;
+}
+
+/* --------------------------------------------------------- responsive */
+
 @media (max-width: 1023px) {
-  .cells {
-    --rule-grid-pad-block: 24px;
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .closing {
-    --rule-grid-pad-block: 28px;
+  .card {
+    min-height: 118px;
   }
 
   .closingText {
@@ -64,14 +112,48 @@
   }
 }
 
-/* The section mark. It sits above the heading rather than in a column of its
-   own: the ruled blocks below set the column lines, and giving the mark a
-   column would move them. */
-.plate {
-  margin-bottom: 28px;
+@media (max-width: 599px) {
+  .header {
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .card {
+    min-height: 0;
+    gap: 14px;
+  }
 }
 
-/* The field sits under the closing line it illustrates. */
-.field {
-  margin-top: 48px;
+/* ---------------------------------------------------------------------------
+   The cards as instruments.
+
+   Fine pointers only, and only where motion is welcome. Touch never reaches
+   this, and under reduced motion the cards are exactly what they are at rest —
+   no state is carried by the hover, so nothing is lost by not having it. 2px of
+   travel, which is the ceiling §28 allows a pointer to cause.
+   --------------------------------------------------------------------------- */
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .card {
+    transition:
+      transform var(--motion-normal) var(--ease-system),
+      border-color var(--motion-normal) var(--ease-system);
+  }
+
+  .node {
+    transition: background var(--motion-normal) var(--ease-system);
+  }
+
+  .card:hover {
+    transform: translateY(var(--lift-hover));
+    border-color: var(--ink);
+  }
+
+  .card:hover .node {
+    background: var(--acid);
+  }
 }

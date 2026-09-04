@@ -77,7 +77,9 @@ const BANNED_PHRASES = [
   /\d+\s*\+\s*(?:certified\s+)?professionals/i,
   /focus\s+on\s+your\s+growth/i,
   /no\s+hidden\s+charges/i,
-  /transparent\s+pricing/i,
+  /* "transparent pricing" was here. Struck from rule 6 by the owner on
+     2026-09-04, who chose it as the pricing headline after being shown the
+     conflict. See CLAUDE.md rule 6. */
   /starting\s+at\s+₹?\s*\d/i,
   /file\s+in\s+minutes/i,
   /maximum\s+refund/i,

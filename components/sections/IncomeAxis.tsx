@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { Container, Grid, NodeAxis, Section, TextLink, ThresholdNode } from "@/components/foundation";
+import { Button, Container, Grid, NodeAxis, Section, ThresholdNode } from "@/components/foundation";
 import { Plate } from "@/components/plates";
 import { DeadlineRecord } from "@/components/objects";
 import { incomeAxis } from "@/lib/content/homepage";
@@ -86,7 +86,7 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
           <Grid>
             <div className={styles.intro}>
               <Plate kind="incomeAxis" className={styles.plate} />
-              <h2 id="income-axis" className={styles.headline}>
+              <h2 id="income-axis" className="section-headline section-headline--wide">
                 {incomeAxis.headline}
               </h2>
             </div>
@@ -115,7 +115,10 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
               every label it marks is in the list below. */}
           {sticky ? (
             <Container className={styles.chapter}>
-              <h2 id="income-axis" className={styles.chapterHeadline}>
+              <h2
+                id="income-axis"
+                className="section-headline section-headline--wide"
+              >
                 {incomeAxis.headline}
               </h2>
               <p className={styles.chapterLede}>{incomeAxis.intro}</p>
@@ -139,73 +142,83 @@ export function IncomeAxis({ compact = false }: IncomeAxisProps) {
             </div>
           ) : null}
 
-          <Container className={styles.panelInner}>
-            <ol className={cx(styles.list, compact && styles.listCompact)}>
-              {milestones.map((milestone, index) => (
-                <li
-                  key={milestone.id}
-                  className={cx(styles.milestone, index === active && styles.milestoneActive)}
-                >
-                  <div className={styles.rail}>
-                    <ThresholdNode
-                      className={styles.railNode}
-                      orientation="vertical"
-                      lineAfter={index < milestones.length - 1}
-                    />
-                  </div>
+          {/* The stage. Content and the action that follows it are one group,
+              centred together in whatever height the panel has left over.
+              Previously the action was pinned to the panel's foot while the
+              content centred above it, which opened a couple of hundred pixels
+              of empty ink between them on every milestone. */}
+          <div className={styles.stage}>
+            <Container className={styles.panelInner}>
+              <ol className={cx(styles.list, compact && styles.listCompact)}>
+                {milestones.map((milestone, index) => (
+                  <li
+                    key={milestone.id}
+                    className={cx(styles.milestone, index === active && styles.milestoneActive)}
+                  >
+                    <div className={styles.rail}>
+                      <ThresholdNode
+                        className={styles.railNode}
+                        orientation="vertical"
+                        lineAfter={index < milestones.length - 1}
+                      />
+                    </div>
 
-                  <div className={styles.body}>
-                    <h3 className={styles.label}>{milestone.label}</h3>
+                    <div className={styles.body}>
+                      <h3 className={styles.label}>{milestone.label}</h3>
 
-                    <dl className={styles.fields}>
-                      <div className={styles.field}>
-                        <dt className={styles.fieldLabel}>{fieldLabels.question}</dt>
-                        <dd className={styles.fieldValue}>{milestone.question}</dd>
-                      </div>
-
-                      {milestone.whatChanges ? (
+                      <dl className={styles.fields}>
                         <div className={styles.field}>
-                          <dt className={styles.fieldLabel}>{fieldLabels.whatChanges}</dt>
-                          <dd className={styles.fieldValue}>
-                            {factValue(milestone.whatChanges)}
-                          </dd>
+                          <dt className={styles.fieldLabel}>{fieldLabels.question}</dt>
+                          <dd className={styles.fieldValue}>{milestone.question}</dd>
                         </div>
-                      ) : null}
 
-                      <div className={styles.field}>
-                        <dt className={styles.fieldLabel}>{fieldLabels.mfo}</dt>
-                        <dd className={styles.fieldValue}>{milestone.mfo}</dd>
-                      </div>
-                    </dl>
-                  </div>
+                        {milestone.whatChanges ? (
+                          <div className={styles.field}>
+                            <dt className={styles.fieldLabel}>{fieldLabels.whatChanges}</dt>
+                            <dd className={styles.fieldValue}>
+                              {factValue(milestone.whatChanges)}
+                            </dd>
+                          </div>
+                        ) : null}
 
-                  {/* The right half of the sticky composition. It names the
-                      milestone and states that MyFinanceOfficer is watching it.
-                      No date, no threshold, no tax conclusion: the status is a
-                      value from the approved union and the date row renders the
-                      empty marker until a CA supplies one. */}
-                  <div className={styles.record}>
-                    <DeadlineRecord
-                      className={styles.recordSurface}
-                      what={milestone.label}
-                      when={null}
-                      status={milestone.tracking}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </Container>
+                        <div className={styles.field}>
+                          <dt className={styles.fieldLabel}>{fieldLabels.mfo}</dt>
+                          <dd className={styles.fieldValue}>{milestone.mfo}</dd>
+                        </div>
+                      </dl>
+                    </div>
 
-          {/* The chapter's way out. At the foot of the panel rather than after
-              the scroller: the panel is what the reader is looking at for the
-              whole section, and an action below 320vh of scroll is one nobody
-              reaches. Acid, because on ink that is what a text link is. */}
-          {sticky ? (
-            <Container className={styles.action}>
-              <TextLink href={primaryCta.href}>{primaryCta.label}</TextLink>
+                    {/* The right half of the sticky composition. It names the
+                        milestone and states that MyFinanceOfficer is watching
+                        it. No date, no threshold, no tax conclusion: the status
+                        is a value from the approved union, and the date row is
+                        left out entirely rather than printing a permanent empty
+                        marker on every milestone. */}
+                    <div className={styles.record}>
+                      <DeadlineRecord
+                        className={styles.recordSurface}
+                        what={milestone.label}
+                        when={null}
+                        status={milestone.tracking}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </Container>
-          ) : null}
+
+            {/* The chapter's way out, directly under the content rather than at
+                the foot of a viewport-tall panel. A button, like every other
+                call to action on the site; outlined in paper because the one
+                acid control on this screen is the header's. */}
+            {sticky ? (
+              <Container className={styles.action}>
+                <Button href={primaryCta.href} tone="secondary">
+                  {primaryCta.label}
+                </Button>
+              </Container>
+            ) : null}
+          </div>
         </div>
       </div>
     </Section>

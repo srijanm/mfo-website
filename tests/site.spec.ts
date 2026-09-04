@@ -111,8 +111,10 @@ test.describe("JavaScript disabled", () => {
       /* Sampled once the entrance has finished. A counting figure shows an
          intermediate value while it runs, which is a transient difference
          rather than missing content — it lands on exactly the string the
-         server rendered. Anything still different after this is a real gap. */
-      await scriptedPage.waitForTimeout(1400);
+         server rendered. The hero's record builds at the slow pace (260ms in,
+         1500ms counting), so this waits past that. Anything still different
+         after it is a real gap. */
+      await scriptedPage.waitForTimeout(2600);
       const withJs = await documentText(scriptedPage);
       await scripted.close();
 
@@ -167,22 +169,34 @@ test.describe("Layer B never appears in the core scope section", () => {
  * load-bearing: the whole core CA relationship has to land before any mention
  * of broader financial services, or the positioning collapses into the
  * everything-office framing the hierarchy exists to prevent.
+ *
+ * Four of §12's sections were cut from this page on the owner's instruction —
+ * the operating model, the managed calendar, the trust ledger and additional
+ * financial support. The remaining order is unchanged, and the property that
+ * matters is intact: no Layer B service appears anywhere on the page, which the
+ * test below this one asserts directly.
  */
 test.describe("homepage architecture", () => {
   const LOCKED_ORDER = [
-    "Half the work you do",           // 1. Hero
-    "Different jobs. Same problem",   // 2. Recognition
-    "Nothing goes wrong in your first year",  // 3. Latent problem
-    "Your work changed",              // 4. Structural mismatch
-    "Your obligations change",        // 5. Income Axis
-    "You shouldn’t have to know which question to ask",  // 6. Operating model
-    "Your work has deadlines",        // 7. Managed calendar
-    "The CA and compliance work we are built to run",    // 8. Core scope
-    "Judge us by what happens before we file anything",  // 9. Trust ledger
-    "The price is on the site before we speak",          // 10. Pricing
-    "And when something else comes up",                  // 11. Additional support
-    "I don’t earn enough for this yet",                  // 12. FAQ
-    "Tell us how you earn",                              // 13. Final CTA
+    "Half the work you do",                    // 1. Hero
+    "Different sources of income",             // 2. Recognition
+    "Nothing goes wrong in your first year",   // 3. Latent problem
+    "Your work changed",                       // 4. Structural mismatch
+    "Your obligations change",                 // 5. Income Axis
+    "The CA and compliance work we are built to run",  // 6. Core scope
+    "Transparent pricing without any nasty surprises", // 7. Pricing
+    "I don’t earn enough for this yet",        // 8. FAQ
+    "Tell us how you earn",                    // 9. Final CTA
+  ];
+
+  /* Cut from this page. Each is asserted absent rather than merely dropped from
+     the list above, so re-adding one is a deliberate act with a failing test
+     behind it rather than something that quietly reappears. */
+  const REMOVED = [
+    "You shouldn’t have to know which question to ask",
+    "Your work has deadlines",
+    "Judge us by what happens before we file anything",
+    "And when something else comes up",
   ];
 
   test("sections appear in the order locked by section 12", async ({ page }) => {
@@ -200,6 +214,12 @@ test.describe("homepage architecture", () => {
 
     // The footer closes the page.
     await expect(page.locator("footer")).toBeVisible();
+
+    for (const marker of REMOVED) {
+      expect(body, `"${marker}" was removed from the homepage`).not.toContain(
+        marker.replace(/\s+/g, " "),
+      );
+    }
   });
 
   test("no Layer B service appears before pricing", async ({ page }) => {
@@ -891,9 +911,11 @@ test.describe("income axis", () => {
         };
       });
 
-      // §17: approximately 300–340vh.
-      expect(geometry.scrollLength).toBeGreaterThanOrEqual(3);
-      expect(geometry.scrollLength).toBeLessThanOrEqual(3.4);
+      /* §17 puts this at roughly 300-340vh; the owner asked for the section to
+         be more compact and it is now 260vh. Still a multi-screen chapter, and
+         still ordinary document scrolling. */
+      expect(geometry.scrollLength).toBeGreaterThanOrEqual(2.4);
+      expect(geometry.scrollLength).toBeLessThanOrEqual(2.8);
       expect(geometry.position).toBe("sticky");
       expect(geometry.top).toBe("64px");
 
@@ -1540,16 +1562,26 @@ test.describe("motion system", () => {
     expect(during.words, "the headline should still be arriving").toBeLessThan(during.wordsTotal);
 
     /* §28 closes the hero at 800ms. Sampled a little after, to allow for the
-       frame the browser needs to commit the last transition. */
+       frame the browser needs to commit the last transition.
+
+       The copy half of the hero still has to make that budget. The payment
+       object does not: the owner asked for it to build more slowly, so it is on
+       the record surface's `slow` pace — 260ms in, then a 1500ms count with its
+       rows 130ms apart — and it is deliberately still going here. */
     await page.waitForTimeout(600);
+    const copyDone = await state();
+    expect(copyDone.words).toBe(copyDone.wordsTotal);
+    expect(copyDone.band).toBe("matrix(1, 0, 0, 1, 0, 0)");
+    expect(copyDone.subhead).toBe(true);
+    expect(copyDone.actions).toBe(true);
+
+    /* The object's own budget. Past the slow pace's last row it must be fully
+       settled — and, like everything else in the hero, finished for good. */
+    await page.waitForTimeout(1800);
     const done = await state();
-    expect(done.words).toBe(done.wordsTotal);
     expect(done.cells).toBe(done.cellsTotal);
-    expect(done.band).toBe("matrix(1, 0, 0, 1, 0, 0)");
-    expect(done.subhead).toBe(true);
-    expect(done.actions).toBe(true);
     expect(done.amount).toBe(true);
-    expect(done.running, "the hero must be finished at 800ms").toBe(0);
+    expect(done.running, "the hero must be finished once the object has built").toBe(0);
 
     /* And then permanently: nothing in the hero starts again on its own. */
     await page.waitForTimeout(900);
@@ -1791,21 +1823,41 @@ test.describe("QA checklist", () => {
     expect(afterIdle! - afterScroll!, "no section may hold a frame loop open").toBe(0);
   });
 
-  test("every button-shaped call to action routes to /get-started", async ({ page }) => {
+  test("every dominant call to action routes to /get-started", async ({ page }) => {
+    /* CLAUDE.md rule 9 is about *primary* calls to action. Every action on the
+       site is now a button, so "is a button" no longer identifies one: the
+       filled acid button (and its reversed ink twin on the acid panel) is the
+       dominant CTA, and the outlined `.button-secondary` is the second action
+       beside it — "View pricing", "Find the right plan" — which is allowed to
+       go somewhere else. Both are checked, each against its own rule. */
     const strays: string[] = [];
+    const badSecondary: string[] = [];
+
     for (const route of ROUTES) {
       await page.goto(route);
       const ctas = await page.evaluate(() =>
-        [...document.querySelectorAll('a[class*="button"], a[class*="Button"]')].map((a) => ({
-          href: a.getAttribute("href"),
-          text: (a.textContent ?? "").trim().slice(0, 30),
-        })),
+        [...document.querySelectorAll("a[class*='button-primary'], a[class*='button-secondary']")].map(
+          (a) => ({
+            href: a.getAttribute("href"),
+            dominant: a.className.includes("button-primary"),
+            text: (a.textContent ?? "").trim().slice(0, 30),
+          }),
+        ),
       );
+
       for (const cta of ctas) {
-        if (cta.href !== "/get-started") strays.push(`${route}: "${cta.text}" -> ${cta.href}`);
+        if (cta.dominant) {
+          if (cta.href !== "/get-started") strays.push(`${route}: "${cta.text}" -> ${cta.href}`);
+        } else if (!cta.href?.startsWith("/")) {
+          /* A secondary action may go elsewhere on the site; it may not leave
+             it, and it may not be an anchor with nowhere to go. */
+          badSecondary.push(`${route}: "${cta.text}" -> ${cta.href}`);
+        }
       }
     }
+
     expect(strays).toEqual([]);
+    expect(badSecondary).toEqual([]);
   });
 
   test("no WebGL anywhere, and no three.js in the bundle", async ({ page }) => {

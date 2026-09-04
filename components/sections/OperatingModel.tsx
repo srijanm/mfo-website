@@ -17,7 +17,7 @@ export function OperatingModel() {
     <Section labelledBy="operating-model">
       <Container>
         <Grid>
-          <h2 id="operating-model" className={styles.headline}>
+          <h2 id="operating-model" className={cx("section-headline", styles.headline)}>
             {operatingModel.headline}
           </h2>
 

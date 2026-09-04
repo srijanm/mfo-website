@@ -32,7 +32,7 @@ export function TemporalLedger() {
       <Container>
         <div className={cx("rule-grid", "rule-grid--4-8", styles.split)}>
           <div className={styles.copy}>
-            <h2 id="temporal-ledger" className={styles.headline}>
+            <h2 id="temporal-ledger" className={cx("section-headline", styles.headline)}>
               {temporalLedger.headline}
             </h2>
             <p className={styles.body}>{temporalLedger.body}</p>

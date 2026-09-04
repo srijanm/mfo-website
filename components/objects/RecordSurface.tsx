@@ -37,6 +37,12 @@ type RecordSurfaceProps = {
   /** Row groups, separated by a gap the way the anatomy separates them. */
   groups: RecordRow[][];
   note?: ReactNode;
+  /**
+   * `slow` roughly doubles the pace at which the object builds itself: the
+   * figure counts for longer and the rows arrive further apart. Used where the
+   * object is the thing being looked at rather than one element among many.
+   */
+  pace?: "default" | "slow";
   className?: string;
 };
 
@@ -56,8 +62,10 @@ export function RecordSurface({
   amountFormat,
   groups,
   note,
+  pace = "default",
   className,
 }: RecordSurfaceProps) {
+  const slow = pace === "slow";
   /* One flat sequence of grid children: the rows of each group, with a drawn
      divider standing between one group and the next. The divider is a child of
      the same list rather than a margin on the next row, so it takes its own
@@ -69,14 +77,21 @@ export function RecordSurface({
   ]);
 
   return (
-    <figure className={cx(styles.surface, Boolean(note) && styles.hasNote, className)}>
+    <figure
+      className={cx(
+        styles.surface,
+        Boolean(note) && styles.hasNote,
+        slow && styles.slow,
+        className,
+      )}
+    >
       <figcaption className={styles.title}>{title}</figcaption>
       <hr aria-hidden="true" className={styles.titleRule} />
 
       {amount ? (
-        <Reveal as="p" delay={140} className={cx(styles.amount, "data-number")}>
+        <Reveal as="p" delay={slow ? 260 : 140} className={cx(styles.amount, "data-number")}>
           {amountValue !== undefined && amountFormat ? (
-            <CountUp to={amountValue} format={amountFormat}>
+            <CountUp to={amountValue} format={amountFormat} durationMs={slow ? 1500 : 640}>
               {amount}
             </CountUp>
           ) : (
@@ -88,7 +103,7 @@ export function RecordSurface({
       {/* `cells` rather than `rows`: each row is a display:contents wrapper so
           that its label and value join the one shared grid, and an element with
           no box cannot be faded or moved. The choreography runs on the cells. */}
-      <Reveal as="dl" variant="cells" delay={240} className={styles.rows}>
+      <Reveal as="dl" variant="cells" delay={slow ? 520 : 240} className={styles.rows}>
         {items.map((item) =>
           item.divider ? (
             <div key={item.key} className={styles.divider}>

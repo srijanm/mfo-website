@@ -16,23 +16,30 @@
   padding-block: 24px 0;
 }
 
-/* The token sheet defines display-1 and display-2 only, so the H2 step of the
-   scale in §3 is set here from the same token. */
-.headline {
-  margin: 0;
-  max-width: 18ch;
-  font-size: var(--fs-h2);
-  font-weight: 400;
-  line-height: 1.02;
-  letter-spacing: -.035em;
+/* Mark and heading as one header block. The mark used to sit above the heading
+   as a block of its own with 28px under it, which read as a stray object; here
+   it is the first line of the header. */
+.copyHead {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.plate {
+  flex: none;
 }
 
 .body {
-  margin: 28px 0 0;
+  margin: 0 0 18px;
   max-width: 46ch;
   font-size: var(--fs-body);
   line-height: 1.52;
   color: var(--ink-2);
+}
+
+.body:last-child {
+  margin-bottom: 0;
 }
 
 .row {
@@ -109,12 +116,6 @@
   }
 }
 
-/* The section mark. It sits above the heading rather than in a column of its
-   own: the ruled blocks below set the column lines, and giving the mark a
-   column would move them. */
-.plate {
-  margin-bottom: 28px;
-}
 
 /* ---------------------------------------------------------------------------
    Item 04. Which stages of the year an alternative owns.

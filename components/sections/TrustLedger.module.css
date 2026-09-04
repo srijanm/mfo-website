@@ -1,14 +1,11 @@
 /* H09, §21. Ruled two-column rows. Explicitly not a grid of green check
    cards — the rules carry the structure and nothing is decorated with a tick. */
 
+/* Type comes from the canonical .section-headline; this only places it. */
 .headline {
   grid-column: 1 / span 8;
   margin: 0;
   max-width: 20ch;
-  font-size: var(--fs-h2);
-  font-weight: 400;
-  line-height: 1.02;
-  letter-spacing: -.035em;
 }
 
 .rows {

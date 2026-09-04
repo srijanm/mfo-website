@@ -4,6 +4,8 @@ import { Reveal } from "@/components/motion";
 import { Plate } from "@/components/plates";
 import { trustLedger } from "@/lib/content/homepage";
 
+import { cx } from "@/lib/cx";
+
 import styles from "./TrustLedger.module.css";
 
 /**
@@ -20,7 +22,7 @@ export function TrustLedger() {
       <Container>
         <Grid>
           <Plate kind="trust" className={styles.plate} />
-          <h2 id="trust-ledger" className={styles.headline}>
+          <h2 id="trust-ledger" className={cx("section-headline", styles.headline)}>
             {trustLedger.headline}
           </h2>
 

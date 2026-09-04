@@ -1,10 +1,7 @@
 "use client";
 
-import type { CSSProperties } from "react";
-
 import { Container, Grid, Section, ThresholdNode } from "@/components/foundation";
 import { useScrollProgress } from "@/components/motion";
-import { Plate } from "@/components/plates";
 import { EMPTY_VALUE } from "@/components/objects";
 import {
   latentProblem,
@@ -52,11 +49,11 @@ export function LatentProblemTable() {
           <>
             <Grid>
               <div className={styles.proposition}>
-                <h2 id="latent-problem" className={`display-2 ${styles.headline}`}>
+                <h2 id="latent-problem" className="section-headline">
                   {latentProblem.headline}
                 </h2>
                 <p className={styles.follow}>{latentProblem.follow}</p>
-                <p className={styles.intro}>{latentProblem.intro}</p>
+                <p className="section-lede">{latentProblem.intro}</p>
               </div>
             </Grid>
 
@@ -93,32 +90,23 @@ export function LatentProblemTable() {
         ) : (
           <div className={cx("rule-grid", "rule-grid--5-7", styles.split)}>
             <div className={styles.splitCopy}>
-              <Plate kind="latentProblem" className={styles.plate} />
-              <h2 id="latent-problem" className={`display-2 ${styles.headline}`}>
+              <h2 id="latent-problem" className="section-headline">
                 {latentProblem.headline}
               </h2>
               <p className={styles.follow}>{latentProblem.follow}</p>
+              {/* The section's lede, with the proposition it belongs to rather
+                  than floating above the examples in the other column. */}
+              <p className="section-lede">{latentProblem.intro}</p>
             </div>
 
             <div className="rule-grid-flush">
-              <p className={styles.splitIntro}>{latentProblem.intro}</p>
-
-              {/* The rail. Decorative: every row it marks is the sentence
-                  beside it, and the two end markers are content. */}
+              {/* The rail. One row per example: each carries the segment of
+                  line above its node and the segment below it, so the line
+                  starts at the first node and stops at the last instead of
+                  running on past it into empty space. Decorative — every row
+                  it marks is the sentence beside it, and the two end markers
+                  are ordinary text. */}
               <div className={styles.rail}>
-                <span aria-hidden="true" className={styles.railLine} />
-                <span
-                  aria-hidden="true"
-                  className={styles.railFill}
-                  style={
-                    {
-                      "--rail-progress": `${((active + 1) / examples.length) * 100}%`,
-                    } as CSSProperties
-                  }
-                />
-                <span className={styles.railStart}>{latentProblem.railStart}</span>
-                <span className={styles.railEnd}>{latentProblem.railEnd}</span>
-
                 {/* Empty blocks whose only job is to be intersected. */}
                 <div ref={sentinelsRef} aria-hidden="true" className={styles.sentinels}>
                   {examples.map((example, index) => (
@@ -127,7 +115,31 @@ export function LatentProblemTable() {
                 </div>
 
                 {examples.map((example, index) => (
-                  <div key={example.id} className={styles.summaryRow}>
+                  <div
+                    key={example.id}
+                    className={cx(
+                      styles.summaryRow,
+                      index === 0 && styles.summaryRowFirst,
+                      index === examples.length - 1 && styles.summaryRowLast,
+                      /* The node is reached, so the line leading to it is. */
+                      index <= active && styles.segAbovePassed,
+                      /* The next node is reached, so the line leaving this one
+                         is too. Under reduced motion or with no JavaScript
+                         `active` never moves off 0 and the rail is simply
+                         present and unfilled, which is a correct resting
+                         state. */
+                      index < active && styles.segBelowPassed,
+                    )}
+                  >
+                    {/* The two end markers sit in the rail's own gutter, in
+                        the row whose node they name, so each one is level with
+                        its node however many lines the sentence beside it
+                        runs to. */}
+                    <span className={styles.rowMarker}>
+                      {index === 0 ? latentProblem.railStart : null}
+                      {index === examples.length - 1 ? latentProblem.railEnd : null}
+                    </span>
+
                     <ThresholdNode
                       className={cx(
                         styles.rowNode,

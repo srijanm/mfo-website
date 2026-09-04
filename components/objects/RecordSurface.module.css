@@ -222,3 +222,18 @@
   from { background: transparent; }
   to { background: var(--acid); }
 }
+
+/* ---------------------------------------------------------------------------
+   The slow pace.
+
+   Rebinds the two motion tokens the row choreography reads rather than
+   restating the choreography: the rows still arrive one at a time in the same
+   order, they simply take longer to do it. Both are plain custom properties,
+   so under reduced motion — where globals.css kills every duration outright —
+   these change nothing at all.
+   --------------------------------------------------------------------------- */
+
+.slow {
+  --stagger-row: 130ms;
+  --motion-row: 420ms;
+}

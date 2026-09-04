@@ -19,11 +19,45 @@
   color: var(--muted);
 }
 
-/* The label rides above the wipe. Positioned unconditionally, so it sits
-   correctly whether or not the wipe exists. */
-.label {
+/* Outlined secondary. Compounded with .button for the same reason .ink is:
+   .button-secondary lives in the global sheet at equal specificity, so one
+   class here would win or lose on stylesheet order alone. */
+.button.secondary {
+  background: transparent;
+  color: var(--ink);
+}
+
+/* On the ink chapter an ink border on ink is invisible, so the outline and the
+   label take paper — 17.4:1 — and the fill it takes on hover is acid, which is
+   16.2:1 against the ink label it then carries. */
+:global(.surface-ink) .button.secondary {
+  border-color: var(--paper);
+  color: var(--paper);
+}
+
+/* The label and arrow ride above the wipe. Positioned unconditionally, so they
+   sit correctly whether or not the wipe exists. */
+.label,
+.arrow {
   position: relative;
   z-index: 1;
+}
+
+/* The arrow steps forward on hover, which is the whole of the movement: the
+   button itself never lifts, so a row of them stays on one line. */
+.arrow {
+  font-size: 1.05em;
+  line-height: 1;
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .arrow {
+    transition: transform var(--motion-fast) var(--ease-system);
+  }
+
+  .button:hover .arrow {
+    transform: translateX(3px);
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -39,6 +73,16 @@
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
   .button.ink:hover {
     background: var(--paper);
+    color: var(--ink);
+  }
+
+  .button.secondary:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  :global(.surface-ink) .button.secondary:hover {
+    background: var(--acid);
     color: var(--ink);
   }
 }
@@ -63,7 +107,8 @@
     transform: scaleX(1);
   }
 
-  .button:hover .label {
+  .button:hover .label,
+  .button:hover .arrow {
     color: var(--paper);
   }
 
@@ -72,7 +117,18 @@
     background: var(--paper);
   }
 
-  .button.ink:hover .label {
+  /* And on the ink chapter the secondary's wipe is acid. */
+  :global(.surface-ink) .button.secondary::after {
+    background: var(--acid);
+  }
+
+  :global(.surface-ink) .button.secondary:hover .label,
+  :global(.surface-ink) .button.secondary:hover .arrow {
+    color: var(--ink);
+  }
+
+  .button.ink:hover .label,
+  .button.ink:hover .arrow {
     color: var(--ink);
   }
 

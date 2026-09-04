@@ -143,11 +143,14 @@ fine.
    not draw a date, a threshold or an amount.
 4. **Never sell with fear.** State a consequence once, flat, and move on.
 5. **Never attack the family CA.** Frame it as fit and mismatch.
-6. **Banned phrases.** expert CAs · X+ professionals · transparent pricing · no
+6. **Banned phrases.** expert CAs · X+ professionals · no
    hidden charges · 100% online · hassle-free · one-stop shop · all-in-one ·
    end-to-end · India's #1 / largest / most trusted · AI-powered · file in
    minutes · maximum refund · starting at ₹999 · hassle · boring · tedious ·
    paperwork. Do not call tax rules "simple" or "easy."
+
+   *Amended 2026-09-04 by the owner: "transparent pricing" was struck from this
+   list and is now the pricing headline. No other phrase changed.*
 7. **Content must be visible at rest.** `globals.css` kills animation under
    `prefers-reduced-motion` with `!important`, so anything starting at
    `opacity: 0` renders **blank** for those users. Gate initial hidden states

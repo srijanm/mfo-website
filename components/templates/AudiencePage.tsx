@@ -98,7 +98,7 @@ export function AudiencePage({ audience }: AudiencePageProps) {
                 <IncomingPaymentRecord
                   amount={audience.record.amount}
                   from={audience.record.from}
-                  received={audience.record.received}
+                  received={audience.record.received()}
                   into={audience.record.into}
                   frequency={audience.record.frequency}
                   indianPayroll={audience.record.indianPayroll}

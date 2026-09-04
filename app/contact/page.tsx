@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { Container } from "@/components/foundation";
-import { TextLink } from "@/components/foundation";
+import { Button } from "@/components/foundation";
 import { primaryCta } from "@/lib/content/navigation";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -27,7 +27,7 @@ export default function ContactPage() {
         tell us how you earn and we will come back to you.
       </p>
       <div className={styles.action}>
-        <TextLink href={primaryCta.href}>{primaryCta.label}</TextLink>
+        <Button href={primaryCta.href}>{primaryCta.label}</Button>
       </div>
     </Container>
   );

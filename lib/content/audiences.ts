@@ -21,7 +21,8 @@ export type AudienceBlock =
 export type AudienceRecord = {
   amount: string;
   from: string;
-  received: string;
+  /** Evaluated per render — see homepage.ts paymentExample.received. */
+  received: () => string;
   into: string;
   frequency: string;
   indianPayroll: string;
