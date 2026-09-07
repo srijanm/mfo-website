@@ -12,7 +12,6 @@ import { audiences } from "@/lib/content/audiences";
  *   /guides       — built and reachable, noindexed until it has real content
  *   /privacy      — a notice, not the policy
  *   /terms        — a notice, not the terms
- *   /styleguide   — internal
  */
 export function indexableRoutes(): string[] {
   return [

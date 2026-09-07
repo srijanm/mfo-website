@@ -14,7 +14,6 @@ const ROUTES = [
   "/terms",
   "/guides",
   "/guides/how-we-decide-what-you-need",
-  "/styleguide",
 ] as const;
 
 const PAPER = "rgb(246, 247, 242)";
@@ -669,8 +668,7 @@ test.describe("metadata", () => {
     "/get-started",
     "/privacy",
     "/terms",
-    "/styleguide",
-    "/guides",
+      "/guides",
     "/guides/how-we-decide-what-you-need",
   ];
 
@@ -1292,17 +1290,10 @@ test.describe("flair", () => {
  *
  * Two of these can only be checked on a rendered page: how many colour blocks a
  * page actually ends up with once its components are composed, and whether any
- * text on a dark surface resolves to a colour that fails AA. guardrails.mjs
- * catches the single-file cases; these catch the composed ones.
+ * text on a dark surface resolves to a colour that fails AA.
  */
 test.describe("surfaces", () => {
-  /**
-   * Real pages only. /styleguide is deliberately outside all three: it renders
-   * every primitive on all four surfaces, several times over, which is both
-   * more colour blocks than a page may carry and — by design — the one place
-   * a paper-surface component is shown failing on ink. Excluding it is the
-   * point of it existing; these rules still bind everywhere they apply.
-   */
+  /** Every real page. */
   const SURFACE_ROUTES = [
     "/", "/pricing", "/paid-from-abroad", "/freelancers", "/creators",
     "/how-we-work", "/get-started", "/guides", "/contact", "/privacy", "/terms",
@@ -1594,7 +1585,7 @@ test.describe("motion system", () => {
 
 /**
  * The QA checklist items that were only ever verified by hand. Each of these
- * is a line in docs/QA_CHECKLIST.md, measured rather than asserted.
+ * is measured rather than asserted.
  */
 test.describe("QA checklist", () => {
   const ROUTES = [

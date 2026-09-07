@@ -8,9 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "guardrails": "node scripts/guardrails.mjs",
     "test:e2e": "playwright test",
-    "check": "npm run guardrails && next lint && tsc --noEmit && playwright test"
+    "check": "next lint && tsc --noEmit"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

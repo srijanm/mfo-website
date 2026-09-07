@@ -16,7 +16,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/get-started", "/styleguide"],
+      disallow: ["/get-started"],
     },
     sitemap: absoluteUrl("/sitemap.xml"),
   };
