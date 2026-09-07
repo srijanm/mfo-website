@@ -141,6 +141,36 @@
 
 .rail {
   position: relative;
+
+  /* Where the rail stands, how far down a row its node sits, and how tall a
+     row is. Declared once on the block so the bookends, the line segments,
+     the nodes and the sentences cannot drift apart.
+
+     --rail-x used to be 104px because the two ordinals needed a gutter to sit
+     in. They are bookends now, so the gutter is gone and the sentences get
+     that width back.
+
+     --node-y is the vertical centre of the sentence's first line: the row's
+     top padding plus half the first line box (--fs-body at 1.5). Written flat
+     rather than as `(--fs-body * 1.5) / 2` — same number, one less level of
+     nesting for a parser to disagree about inside a custom property. */
+  --rail-x: 40px;
+  --row-pad: 24px;
+  --node-y: calc(var(--row-pad) + var(--fs-body) * 0.75);
+  --text-x: calc(var(--rail-x) + 32px);
+}
+
+/* Every row the same height, whatever its sentence runs to.
+
+   `1fr` auto-rows on an auto-height grid sizes every track to the tallest,
+   so the nodes fall on an exactly even pitch without a magic number that a
+   third line at some width would break. The sentences stay top-aligned inside
+   that track: the node marks the first line, so anything that moves the first
+   line moves the node off the pitch this is here to establish. */
+.rows {
+  position: relative;
+  display: grid;
+  grid-auto-rows: 1fr;
 }
 
 .sentinels {
@@ -151,33 +181,51 @@
   pointer-events: none;
 }
 
+/* The two ends of the span, on the rail's own axis and aligned with the
+   sentences rather than indented from them. Data-label register. */
+.bookend {
+  margin: 0;
+  padding-left: var(--text-x);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--muted);
+}
+
+/* The block's top and bottom rules are the cell's edges, and the copy column
+   opposite starts 40px below the first. The bookends match it, so the two
+   columns begin and end on the same lines. */
+.bookendStart {
+  padding-top: 40px;
+  padding-bottom: 14px;
+}
+
+.bookendEnd {
+  padding-top: 14px;
+  padding-bottom: 44px;
+}
+
 /* One example. No padding on the row itself: the row's rule has to run the
    full width of the cell and terminate on the divider, so the inset goes on
    the text inside it — a rule and a reading measure never share an element. */
 .summaryRow {
   position: relative;
-  /* If this padding changes, --node-y below changes with it. */
-  padding: 24px 0;
+  padding: var(--row-pad) 0;
   border-top: 1px solid var(--rule);
-
-  /* Where the rail stands, and how far down the row its node sits. Declared
-     once here so the line segments, the node and the end markers cannot drift
-     apart — which is exactly how the two markers ended up on different
-     offsets before.
-
-     --node-y is the vertical centre of the sentence's first line: the row's
-     top padding plus half the first line box (--fs-body at 1.5). A fixed 30px
-     sat the node — and the marker centred on it — visibly above the text it
-     belongs to. */
-  --rail-x: 104px;
-  --node-y: calc(24px + (var(--fs-body) * 1.5) / 2);
 }
 
 /* The line, in two segments per row: above the node and below it. Built this
    way rather than as one absolutely-positioned line down the whole rail
    because that line could only end at the container's bottom edge — which is
    the foot of the last row, not its node, so it ran on past the last marker
-   into empty space. */
+   into empty space.
+
+   The segments tile into one unbroken stroke. An absolutely positioned child
+   is placed against the padding box, so `top: 0` started the segment *below*
+   the row's 1px rule and left a hairline hole at every row boundary — which is
+   the break that made the acid look like it stopped somewhere arbitrary. The
+   upper segment starts a pixel higher and is a pixel taller, so it crosses the
+   rule and meets the segment above it. */
 .summaryRow::before,
 .summaryRow::after {
   content: "";
@@ -188,8 +236,8 @@
 }
 
 .summaryRow::before {
-  top: 0;
-  height: var(--node-y);
+  top: -1px;
+  height: calc(var(--node-y) + 1px);
 }
 
 .summaryRow::after {
@@ -203,7 +251,7 @@
   content: none;
 }
 
-/* On the rail, centred on the line. */
+/* On the rail, centred on the line and on the first line of its sentence. */
 .rowNode {
   position: absolute;
   left: var(--rail-x);
@@ -221,30 +269,12 @@
   background: var(--paper);
 }
 
-/* The two end markers. In the rail's gutter, in the row whose node they name,
-   vertically centred on that node — which is itself centred on the sentence's
-   first line, so marker, node and text line up however many lines the
-   sentence runs to. The column stops 26px short of the rail: wide enough for
-   both markers to sit on one line at every breakpoint the rail exists at, with
-   clear air between the label and its dot. */
-.rowMarker {
-  position: absolute;
-  left: 0;
-  top: var(--node-y);
-  width: calc(var(--rail-x) - 26px);
-  transform: translateY(-50%);
-  font-size: var(--fs-small);
-  font-weight: 500;
-  line-height: 1.2;
-  color: var(--muted);
-}
-
 /* The scenarios are the content the lede introduces, so they sit a step below
    it: body rather than lead. At the same size as the lede nothing read as
    subordinate and the section was five equal paragraphs. */
 .summaryText {
   margin: 0;
-  padding-left: calc(var(--rail-x) + 32px);
+  padding-left: var(--text-x);
   max-width: 66ch;
   font-size: var(--fs-body);
   line-height: 1.5;
@@ -292,27 +322,21 @@
     padding-block: 0 28px;
   }
 
-  /* The gutter narrows to what the markers need and the text follows it, so
-     the rail keeps its geometry rather than being switched off. 92px leaves
-     the marker column 66px — "Year three" on one line, with air before the
-     node. */
-  .summaryRow {
-    --rail-x: 92px;
-  }
-
-  .summaryText {
-    padding-left: calc(var(--rail-x) + 24px);
+  /* The rail keeps its geometry below desktop, drawn a little tighter. */
+  .rail {
+    --rail-x: 28px;
+    --text-x: calc(var(--rail-x) + 24px);
   }
 }
 
 @media (max-width: 599px) {
-  /* Below this the gutter costs more width than the two markers are worth, so
-     the rail comes out and the markers become ordinary labels above the first
-     and last sentence. */
-  .summaryRow {
+  /* Below this the rail costs more width than the drawing is worth, so it
+     comes out. The bookends were already ordinary text above and below the
+     list, so they simply move flush with it. */
+  .rail {
     --rail-x: 0px;
-    --node-y: 0px;
-    padding: 20px 0;
+    --row-pad: 20px;
+    --text-x: 0px;
   }
 
   .summaryRow::before,
@@ -321,19 +345,9 @@
     display: none;
   }
 
-  .rowMarker {
-    position: static;
-    display: block;
-    width: auto;
-    transform: none;
-  }
-
-  .rowMarker:not(:empty) {
-    margin-bottom: 8px;
-  }
-
-  .summaryText {
-    padding-left: 0;
+  /* With no rail to hang from, the rows no longer need a common height. */
+  .rows {
+    grid-auto-rows: auto;
   }
 }
 

@@ -100,55 +100,65 @@ export function LatentProblemTable() {
             </div>
 
             <div className="rule-grid-flush">
-              {/* The rail. One row per example: each carries the segment of
-                  line above its node and the segment below it, so the line
-                  starts at the first node and stops at the last instead of
-                  running on past it into empty space. Decorative — every row
-                  it marks is the sentence beside it, and the two end markers
-                  are ordinary text. */}
+              {/* The rail.
+
+                  The two ordinals are bookends on the timeline, above the
+                  first sentence and below the last, rather than a column
+                  beside the rows. As a column they occupied a gutter that was
+                  empty on every row but two, and two filled cells among four
+                  read as missing content rather than as the ends of a span.
+
+                  Inside, one row per example, each carrying the segment of
+                  line above its node and the segment below it. The segments
+                  tile: each overlaps the row rule above it, so the line is
+                  unbroken from the first node to the last, and it changes from
+                  acid to rule exactly at the node the reader has reached.
+                  Decorative — every row it marks is the sentence beside it,
+                  and the two bookends are ordinary text. */}
               <div className={styles.rail}>
-                {/* Empty blocks whose only job is to be intersected. */}
-                <div ref={sentinelsRef} aria-hidden="true" className={styles.sentinels}>
+                <p className={cx(styles.bookend, styles.bookendStart)}>
+                  {latentProblem.railStart}
+                </p>
+
+                <div className={styles.rows}>
+                  {/* Empty blocks whose only job is to be intersected. */}
+                  <div ref={sentinelsRef} aria-hidden="true" className={styles.sentinels}>
+                    {examples.map((example, index) => (
+                      <div key={example.id} data-index={index} />
+                    ))}
+                  </div>
+
                   {examples.map((example, index) => (
-                    <div key={example.id} data-index={index} />
+                    <div
+                      key={example.id}
+                      className={cx(
+                        styles.summaryRow,
+                        index === 0 && styles.summaryRowFirst,
+                        index === examples.length - 1 && styles.summaryRowLast,
+                        /* The node is reached, so the line leading to it is. */
+                        index <= active && styles.segAbovePassed,
+                        /* The next node is reached, so the line leaving this
+                           one is too. Under reduced motion or with no
+                           JavaScript `active` never moves off 0 and the rail
+                           is simply present and unfilled, which is a correct
+                           resting state. */
+                        index < active && styles.segBelowPassed,
+                      )}
+                    >
+                      <ThresholdNode
+                        className={cx(
+                          styles.rowNode,
+                          index <= active && styles.rowNodePassed,
+                        )}
+                      />
+                      <p className={styles.summaryText}>{factValue(example.summary)}</p>
+                    </div>
                   ))}
                 </div>
 
-                {examples.map((example, index) => (
-                  <div
-                    key={example.id}
-                    className={cx(
-                      styles.summaryRow,
-                      index === 0 && styles.summaryRowFirst,
-                      index === examples.length - 1 && styles.summaryRowLast,
-                      /* The node is reached, so the line leading to it is. */
-                      index <= active && styles.segAbovePassed,
-                      /* The next node is reached, so the line leaving this one
-                         is too. Under reduced motion or with no JavaScript
-                         `active` never moves off 0 and the rail is simply
-                         present and unfilled, which is a correct resting
-                         state. */
-                      index < active && styles.segBelowPassed,
-                    )}
-                  >
-                    {/* The two end markers sit in the rail's own gutter, in
-                        the row whose node they name, so each one is level with
-                        its node however many lines the sentence beside it
-                        runs to. */}
-                    <span className={styles.rowMarker}>
-                      {index === 0 ? latentProblem.railStart : null}
-                      {index === examples.length - 1 ? latentProblem.railEnd : null}
-                    </span>
-
-                    <ThresholdNode
-                      className={cx(
-                        styles.rowNode,
-                        index <= active && styles.rowNodePassed,
-                      )}
-                    />
-                    <p className={styles.summaryText}>{factValue(example.summary)}</p>
-                  </div>
-                ))}
+                <p className={cx(styles.bookend, styles.bookendEnd)}>
+                  {latentProblem.railEnd}
+                </p>
               </div>
             </div>
           </div>

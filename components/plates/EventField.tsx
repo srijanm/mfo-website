@@ -144,6 +144,11 @@ export function EventField({ className }: { className?: string }) {
         })}
       </div>
 
+      {/* What one square is, before the field rather than after it. The
+          figcaption below says what these are not; a reader needs to be told
+          what they are first, and needs it where the drawing starts. */}
+      <p className={styles.legend}>{incomeField.legend}</p>
+
       <div
         id={panelId}
         role="tabpanel"

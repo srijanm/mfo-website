@@ -18,12 +18,22 @@
   }
 }
 
-/* Defined here because the component references it. Without this the heading
-   fell back to the browser default: 700 weight, which the type system does not
-   permit, and an arbitrary size. */
-/* Type comes from the canonical .section-headline; this only spaces it. */
-.headline {
-  margin: 0 0 36px;
+/* Type comes from the canonical .section-headline; this only spaces it.
+
+   Doubled selector on purpose. `.section-headline` is global and sets
+   `margin: 0`; at equal specificity the winner would be decided by which
+   stylesheet the bundler happened to emit last, which is not a thing to leave
+   to chance for the one rule holding the headline off the accordion. 36px was
+   not enough air between a 56px headline and the first rule — the two read as
+   one block. */
+.headline.headline {
+  margin: 0 0 56px;
+}
+
+@media (max-width: 767px) {
+  .headline.headline {
+    margin-bottom: 40px;
+  }
 }
 
 /* The last row closes the block, so the accordion reads as one ruled object

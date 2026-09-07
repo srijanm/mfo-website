@@ -53,6 +53,13 @@ function build(
 export const incomeField = {
   /** Says plainly what these are, so no reader takes them for real records. */
   caption: "Two illustrative years. Shapes, not anyone's records.",
+
+  /* What the drawing is, said before it is read rather than after. Two grids of
+     small squares mean nothing until someone says what one square is; the
+     caption below says what they are *not*, which is a different job. Neither
+     sentence names a month, a date or an obligation. */
+  legend:
+    "Each square is a week of the year. The marked ones are weeks where something needed attention.",
   shapes: [
     {
       id: "salaried",

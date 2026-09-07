@@ -415,6 +415,12 @@ if (leakedIntoCoreScope.length > 0) {
 export const coreScopeSection = {
   headline: "The CA and compliance work we are built to run.",
   items: coreScope,
+
+  /* The way out of the section. It used to borrow the hero's secondary action,
+     which pointed at /pricing — the section immediately below it on this same
+     page, so the link scrolled the reader past nothing. The exit from the
+     scope list is the one action the whole page is for. */
+  cta: primaryCta,
 } as const;
 
 /* ------------------------------------------------------------------ H09 */

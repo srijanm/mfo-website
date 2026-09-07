@@ -258,23 +258,215 @@ test.describe("homepage architecture", () => {
   });
 });
 
-/** §24 sets the accordion's minimum row heights. */
+/**
+ * Row heights. §24 sets a 64px floor; the owner set the closed row at 72-88px
+ * on 2026-09-07, which is what is asserted here.
+ *
+ * The ceiling is the point. The rows stood at ~105px for a single line of text
+ * because the heading wrapping each trigger kept the browser's default margin,
+ * and dead space around a control is not something a minimum can catch.
+ */
 test.describe("FAQ", () => {
-  test("triggers meet the minimum row height and expose state", async ({ page }) => {
+  test("a closed row is 72-88px, and the whole row is the target", async ({ page }) => {
     await page.goto("/");
 
     const triggers = page.locator("main button[aria-expanded]");
     expect(await triggers.count()).toBe(7);
 
     for (let i = 0; i < 7; i += 1) {
-      const box = await triggers.nth(i).boundingBox();
-      expect(box!.height, `FAQ row ${i + 1} is under 64px`).toBeGreaterThanOrEqual(64);
+      const trigger = triggers.nth(i);
+      const box = (await trigger.boundingBox())!;
+      expect(box.height, `FAQ trigger ${i + 1} is outside 72-88px`).toBeGreaterThanOrEqual(72);
+      expect(box.height, `FAQ trigger ${i + 1} is outside 72-88px`).toBeLessThanOrEqual(88);
+
+      /* The row is the trigger, not a box around it: anything the row occupies
+         that the trigger does not is space that looks clickable and is not. */
+      const row = trigger.locator("xpath=ancestor::div[1]");
+      const rowBox = (await row.boundingBox())!;
+      expect(
+        rowBox.height - box.height,
+        `FAQ row ${i + 1} is taller than its trigger`,
+      ).toBeLessThanOrEqual(2);
     }
 
+    /* Clicked at its far left, well away from the marker — by coordinate, so
+       that "the row is the target" is what is actually being tested and not
+       Playwright's own centre-of-the-element click. */
     const first = triggers.first();
+    await first.scrollIntoViewIfNeeded();
+    const firstBox = (await first.boundingBox())!;
     await expect(first).toHaveAttribute("aria-expanded", "false");
-    await first.click();
+    await page.mouse.click(firstBox.x + 8, firstBox.y + firstBox.height / 2);
     await expect(first).toHaveAttribute("aria-expanded", "true");
+  });
+
+  test("the headline is not crammed against the first rule", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+
+    const gap = await page.evaluate(() => {
+      const headline = document.querySelector("#faq-headline")!;
+      const firstRow = document.querySelector("main button[aria-expanded]")!
+        .closest("div")!;
+      return firstRow.getBoundingClientRect().top - headline.getBoundingClientRect().bottom;
+    });
+
+    expect(gap, "the FAQ headline sits on top of the accordion").toBeGreaterThanOrEqual(48);
+  });
+});
+
+/**
+ * H03's time rail. Three things have to hold at once, and they broke each
+ * other every time one of them was fixed alone:
+ *
+ *  - every node sits on the first line of its own sentence;
+ *  - every row is the same height, so the nodes fall on an even pitch;
+ *  - the line is one unbroken stroke from the first node to the last, changing
+ *    from acid to rule at a node and nowhere else.
+ */
+test.describe("the latent problem rail", () => {
+  test("even rows, nodes on first lines, and one unbroken line", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+
+    const rail = await page.evaluate(() => {
+      const rows = [...document.querySelectorAll('[class*="summaryRow"]')];
+      return rows.map((row) => {
+        const dot = row.querySelector('span[class*="dot"]')!.getBoundingClientRect();
+        const text = row.querySelector('[class*="summaryText"]')!;
+        const textBox = text.getBoundingClientRect();
+        const lineHeight = parseFloat(getComputedStyle(text).lineHeight);
+        const box = row.getBoundingClientRect();
+        const above = getComputedStyle(row, "::before");
+        const below = getComputedStyle(row, "::after");
+        return {
+          top: box.top,
+          height: box.height,
+          lines: Math.round(textBox.height / lineHeight),
+          /* Positive means the text sits below the node. */
+          drift: textBox.top + lineHeight / 2 - (dot.top + dot.height / 2),
+          aboveDrawn: above.content !== "none",
+          belowDrawn: below.content !== "none",
+          aboveTop: box.top + parseFloat(above.top),
+          aboveEnd: box.top + parseFloat(above.top) + parseFloat(above.height),
+          belowTop: box.top + parseFloat(below.top),
+        };
+      });
+    });
+
+    expect(rail.length).toBeGreaterThan(1);
+
+    /* At this width the sentences run to different numbers of lines, which is
+       the whole reason the rows need a common height. */
+    expect(new Set(rail.map((row) => row.lines)).size).toBeGreaterThan(1);
+
+    for (const [index, row] of rail.entries()) {
+      expect(Math.abs(row.drift), `node ${index + 1} is off its first line`).toBeLessThanOrEqual(1);
+      expect(row.height, `row ${index + 1} is not on the common height`).toBeCloseTo(rail[0].height, 0);
+    }
+
+    /* The line begins at the first node and ends at the last. */
+    expect(rail[0].aboveDrawn, "the line runs above the first node").toBe(false);
+    expect(rail.at(-1)!.belowDrawn, "the line runs below the last node").toBe(false);
+
+    /* And between them it is continuous: each row's upper segment starts where
+       the row above stopped drawing, crossing the 1px row rule rather than
+       leaving a hole at it. */
+    for (let i = 1; i < rail.length; i += 1) {
+      const previousBottom = rail[i - 1].top + rail[i - 1].height;
+      expect(
+        rail[i].aboveTop,
+        `the line breaks at the rule above row ${i + 1}`,
+      ).toBeLessThanOrEqual(previousBottom);
+      expect(rail[i].belowTop).toBeCloseTo(rail[i].aboveEnd, 0);
+    }
+  });
+
+  test("the two ordinals are bookends, not a column with holes", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+
+    const bookends = await page.evaluate(() => {
+      const rows = [...document.querySelectorAll('[class*="summaryRow"]')];
+      return [...document.querySelectorAll('[class*="bookend"]')].map((node) => ({
+        text: node.textContent!.trim(),
+        insideARow: rows.some((row) => row.contains(node)),
+        top: node.getBoundingClientRect().top,
+      }));
+    });
+
+    expect(bookends.map((b) => b.text)).toEqual(["Year one", "Year three"]);
+    for (const bookend of bookends) {
+      expect(bookend.insideARow, `"${bookend.text}" is still inside a row`).toBe(false);
+    }
+
+    const rowsBox = await page.evaluate(() => {
+      const rows = [...document.querySelectorAll('[class*="summaryRow"]')];
+      const first = rows[0].getBoundingClientRect();
+      const last = rows.at(-1)!.getBoundingClientRect();
+      return { top: first.top, bottom: last.bottom };
+    });
+
+    expect(bookends[0].top).toBeLessThan(rowsBox.top);
+    expect(bookends[1].top).toBeGreaterThanOrEqual(rowsBox.bottom);
+  });
+});
+
+/**
+ * H02's conclusion introduces the comparison below it; it is not a caption on
+ * the four cells above it. Spacing is the only thing that says so, so spacing
+ * is what is asserted.
+ */
+test.describe("the recognition comparison", () => {
+  test("the conclusion belongs to the comparison, not to the cells", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+
+    const spacing = await page.evaluate(() => {
+      const cells = document.querySelector('[class*="RecognitionStrip"][class*="cards"]')!;
+      const line = document.querySelector('[class*="closingText"]')!;
+      const tabs = document.querySelector('[role="tablist"]')!;
+      return {
+        fromCells: line.getBoundingClientRect().top - cells.getBoundingClientRect().bottom,
+        toTabs: tabs.getBoundingClientRect().top - line.getBoundingClientRect().bottom,
+      };
+    });
+
+    expect(spacing.fromCells, "the conclusion still reads as a caption on the cells")
+      .toBeGreaterThan(spacing.toTabs * 2);
+  });
+
+  test("the field says what one square is, before the field", async ({ page }) => {
+    await page.goto("/");
+
+    const legend = page.getByText("Each square is a week of the year", { exact: false });
+    await expect(legend).toBeVisible();
+
+    const order = await page.evaluate(() => {
+      const tabs = document.querySelector('[role="tablist"]')!;
+      const panel = document.querySelector('[role="tabpanel"]')!;
+      const text = [...document.querySelectorAll("p")].find((p) =>
+        p.textContent!.startsWith("Each square is a week"),
+      )!;
+      return {
+        afterTabs: tabs.compareDocumentPosition(text) & Node.DOCUMENT_POSITION_FOLLOWING,
+        beforeGrid: text.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING,
+      };
+    });
+
+    expect(order.afterTabs).toBeTruthy();
+    expect(order.beforeGrid).toBeTruthy();
+  });
+});
+
+/** The scope list's exit used to point at the section directly below it. */
+test.describe("the core scope exit", () => {
+  test("leaves the page rather than scrolling past nothing", async ({ page }) => {
+    await page.goto("/");
+
+    const link = page.locator("#core-scope a[class*='button-']");
+    await expect(link).toHaveCount(1);
+    await expect(link).toHaveAttribute("href", "/get-started");
   });
 });
 

@@ -54,13 +54,22 @@
   color: var(--muted);
 }
 
-/* ------------------------------------------------------------ closing */
+/* --------------------------------------------------------- comparison */
 
-/* The rule that closes the block the heading opened. It is on the wrapper, not
-   on the paragraph: a border and a reading measure never share an element, or
-   the rule stops where the text does instead of at the container edge. */
-.closing {
-  margin-top: 40px;
+/* The conclusion and the drawing of it, as one block.
+
+   The spacing carries the argument. The sentence used to sit 40px under the
+   cells and 48px above the tabs — equidistant, so it read as a caption on the
+   cells it follows rather than as the introduction to the comparison it
+   precedes. Now a major gap and a rule separate it from the cells, and 20px
+   separate it from the tabs: the block opens with the sentence and everything
+   below it is that sentence, drawn.
+
+   The rule is on the wrapper, not on the paragraph: a border and a reading
+   measure never share an element, or the rule stops where the text does
+   instead of at the container edge. */
+.comparison {
+  margin-top: 88px;
   padding-top: 32px;
   border-top: 1px solid var(--rule);
 }
@@ -75,9 +84,9 @@
   color: var(--ink-2);
 }
 
-/* The field sits under the closing line it illustrates. */
+/* The field is what the line above it says, so it follows closely. */
 .field {
-  margin-top: 48px;
+  margin-top: 20px;
 }
 
 /* --------------------------------------------------------- responsive */
@@ -85,6 +94,10 @@
 @media (max-width: 1023px) {
   .cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .comparison {
+    margin-top: 64px;
   }
 }
 
@@ -96,6 +109,11 @@
   .cardLink {
     min-height: 64px;
     padding: 18px;
+  }
+
+  .comparison {
+    margin-top: 48px;
+    padding-top: 28px;
   }
 }
 

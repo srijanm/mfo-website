@@ -1,6 +1,6 @@
 import { Button, Container, Section } from "@/components/foundation";
 import { Reveal } from "@/components/motion";
-import { coreScopeSection, hero } from "@/lib/content/homepage";
+import { coreScopeSection } from "@/lib/content/homepage";
 
 import styles from "./CoreScopeMatrix.module.css";
 
@@ -10,8 +10,9 @@ type CoreScopeMatrixProps = {
   /** Overrides the homepage headline — the pricing page titles this section
       "What the fee covers". */
   headline?: string;
-  /** The homepage routes onward to pricing; the pricing page must not link to
-      itself, so it turns the action off. */
+  /** The homepage routes onward to /get-started; the pricing page repeats
+      this section under its own fee and closes with its own action, so it
+      turns this one off. */
   showAction?: boolean;
 };
 
@@ -53,12 +54,14 @@ export function CoreScopeMatrix({ label, headline, showAction = true }: CoreScop
           ))}
         </Reveal>
 
-        {/* A way out of the section. Secondary rather than acid: the one acid
+        {/* A way out of the section, and it leaves the page: the section that
+            used to be the destination — pricing — is the next thing the reader
+            scrolls to anyway. Secondary rather than acid, because the one acid
             control on this screen is the header's. */}
         {showAction ? (
           <div className={styles.action}>
-            <Button href={hero.secondaryCta.href} tone="secondary">
-              {hero.secondaryCta.label}
+            <Button href={coreScopeSection.cta.href} tone="secondary">
+              {coreScopeSection.cta.label}
             </Button>
           </div>
         ) : null}

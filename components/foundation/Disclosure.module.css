@@ -1,8 +1,19 @@
 /* A ruled disclosure row. Rows are separated by 1px rules rather than boxed —
-   §5. Minimum row heights follow §24: 64px desktop, 56px mobile. */
+   §5. Minimum row heights are 80px desktop and 68px mobile: §24 sets 64/56,
+   and the rows stood at ~105px anyway because of a margin nobody meant to
+   ship. Owner's instruction, 2026-09-07 — a 72-88px closed row. */
 
 .row {
   border-top: 1px solid var(--rule);
+}
+
+/* The wrapper heading is structure, not a block of type: the trigger inside it
+   carries the size, the weight and the whole row height. */
+.heading {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
 }
 
 /* The row rule spans the container like every other rule on the site, and so
@@ -15,7 +26,12 @@
   justify-content: space-between;
   gap: 20px;
   width: 100%;
-  min-height: 64px;
+  /* §24 sets this at 64px. The rows were standing at ~105px because of the
+     wrapper heading's default margin, and 64px on its own reads cramped for a
+     row this wide, so the height the section actually had is now the height it
+     asks for — and it is the trigger's, which means the whole row is the
+     target rather than 105px of row around a 64px one. */
+  min-height: 80px;
   padding: 18px 0;
   border: 0;
   background: transparent;
@@ -39,10 +55,13 @@
   max-width: var(--disclosure-measure, none);
 }
 
+/* The state marker. 16px was undersized against an 80px row and a 20px
+   question; 22px reads as a control rather than as punctuation. It is not the
+   target — the trigger is, and the trigger is the row. */
 .marker {
   flex: none;
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   position: relative;
 }
 
@@ -148,7 +167,12 @@
 
 @media (max-width: 767px) {
   .trigger {
-    min-height: 56px;
+    min-height: 68px;
     font-size: var(--fs-body);
+  }
+
+  .marker {
+    width: 18px;
+    height: 18px;
   }
 }

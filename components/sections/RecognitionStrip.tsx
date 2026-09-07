@@ -10,7 +10,8 @@ import styles from "./RecognitionStrip.module.css";
 /**
  * H02 — recognition, doubling as navigation.
  *
- * A heading, four linked cells, and the conclusion beneath them. Each cell
+ * A heading, four linked cells, and then the comparison: the conclusion the
+ * cells lead to, and the drawing of that conclusion, as one block. Each cell
  * names a way of earning and routes to the audience page that owns it — the
  * whole cell is the link, so the target is the card and not a glyph inside it.
  */
@@ -35,14 +36,18 @@ export function RecognitionStrip() {
           ))}
         </ul>
 
-        <div className={styles.closing}>
-          <p className={styles.closingText}>{recognitionClosing}</p>
-        </div>
+        {/* The conclusion and the drawing of it are one block, not two.
 
-        {/* The closing line, drawn. Two illustrative years side by side: the
-            shape a salaried year has, and the shape one without that system
-            has. The caption says plainly that they are shapes. */}
-        <EventField className={styles.field} />
+            The sentence introduces the comparison — it is not a caption on the
+            four cells above — so it sits with the thing it introduces: a major
+            gap and a rule separate it from the cells, and very little separates
+            it from the tabs it leads into. Two illustrative years side by side:
+            the shape a salaried year has, and the shape one without that system
+            has. */}
+        <div className={styles.comparison}>
+          <p className={styles.closingText}>{recognitionClosing}</p>
+          <EventField className={styles.field} />
+        </div>
       </Container>
     </Section>
   );
