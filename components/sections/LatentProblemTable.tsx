@@ -1,7 +1,6 @@
 "use client";
 
-import { Container, Grid, Section, ThresholdNode } from "@/components/foundation";
-import { useScrollProgress } from "@/components/motion";
+import { Container, Section } from "@/components/foundation";
 import { EMPTY_VALUE } from "@/components/objects";
 import {
   latentProblem,
@@ -14,27 +13,30 @@ import { cx } from "@/lib/cx";
 import styles from "./LatentProblemTable.module.css";
 
 /**
- * H03 — the latent problem.
+ * H03 — the delayed problem, as a compact editorial timeline.
  *
- * §15 specifies a three-column ruled table: what started, why it matters later,
- * and what the customer notices. That table is built below and is driven
- * entirely by `latentProblem.examples[].columns`.
+ * Five columns of statement, seven of timeline, tops aligned, and no card
+ * framing around either. The first sentence carries the section; the second is
+ * a step down and muted but still comfortably legible; the explanatory
+ * paragraph sits below both at a reading measure.
  *
- * It is gated on `latentProblemColumnsReady()` because the copy doc supplies
- * one approved sentence per example and nothing for any of the three columns.
- * Rendering it today would print twelve empty cells and drop four lines of
- * approved copy from the page, so until the columns are written the section
- * renders those sentences instead. Populate `columns` on every example in
- * lib/content/homepage.ts and the specified table appears with no other change.
+ * On the right, four entries on a slim vertical rule. The first three are
+ * grouped under "Year one" and the last under "Year three", which is the whole
+ * point of the section: the gap between when something starts and when it
+ * surfaces. The year annotations are ordinals, not calendar dates or due dates.
+ *
+ * These are things that can happen, not things that happen to everyone. The
+ * copy is stated flatly and once — nothing here counts, escalates or warns.
+ *
+ * §15 specifies a three-column ruled table instead, driven by
+ * `latentProblem.examples[].columns`. Those columns are null because writing
+ * them means writing tax content nobody has reviewed, so the timeline renders
+ * until they exist; populate them and the specified table appears with no other
+ * change.
  */
 export function LatentProblemTable() {
   const { columnHeadings, examples } = latentProblem;
   const showColumns = latentProblemColumnsReady();
-
-  /* Which example the reader is level with. With no observer — no JavaScript,
-     or a browser without one — this stays at 0 and the rail below renders in
-     its resting state: present, hollow, unfilled. */
-  const { ref: sentinelsRef, active } = useScrollProgress(examples.length);
 
   const headings: [keyof LatentProblemColumns, string][] = [
     ["started", columnHeadings.started],
@@ -42,24 +44,25 @@ export function LatentProblemTable() {
     ["notices", columnHeadings.notices],
   ];
 
+  /* The last entry is the one that surfaces years later. Everything before it
+     belongs to the first year. */
+  const lastIndex = examples.length - 1;
+
   return (
     <Section labelledBy="latent-problem">
       <Container>
-        {showColumns ? (
-          <>
-            <Grid>
-              <div className={styles.proposition}>
-                <h2 id="latent-problem" className="section-headline">
-                  {latentProblem.headline}
-                </h2>
-                <p className={styles.follow}>{latentProblem.follow}</p>
-                <p className="section-lede">{latentProblem.intro}</p>
-              </div>
-            </Grid>
+        <div className={styles.layout}>
+          <div className={styles.statement}>
+            <h2 id="latent-problem" className={cx("section-headline", styles.headline)}>
+              {latentProblem.headline}
+            </h2>
+            <p className={styles.follow}>{latentProblem.follow}</p>
+            <p className={styles.intro}>{latentProblem.intro}</p>
+          </div>
 
+          {showColumns ? (
             <div className={cx("rule-grid", styles.table)}>
               <div className="rule-grid-flush">
-                {/* Headers once, above the first row. */}
                 <div className={styles.headRow}>
                   {headings.map(([key, label]) => (
                     <p key={key} className={styles.heading}>
@@ -73,10 +76,7 @@ export function LatentProblemTable() {
                     {headings.map(([key, label]) => {
                       const value = example.columns?.[key];
                       return (
-                        <p
-                          key={key}
-                          className={cx(styles.cell, !value && styles.cellEmpty)}
-                        >
+                        <p key={key} className={cx(styles.cell, !value && styles.cellEmpty)}>
                           <span className={styles.cellLabel}>{label}</span>
                           {value || EMPTY_VALUE}
                         </p>
@@ -86,73 +86,35 @@ export function LatentProblemTable() {
                 ))}
               </div>
             </div>
-          </>
-        ) : (
-          <div className={cx("rule-grid", "rule-grid--5-7", styles.split)}>
-            <div className={styles.splitCopy}>
-              <h2 id="latent-problem" className="section-headline">
-                {latentProblem.headline}
-              </h2>
-              <p className={styles.follow}>{latentProblem.follow}</p>
-              {/* The section's lede, with the proposition it belongs to rather
-                  than floating above the examples in the other column. */}
-              <p className="section-lede">{latentProblem.intro}</p>
-            </div>
+          ) : (
+            <ol className={styles.timeline}>
+              {examples.map((example, index) => {
+                const opensYearOne = index === 0;
+                const opensYearThree = index === lastIndex;
 
-            <div className="rule-grid-flush">
-              {/* The rail. One row per example: each carries the segment of
-                  line above its node and the segment below it, so the line
-                  starts at the first node and stops at the last instead of
-                  running on past it into empty space. Decorative — every row
-                  it marks is the sentence beside it, and the two end markers
-                  are ordinary text. */}
-              <div className={styles.rail}>
-                {/* Empty blocks whose only job is to be intersected. */}
-                <div ref={sentinelsRef} aria-hidden="true" className={styles.sentinels}>
-                  {examples.map((example, index) => (
-                    <div key={example.id} data-index={index} />
-                  ))}
-                </div>
-
-                {examples.map((example, index) => (
-                  <div
+                return (
+                  <li
                     key={example.id}
-                    className={cx(
-                      styles.summaryRow,
-                      index === 0 && styles.summaryRowFirst,
-                      index === examples.length - 1 && styles.summaryRowLast,
-                      /* The node is reached, so the line leading to it is. */
-                      index <= active && styles.segAbovePassed,
-                      /* The next node is reached, so the line leaving this one
-                         is too. Under reduced motion or with no JavaScript
-                         `active` never moves off 0 and the rail is simply
-                         present and unfilled, which is a correct resting
-                         state. */
-                      index < active && styles.segBelowPassed,
-                    )}
+                    className={cx(styles.entry, opensYearThree && styles.entryLate)}
                   >
-                    {/* The two end markers sit in the rail's own gutter, in
-                        the row whose node they name, so each one is level with
-                        its node however many lines the sentence beside it
-                        runs to. */}
-                    <span className={styles.rowMarker}>
-                      {index === 0 ? latentProblem.railStart : null}
-                      {index === examples.length - 1 ? latentProblem.railEnd : null}
-                    </span>
+                    {/* The year annotation opens the group it names. Real text,
+                        not a marking: it is what the section is about. */}
+                    {opensYearOne || opensYearThree ? (
+                      <p className={styles.year}>
+                        {opensYearThree ? latentProblem.railEnd : latentProblem.railStart}
+                      </p>
+                    ) : null}
 
-                    <ThresholdNode
-                      className={cx(
-                        styles.rowNode,
-                        index <= active && styles.rowNodePassed,
-                      )}
-                    />
-                    <p className={styles.summaryText}>{factValue(example.summary)}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+                    <div className={styles.entryBody}>
+                      <span aria-hidden="true" className={styles.marker} />
+                      <p className={styles.entryText}>{factValue(example.summary)}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+        </div>
       </Container>
     </Section>
   );

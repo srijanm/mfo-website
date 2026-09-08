@@ -38,7 +38,11 @@ export function Disclosure({
 
   return (
     <div className={cx(styles.row, open && styles.isOpen, className)}>
-      <Heading>
+      {/* The heading exists for the document outline; the row's height is the
+          trigger's. Without a margin reset the browser default on h2/h3 adds
+          about 40px of dead space to every closed row — space that looks
+          clickable and is not. */}
+      <Heading className={styles.heading}>
         <button
           type="button"
           id={triggerId}

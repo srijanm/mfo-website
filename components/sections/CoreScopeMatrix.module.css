@@ -1,100 +1,137 @@
-/* H08, §20. The core CA relationship, as a grid of areas. Layer A only —
-   FX, insurance, loans, wealth planning and MIS are not part of this section
-   under any circumstances. */
+/* H08. A four-column introduction and an eight-column list in two columns.
 
-/* Mark and heading on one line, closed by a rule. */
-/* Four across, two rows. The old form was eight ruled rows of Area / What we
-   handle, which read as a table to be worked through top to bottom; these are
-   eight independent areas, so they are laid out as a field the reader can
-   enter anywhere. */
-.cards {
+   Open entries, not cards: an index, a title, a description and a hairline
+   underneath. Eight bordered tiles was the single densest block on the page and
+   said nothing that eight ruled rows do not. */
+
+.layout {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--grid-gap);
-  margin: 40px 0 0;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: var(--sp-6);
+  align-items: start;
+}
+
+.intro {
+  min-width: 0;
+  position: sticky;
+  top: calc(var(--nav-h) + var(--sp-5));
+}
+
+.headline {
+  max-width: 16ch;
+}
+
+.action {
+  margin-top: var(--sp-5);
+}
+
+/* Two columns of four. `column-count` would break an entry across columns;
+   a grid keeps each one whole.
+
+   The gutter is padding and a divider, not a grid gap. As a gap, every row
+   rule stopped short of it and the two columns' rules never met the divider —
+   a rule ending in empty space, which is the one thing the site's rule system
+   forbids. With the gutter inside the cells, each rule runs the full width of
+   its own column and terminates on the divider between them. */
+.list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
   padding: 0;
   list-style: none;
+  min-width: 0;
 }
 
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 24px;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-object);
-  background: var(--white);
+.entry {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--sp-3);
+  align-items: start;
+  padding: var(--sp-4) var(--sp-5) var(--sp-4) 0;
+  border-bottom: 1px solid var(--rule);
 }
 
-/* Row title: --fs-body, weight 500, --ink — CLAUDE.md typography. */
-.cardTitle {
-  margin: 0;
-  font-size: var(--fs-body);
+/* The divider between the two columns, and the gutter on the far side of it. */
+.entry:nth-child(even) {
+  padding-right: 0;
+  padding-left: var(--sp-5);
+  border-left: 1px solid var(--rule);
+}
+
+/* The first entry in each column opens on a rule, so both columns start level
+   and the two lists read as one block. */
+.entry:nth-child(1),
+.entry:nth-child(2) {
+  border-top: 1px solid var(--rule);
+}
+
+.index {
+  font-size: var(--fs-micro);
   font-weight: 500;
-  line-height: 1.32;
+  letter-spacing: .06em;
+  color: var(--muted);
+  padding-top: 5px;
+}
+
+.entryBody {
+  min-width: 0;
+}
+
+.entryTitle {
+  margin: 0;
+  font-size: var(--fs-lead);
+  font-weight: 500;
+  line-height: 1.28;
   letter-spacing: -.014em;
 }
 
-/* Row description: --fs-body, weight 400, --ink-2 — CLAUDE.md typography.
-   Set at --fs-ui here: eight of these side by side at body size crowd the
-   card, and the title above it is the line that has to carry. */
-.cardBody {
-  margin: 0;
+.entryText {
+  margin: 6px 0 0;
+  max-width: 42ch;
   font-size: var(--fs-ui);
-  line-height: 1.45;
+  line-height: 1.55;
   color: var(--ink-2);
 }
 
-/* Section-ending action, under the grid. */
-.action {
-  margin-top: 36px;
-}
+/* --------------------------------------------------------------- narrow */
 
-@media (max-width: 1199px) {
-  .cards {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 899px) {
-  .cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 599px) {
-  .header {
-    align-items: flex-start;
-    gap: 18px;
+@media (max-width: 1023px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-5);
   }
 
-  .cards {
+  .intro {
+    position: static;
+  }
+
+  .headline {
+    max-width: 24ch;
+  }
+
+  .list {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .card {
-    padding: 20px;
+  .entry:nth-child(2) {
+    border-top: 0;
+  }
+
+  /* Stacked, there is no second column to divide. */
+  .entry,
+  .entry:nth-child(even) {
+    padding-inline: 0;
+    border-left: 0;
   }
 }
 
-/* ---------------------------------------------------------------------------
-   The cards as instruments.
-
-   Fine pointers only, and only where motion is welcome. Touch never reaches
-   this, and under reduced motion the cards are exactly what they are at rest —
-   no state is carried by the hover, so nothing is lost by not having it. 2px
-   of travel, the ceiling §28 allows a pointer to cause.
-   --------------------------------------------------------------------------- */
-
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .card {
-    transition:
-      transform var(--motion-normal) var(--ease-system),
-      border-color var(--motion-normal) var(--ease-system);
+  .entry {
+    transition: border-color var(--motion-normal) var(--ease-system);
   }
 
-  .card:hover {
-    transform: translateY(var(--lift-hover));
-    border-color: var(--ink);
+  .entry:hover {
+    border-bottom-color: var(--rule-strong);
   }
 }

@@ -1,0 +1,232 @@
+/* Graphic A. An illustrative payment document, an acid backing plate, and a
+   narrower dark docket overlapping its lower edge.
+
+   Three rules hold the composition together at every width:
+
+   1. The figure carries the backing's offset as padding, so the acid plate is
+      inside the illustration's own bounds and never paints into the column
+      beside it.
+   2. The docket is in normal flow with a constant negative top margin. The
+      overlap is therefore the same 32px at every viewport, the figure's height
+      includes the docket, and the document reserves matching bottom padding so
+      nothing is hidden underneath.
+   3. Nothing is rotated and nothing is absolutely positioned except the two
+      decorative layers. */
+
+.figure {
+  /* Room for the backing plate to sit up and to the right of the document. */
+  --offset: 16px;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: var(--offset) var(--offset) 0 0;
+  width: 100%;
+  max-width: 500px;
+}
+
+.documentWrap {
+  position: relative;
+}
+
+/* The flat acid plate. No gradient, no shadow, no rotation — a printed second
+   colour behind the sheet. It stops short of the document's foot so the dark
+   docket below reads against paper rather than against acid. */
+.backing {
+  position: absolute;
+  top: calc(var(--offset) * -1);
+  right: calc(var(--offset) * -1);
+  left: var(--offset);
+  bottom: var(--offset);
+  background: var(--acid);
+  border-radius: var(--radius-object);
+}
+
+/* ------------------------------------------------------- the document */
+
+.document {
+  position: relative;
+  /* The bottom padding is the docket's overlap plus clearance. The docket sits
+     in front of this edge, and no document content may end up underneath it. */
+  padding: 26px 26px 52px;
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-object);
+  /* The one shadow in the composition, and the token the design system already
+     owns: this is an object sitting on top of a colour field. */
+  box-shadow: var(--shadow-object);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.amount {
+  margin: 8px 0 0;
+  font-size: clamp(2rem, 1.4rem + 1.9vw, 2.875rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -.035em;
+}
+
+.rule {
+  margin: 16px 0 0;
+  border: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.rows {
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+/* Label and value on one line, value right-aligned so the column reads down
+   its own edge. `display: contents` would drop the row box; a two-column grid
+   per row keeps each pair together while the shared template aligns them. */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: 16px;
+  align-items: baseline;
+  padding-top: 10px;
+}
+
+.row:first-child {
+  padding-top: 14px;
+}
+
+.rowLabel {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+.rowValue {
+  margin: 0;
+  font-size: var(--fs-ui);
+  text-align: right;
+  color: var(--ink);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-ui);
+  font-weight: 500;
+}
+
+/* Decorative. The label beside it carries the meaning. */
+.statusMarker {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--acid);
+  border: 1px solid var(--ink);
+}
+
+/* ---------------------------------------------------------- the docket */
+
+.docket {
+  position: relative;
+  z-index: 1;
+  /* The overlap. Constant, so it behaves identically at every width. */
+  margin: -32px 0 0 28px;
+  /* Narrower than the document it sits in front of. */
+  width: calc(100% - 76px);
+  min-width: 220px;
+  padding: 20px 22px 18px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--radius-object);
+  box-shadow: var(--shadow-overlay);
+}
+
+.docketTitle {
+  margin: 0 0 14px;
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  /* 6.9:1 on ink. Plain --muted would fail here. */
+  color: var(--muted-on-ink);
+}
+
+.docketList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docketItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  font-size: var(--fs-ui);
+  line-height: 1.35;
+  border-top: 1px solid var(--rule-on-ink);
+}
+
+.docketItem:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* An open square, deliberately not a tick: nothing here has been completed. */
+.docketMarker {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--acid);
+  border-radius: 1px;
+}
+
+.docketQualification {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule-on-ink);
+  font-size: var(--fs-micro);
+  line-height: 1.4;
+  color: var(--muted-on-ink);
+}
+
+/* ------------------------------------------------------------- narrow */
+
+/* The graphic reflows at real text sizes rather than being scaled down: the
+   padding tightens, the backing offset halves, and the docket goes full width
+   under the document instead of inset into it. Every label keeps its size. */
+@media (max-width: 767px) {
+  .figure {
+    --offset: 12px;
+    max-width: none;
+  }
+
+  .document {
+    padding: 22px 20px 48px;
+  }
+
+  .docket {
+    margin: -28px 0 0 16px;
+    width: calc(100% - 32px);
+    padding: 18px 18px 16px;
+  }
+}
+
+@media (max-width: 359px) {
+  .docket {
+    margin-left: 8px;
+    width: calc(100% - 16px);
+  }
+}

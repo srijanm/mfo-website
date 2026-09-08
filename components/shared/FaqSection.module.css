@@ -1,43 +1,57 @@
-/* H12, §24. A ruled accordion. Row heights are enforced on the trigger inside
-   the Disclosure primitive; this file only places the list.
+/* H12. Four columns of heading, eight of accordion.
 
-   The list spans the container, and so does each row: the question sits at its
-   own measure on the left and the state marker closes the row on the right grid
-   edge. Nothing is capped at the block level, so the section occupies the full
-   twelve columns rather than the left two thirds. */
+   Row heights, the trigger and the marker all live in the Disclosure
+   primitive; this file only places the two areas. */
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: var(--sp-6);
+  align-items: start;
+}
+
+/* Without a heading the rows take the whole width. */
+.layoutBare {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.intro {
+  position: sticky;
+  top: calc(var(--nav-h) + var(--sp-5));
+}
+
+.headline {
+  max-width: 14ch;
+}
 
 .list {
-  grid-column: 1 / -1;
+  min-width: 0;
 }
 
-@media (min-width: 1024px) {
-  .list {
-    /* A 7-column span of the 12-column grid: (7W - 5g) / 12. The question is
-       a heading, so it keeps a tighter measure than the answer below it. */
-    --disclosure-measure: calc((100% * 7 - 5 * var(--grid-gap)) / 12);
-  }
-}
-
-/* Defined here because the component references it. Without this the heading
-   fell back to the browser default: 700 weight, which the type system does not
-   permit, and an arbitrary size. */
-/* Type comes from the canonical .section-headline; this only spaces it. */
-.headline {
-  margin: 0 0 36px;
-}
-
-/* The last row closes the block, so the accordion reads as one ruled object
-   rather than a list that stops mid-air. */
+/* The block closes on its own rule rather than stopping mid-air. */
 .list > :last-child {
   border-bottom: 1px solid var(--rule);
 }
 
 .answer {
   margin: 0;
-  max-width: 64ch;
+  max-width: 62ch;
   font-size: var(--fs-body);
-  line-height: 1.52;
+  line-height: 1.56;
   color: var(--ink-2);
 }
 
+@media (max-width: 1023px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-5);
+  }
 
+  .intro {
+    position: static;
+  }
+
+  .headline {
+    max-width: 24ch;
+  }
+}

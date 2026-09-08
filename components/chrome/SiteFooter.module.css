@@ -10,7 +10,7 @@
 .columns {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--grid-gap-desktop);
+  gap: var(--grid-gap);
 }
 
 .title {
@@ -68,19 +68,16 @@
   margin: 0;
 }
 
+/* Two readable columns below desktop, and it stays at two rather than
+   collapsing to one: five single-item stacks make the footer taller than the
+   section above it and nothing is gained. */
 @media (max-width: 1023px) {
   .columns {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 32px var(--grid-gap-tablet);
+    gap: var(--sp-5) var(--grid-gap);
   }
 
   .footer {
     padding-block: var(--section-dense-mobile) 32px;
-  }
-}
-
-@media (max-width: 479px) {
-  .columns {
-    grid-template-columns: minmax(0, 1fr);
   }
 }

@@ -1,37 +1,35 @@
 import { Button, Container, Section } from "@/components/foundation";
-import { Reveal } from "@/components/motion";
-import { coreScopeSection, hero } from "@/lib/content/homepage";
+import { coreScopeSection } from "@/lib/content/homepage";
+import { primaryCta } from "@/lib/content/navigation";
+import { cx } from "@/lib/cx";
 
 import styles from "./CoreScopeMatrix.module.css";
 
 type CoreScopeMatrixProps = {
   /** Small muted label above the heading, where a page names the register. */
   label?: string;
-  /** Overrides the homepage headline — the pricing page titles this section
-      "What the fee covers". */
+  /** Overrides the homepage headline — /pricing titles this "What the fee covers". */
   headline?: string;
-  /** The homepage routes onward to pricing; the pricing page must not link to
-      itself, so it turns the action off. */
+  /** The pricing page closes with its own action, so it turns this one off. */
   showAction?: boolean;
 };
 
 /**
- * H08 — the core CA and compliance scope.
+ * H08 — the core CA and compliance work.
+ *
+ * Eight identical bordered cards became a four-column introduction beside an
+ * eight-column list in two columns. Each entry is an index, a title, a
+ * description and a hairline under it — open rows rather than boxes, so the
+ * section reads as a list of areas instead of a wall of tiles.
  *
  * Layer A only. §20 forbids FX, insurance, loans, wealth planning and MIS from
- * appearing here, so this component reads exclusively from `coreScope`. It
- * never touches `additionalSupport`, and lib/content asserts at module load
- * that no Layer B item has leaked into that list.
+ * appearing here, so this reads exclusively from `coreScope`; lib/content
+ * asserts at module load that no Layer B item has leaked into that list. It
+ * describes the core relationship, never what any plan includes.
  *
- * This describes the core relationship, not what any plan includes. Plan
- * inclusion lives in pricing data.
- *
- * A grid of cards rather than the two-column ruled matrix it used to be. Eight
- * ruled rows of Area / What we handle read as a table to be worked through in
- * order, when what the section actually lists is eight independent areas — so
- * each is now its own card, the reader can enter the list anywhere, and the two
- * column headings are gone because a card does not need to be told that its
- * first line is the name of the thing.
+ * The qualifications in the descriptions — "where relevant", "according to the
+ * scope of your engagement" — are part of the approved copy and are rendered
+ * verbatim.
  */
 export function CoreScopeMatrix({ label, headline, showAction = true }: CoreScopeMatrixProps) {
   const { items } = coreScopeSection;
@@ -39,29 +37,38 @@ export function CoreScopeMatrix({ label, headline, showAction = true }: CoreScop
   return (
     <Section id="core-scope" dense labelledBy="core-scope-headline">
       <Container>
-        {label ? <p className="section-label">{label}</p> : null}
-        <h2 id="core-scope-headline" className="section-headline section-headline--wide">
-          {headline ?? coreScopeSection.headline}
-        </h2>
+        <div className={styles.layout}>
+          <div className={styles.intro}>
+            {label ? <p className="section-label">{label}</p> : null}
+            <h2 id="core-scope-headline" className={cx("section-headline", styles.headline)}>
+              {headline ?? coreScopeSection.headline}
+            </h2>
 
-        <Reveal as="ul" variant="rows" className={styles.cards}>
-          {items.map((item) => (
-            <li key={item.id} className={styles.card}>
-              <h3 className={styles.cardTitle}>{item.title}</h3>
-              <p className={styles.cardBody}>{item.body}</p>
-            </li>
-          ))}
-        </Reveal>
-
-        {/* A way out of the section. Secondary rather than acid: the one acid
-            control on this screen is the header's. */}
-        {showAction ? (
-          <div className={styles.action}>
-            <Button href={hero.secondaryCta.href} tone="secondary">
-              {hero.secondaryCta.label}
-            </Button>
+            {/* The way out of the section, beside the heading rather than
+                stranded under the list. */}
+            {showAction ? (
+              <div className={styles.action}>
+                <Button href={primaryCta.href} tone="secondary">
+                  {primaryCta.label}
+                </Button>
+              </div>
+            ) : null}
           </div>
-        ) : null}
+
+          <ol className={styles.list}>
+            {items.map((item, index) => (
+              <li key={item.id} className={styles.entry}>
+                <span aria-hidden="true" className={cx(styles.index, "data-number")}>
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div className={styles.entryBody}>
+                  <h3 className={styles.entryTitle}>{item.title}</h3>
+                  <p className={styles.entryText}>{item.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
       </Container>
     </Section>
   );

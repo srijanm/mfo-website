@@ -1,162 +1,166 @@
-/* H01, MASTER_BUILD_SPEC.md §13.
-   Left aligned, never centred. The header already carries a 1px bottom rule,
-   so the hero takes no top rule of its own.
+/* H01. A seven / five composition: text left, illustration right, the
+   illustration vertically centred against the whole text column.
 
-   One 12-column composition, laid out top-down. It previously distributed its
-   three blocks with `align-content: space-between` over a viewport-height grid,
-   which opened a 236px dead zone under the headline and pushed the calls to
-   action to the bottom edge — below the fold, and below the reveal observer's
-   trigger line, so on any viewport shorter than about 850px they never became
-   visible at all. Spacing is now ordinary and the height is slack below the
-   composition rather than inside it. */
+   No fixed viewport height and no spacer elements. The hero is as tall as its
+   content plus its padding, which at 1440x900 lands the next section just under
+   the fold rather than a blank screen below it. */
 
 .hero {
-  /* The measure field sits behind the container and is positioned against
-     this box. */
   position: relative;
-
-  /* §9 puts the bar at 64px; the rule below it adds the 65th pixel, so this is
-     what actually fills the viewport without leaving a sliver of scroll. */
-  --nav-total: 65px;
-
-  display: flex;
-  min-height: max(700px, calc(100svh - var(--nav-total)));
 }
 
 .inner {
-  position: relative;
-  display: flex;
-  width: 100%;
-  padding-block: 64px 72px;
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: var(--sp-6);
+  align-items: center;
+  padding-block: var(--sp-8) var(--sp-9);
 }
 
-.grid {
-  flex: 1;
-  align-content: start;
-  row-gap: 48px;
+.text {
+  min-width: 0;
+  /* The stated target: a text column of roughly 640-720px wherever the
+     viewport allows it. Below that it simply takes the column. */
+  max-width: 720px;
 }
 
 .headline {
-  grid-column: 1 / span 9;
+  /* Five intentional lines, and the measure was chosen by rendering the actual
+     string rather than by arithmetic: at 11ch the balancer keeps the emphasised
+     "you do" on one line at 1100px, 1280px and 1440px, where every wider
+     measure split it across a line break and broke the acid band in half. A
+     measure, not a hard <br>, so intermediate widths still wrap sensibly. */
+  max-width: 11ch;
   text-wrap: balance;
 }
 
-/* Copy and object are the second row of the composition. Both start at the top
-   of that row, so the object's top edge sits on the subhead's first line. */
-.copy {
-  grid-column: 1 / span 5;
-  align-self: start;
-}
-
 .subhead {
-  margin: 0;
-  max-width: 46ch;
+  margin: var(--sp-4) 0 0;
+  /* 520-560px, per the brief. In ch so it tracks the type rather than the
+     viewport. */
+  max-width: 52ch;
   font-size: var(--fs-lead);
-  line-height: 1.44;
-  letter-spacing: -.018em;
+  line-height: 1.5;
+  letter-spacing: -.012em;
   color: var(--ink-2);
 }
 
-/* Directly under the subhead, at ordinary spacing. */
 .actions {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px 28px;
-  margin-top: 32px;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
 }
 
-.object {
-  grid-column: 8 / -1;
-  align-self: start;
-  justify-self: end;
-  width: 100%;
+/* The approved qualification on the illustration. It stays in the text column
+   at reading size rather than inside the graphic, where it would compete with
+   the document's own labels — but it is close enough to the illustration to
+   read as being about it. */
+.qualification {
+  margin: var(--sp-5) 0 0;
+  max-width: 46ch;
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-ui);
+  line-height: 1.5;
+  color: var(--muted);
 }
 
-/* On a short viewport the target height is dropped and the padding tightened
-   rather than shrinking the type or the record. */
-@media (max-height: 820px) {
-  .hero {
-    min-height: 0;
-  }
-
-  .inner {
-    padding-block: 56px 64px;
-  }
-
-  .grid {
-    row-gap: 40px;
-  }
+.graphic {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
 }
+
+/* ---------------------------------------------------------------- tablet */
 
 @media (max-width: 1023px) {
-  .hero {
-    min-height: 0;
-  }
-
   .inner {
-    padding-block: 56px 72px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding-block: var(--sp-7) var(--sp-8);
   }
 
-  .grid {
-    row-gap: 40px;
+  .text {
+    max-width: none;
   }
 
-  /* Below desktop the three blocks stack in reading order: copy, then the
-     calls to action, then the payment object — §13. */
-  .headline,
-  .copy,
-  .object {
-    grid-column: 1 / -1;
+  .headline {
+    max-width: 16ch;
   }
 
-  .object {
-    justify-self: start;
-    max-width: 420px;
+  /* Below desktop the illustration follows the actions, with the stated gap. */
+  .graphic {
+    justify-content: flex-start;
+    margin-top: var(--sp-6);
+    max-width: 460px;
   }
+
+  /* The qualification belongs under the composition once the two are stacked,
+     so it still reads as a note on the illustration. */
+  .qualification {
+    order: 2;
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .headline { order: 0; }
+  .subhead { order: 0; }
+  .actions { order: 0; }
 }
 
-/* ------------------------------------------------------------- the acid band
-
-   The band behind the emphasised words is drawn by the MaskedText primitive,
-   but its geometry there was tuned to nothing in particular: at display-1's
-   .96 line-height it started halfway down the lowercase and ran on past the
-   baseline into the next line's space, reading as a mispositioned rectangle.
-
-   Corrected here, against the type it actually sits behind. Geist's descent
-   puts the fragment's bottom edge .296em below the baseline, so `.28em` parks
-   the band's lower edge a hair under the baseline, and `.52em` of height
-   reaches just shy of the x-height's top (.53em): a marker stroke over the
-   lowercase body, hugging the words with the primitive's own small symmetric
-   bleed, clear of the line below at every wrap. Selected the way the node
-   primitives publish their parts — [class*="…"] — and outranking the source
-   rule on specificity rather than on bundle order. Gated exactly as the source
-   rule is: outside the gates the band does not exist to be positioned. */
-@media (prefers-reduced-motion: no-preference) {
-  :global(html.js) .headline :global(span[class*="emphasis"])::before {
-    bottom: .28em;
-    height: .52em;
-  }
-}
+/* ---------------------------------------------------------------- mobile */
 
 @media (max-width: 767px) {
   .inner {
-    padding-block: 40px 56px;
+    padding-block: var(--sp-6) var(--sp-7);
   }
 
-  .grid {
-    row-gap: 32px;
+  .headline {
+    max-width: none;
   }
 
   .subhead {
+    margin-top: var(--sp-3);
     font-size: var(--fs-body);
   }
 
   .actions {
-    margin-top: 24px;
+    margin-top: var(--sp-4);
   }
 
-  .object {
+  .actions :global(.button-primary),
+  .actions :global(.button-secondary) {
+    flex: 1 1 auto;
+    min-width: 160px;
+  }
+
+  .graphic {
+    /* 32-40px below the actions. */
+    margin-top: var(--sp-5);
     max-width: none;
+  }
+
+  .qualification {
+    margin-top: var(--sp-5);
+  }
+}
+
+/* ------------------------------------------------------------ the acid band
+
+   The band behind the emphasised words is drawn by the MaskedText primitive.
+   Its geometry there is generic; these two values place it against the type it
+   actually sits behind — a marker stroke over the lowercase body, its lower
+   edge a hair under the baseline and its top just shy of the x-height, clear of
+   the line below at every wrap. Gated exactly as the source rule is: outside
+   these gates the band does not exist to be positioned. */
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .headline :global(span[class*="emphasis"])::before {
+    bottom: .18em;
+    height: .5em;
   }
 }

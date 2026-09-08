@@ -1,8 +1,18 @@
-/* A ruled disclosure row. Rows are separated by 1px rules rather than boxed —
-   §5. Minimum row heights follow §24: 64px desktop, 56px mobile. */
+/* A ruled disclosure row. Rows are separated by 1px rules rather than boxed.
+   Minimum row heights are 76px desktop and 64px mobile; the row is the
+   trigger, so the whole of it is the click and touch target. */
 
 .row {
   border-top: 1px solid var(--rule);
+}
+
+/* Structure, not a block of type: the trigger inside carries the size, the
+   weight and the whole row height. */
+.heading {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
 }
 
 /* The row rule spans the container like every other rule on the site, and so
@@ -15,8 +25,11 @@
   justify-content: space-between;
   gap: 20px;
   width: 100%;
-  min-height: 64px;
-  padding: 18px 0;
+  /* Comfortable padding, and the row is the trigger: everything the row
+     occupies is part of the target rather than dead space around a smaller
+     one. */
+  min-height: 76px;
+  padding: 20px 0;
   border: 0;
   background: transparent;
   /* Inherited, not hard-coded: the row renders on whichever surface holds it,
@@ -39,10 +52,13 @@
   max-width: var(--disclosure-measure, none);
 }
 
+/* One consistent expansion icon across every accordion on the site: a plus
+   that rotates into a minus. Sized against the row rather than against the
+   text — 16px read as punctuation beside a 20px question. */
 .marker {
   flex: none;
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   position: relative;
 }
 
@@ -148,7 +164,12 @@
 
 @media (max-width: 767px) {
   .trigger {
-    min-height: 56px;
+    min-height: 64px;
     font-size: var(--fs-body);
+  }
+
+  .marker {
+    width: 18px;
+    height: 18px;
   }
 }

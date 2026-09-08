@@ -1,60 +1,67 @@
-/* H13, §25. The one full acid field on the page.
+/* H13. The one full acid field on the page.
 
-   The background, text colour and rule colour all come from `.surface-acid`.
-   The field itself is full-bleed; its rule is not — it is the shared `.section`
-   rule, drawn at container width, and it picks up the on-acid value because the
-   surface rebinds it. */
+   A typographic conclusion: headline left, supporting sentence and action
+   right, vertically centred against each other. The section is as tall as the
+   statement in it — there is no empty space held open for a graphic. */
 
-/* The field is the height of what is in it, and what is in it is the
-   statement: headline, support, one action. Nothing decorative shares the
-   field with the decision it is asking for.
+.section {
+  padding-block: 72px;
+}
 
-   The height comes from the global `.section--dense` rhythm, applied as a class
-   rather than restated here: a `padding-block` on this module's own `.section`
-   ties with the global rule on specificity and loses to it. */
-.grid {
+.inner {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: var(--sp-6);
   align-items: center;
 }
 
-.statement {
-  grid-column: 1 / span 7;
+.headlineWrap {
+  min-width: 0;
 }
 
-/* Type comes from the canonical .section-headline. The closing panel used to
-   set its own display-2, which made it the second-largest thing on the page
-   after the hero and left five different heading sizes down one document; every
-   section title on the site is now one size. */
+/* Type comes from the canonical .section-headline; this only sets the measure
+   and the colour, which on acid must be ink. */
 .headline {
-  max-width: 18ch;
+  max-width: 17ch;
   color: var(--ink);
 }
 
+.aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+
 .support {
-  margin: 24px 0 0;
-  max-width: 46ch;
+  margin: 0;
+  max-width: 34ch;
   font-size: var(--fs-lead);
-  line-height: 1.44;
-  letter-spacing: -.018em;
-  /* Ink-2 rather than muted: muted grey does not hold its contrast on acid. */
+  line-height: 1.45;
+  letter-spacing: -.012em;
+  /* Ink-2, not muted: muted grey does not hold its contrast on acid. */
   color: var(--ink-2);
 }
 
-.action {
-  margin-top: 40px;
-}
+@media (max-width: 899px) {
+  .inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-5);
+    align-items: start;
+  }
 
-@media (max-width: 1023px) {
-  .statement {
-    grid-column: 1 / -1;
+  .headline {
+    max-width: 20ch;
   }
 }
 
 @media (max-width: 767px) {
-  .support {
-    font-size: var(--fs-body);
+  .section {
+    padding-block: 52px;
   }
 
-  .action {
-    margin-top: 32px;
+  .support {
+    font-size: var(--fs-body);
   }
 }

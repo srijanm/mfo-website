@@ -7,15 +7,23 @@
   /* Typography */
   --font-sans: var(--font-geist), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-  --fs-display-1: clamp(3.75rem, 6.1vw, 5.5rem);
-  --fs-display-2: clamp(3rem, 4.7vw, 4.25rem);
-  --fs-h1: clamp(2.625rem, 4vw, 3.75rem);
-  --fs-h2: clamp(2.125rem, 3vw, 3rem);
-  --fs-h3: clamp(1.5rem, 2vw, 2rem);
-  --fs-lead: 1.25rem;
-  --fs-body: 1.0625rem;
+  /* Display and heading scale.
+
+     Fluid between the redesign's stated floors and ceilings rather than the
+     old ratios: the hero runs 60 -> 82px, a section heading 36 -> 48px. The
+     ceilings are reached at the 1280px container, so nothing keeps growing
+     into an ultrawide viewport where the measure has already stopped. */
+  --fs-display-1: clamp(2.375rem, 1.06rem + 4.6vw, 5.125rem);
+  --fs-display-2: clamp(2.125rem, 1.2rem + 3.2vw, 3.75rem);
+  --fs-h1: clamp(2.25rem, 1.4rem + 2.9vw, 3.5rem);
+  --fs-h2: clamp(1.75rem, 1.05rem + 2.4vw, 3rem);
+  --fs-h3: clamp(1.375rem, 1.05rem + 1.1vw, 1.75rem);
+  --fs-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  --fs-body: clamp(1rem, 0.96rem + 0.16vw, 1.125rem);
   --fs-ui: 0.9375rem;
   --fs-small: 0.8125rem;
+  /* Graphic labels. Never below 12px, and never a scaled-down desktop label. */
+  --fs-micro: 0.75rem;
 
   /* Final palette */
   --paper: #F6F7F2;
@@ -31,6 +39,15 @@
   /* Muted text on a dark surface. Plain --muted on ink is 3.6:1 and fails AA;
      this is 6.9:1. Never use --muted on ink. */
   --muted-on-ink: #9A9E96;
+
+  /* Tints of the two existing grounds, and nothing with a new hue in it.
+     --paper-2 is the warm ground one step down from paper, for a document
+     surface that has to read as a surface without going white. --ink-panel is
+     the raised panel inside the ink chapter. --acid-line is acid held back far
+     enough to draw a hairline on paper without vibrating. */
+  --paper-2: #EDEEE6;
+  --ink-panel: #1B1E19;
+  --acid-line: rgba(160, 190, 0, .58);
 
   /* Paper grain.
 
@@ -51,14 +68,29 @@
   --rule-on-acid: rgba(17, 19, 15, 0.24);
   --rule-on-ink: rgba(246, 247, 242, 0.20);
 
-  /* Layout */
-  --page-max: 1440px;
-  --gutter-desktop: 32px;
+  /* Layout. 1280px ceiling with 40px desktop gutters. */
+  --page-max: 1280px;
+  --gutter-desktop: 40px;
   --gutter-tablet: 24px;
-  --gutter-mobile: 16px;
-  --grid-gap-desktop: 20px;
-  --grid-gap-tablet: 16px;
-  --grid-gap-mobile: 12px;
+  --gutter-mobile: 20px;
+  --grid-gap-desktop: 28px;
+  --grid-gap-tablet: 20px;
+  --grid-gap-mobile: 16px;
+
+  /* The spacing scale. One ladder, so the distance between a label and its
+     content is visibly a different rung from the distance between groups. */
+  --sp-1: 8px;
+  --sp-2: 12px;
+  --sp-3: 16px;
+  --sp-4: 24px;
+  --sp-5: 32px;
+  --sp-6: 48px;
+  --sp-7: 64px;
+  --sp-8: 80px;
+  --sp-9: 96px;
+
+  /* The header, in one place: the hero and every scroll anchor read it. */
+  --nav-h: 76px;
 
   /* The gutter and gap of the current breakpoint. The three values above stay
      because Grid.module.css addresses a specific breakpoint inside its own
@@ -67,17 +99,19 @@
   --gutter: var(--gutter-desktop);
   --grid-gap: var(--grid-gap-desktop);
 
-  /* Section spacing */
-  --section-major-desktop: 120px;
+  /* Section spacing. Major chapters 104px, supporting sections 72px — the
+     supporting rhythm is deliberately a step down from the hero and the dark
+     chapter rather than the same 120px everywhere. */
+  --section-major-desktop: 104px;
   --section-dense-desktop: 72px;
-  --section-major-tablet: 88px;
-  --section-major-mobile: 72px;
-  --section-dense-mobile: 52px;
+  --section-major-tablet: 80px;
+  --section-major-mobile: 60px;
+  --section-dense-mobile: 48px;
 
-  /* Geometry */
-  --radius-button: 2px;
+  /* Geometry. One corner system, 4-8px, across buttons and document surfaces. */
+  --radius-button: 4px;
   --radius-object: 8px;
-  --radius-panel: 12px;
+  --radius-panel: 8px;
 
   /* Depth. Exactly two, and no others.
      --shadow-object is for an information object sitting on top of a colour
@@ -132,9 +166,9 @@ html {
   background: var(--paper);
   color: var(--ink);
   text-rendering: optimizeLegibility;
-  /* The sticky header is 64px tall; anything scrolled to by id must land
-     below it, not underneath it. */
-  scroll-padding-top: 88px;
+  /* Anything scrolled to by id must land below the sticky header, not
+     underneath it. Reads the one header token so the two cannot drift. */
+  scroll-padding-top: calc(var(--nav-h) + 24px);
 }
 
 body {
@@ -144,8 +178,14 @@ body {
   background-blend-mode: multiply;
   color: var(--ink);
   font-size: var(--fs-body);
-  line-height: 1.52;
-  letter-spacing: -0.012em;
+  line-height: 1.56;
+  letter-spacing: -0.008em;
+}
+
+/* Amounts line up down their columns wherever they appear. */
+.data-number,
+.tabular {
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 .container {
@@ -197,16 +237,25 @@ body {
   margin: 0;
   font-size: var(--fs-display-1);
   font-weight: 400;
-  line-height: .96;
-  letter-spacing: -.045em;
+  /* 1.02 desktop. Tight tracking is reserved for display sizes; body copy
+     below stays comfortable. */
+  line-height: 1.02;
+  letter-spacing: -.038em;
 }
 
 .display-2 {
   margin: 0;
   font-size: var(--fs-display-2);
   font-weight: 400;
-  line-height: .97;
-  letter-spacing: -.04em;
+  line-height: 1.04;
+  letter-spacing: -.032em;
+}
+
+@media (max-width: 767px) {
+  .display-1 {
+    line-height: 1.06;
+    letter-spacing: -.028em;
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -228,9 +277,16 @@ body {
   max-width: 20ch;
   font-size: var(--fs-h2);
   font-weight: 400;
-  line-height: 1.02;
-  letter-spacing: -.035em;
+  line-height: 1.1;
+  letter-spacing: -.028em;
   text-wrap: balance;
+}
+
+@media (max-width: 767px) {
+  .section-headline {
+    line-height: 1.12;
+    letter-spacing: -.022em;
+  }
 }
 
 /* A heading that has to carry a longer sentence. Same type, wider measure —
@@ -240,11 +296,13 @@ body {
 }
 
 .section-lede {
-  margin: 20px 0 0;
+  margin: var(--sp-4) 0 0;
+  /* 45-65 characters. A lede that ran the full container was the single
+     biggest reason the supporting sections read as undesigned. */
   max-width: 58ch;
   font-size: var(--fs-lead);
-  line-height: 1.44;
-  letter-spacing: -.018em;
+  line-height: 1.5;
+  letter-spacing: -.014em;
   color: var(--ink-2);
 }
 
@@ -460,6 +518,7 @@ body {
 .button-primary,
 .button-secondary {
   min-height: 48px;
+  min-width: 48px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -515,6 +574,7 @@ body {
   :root {
     --gutter: var(--gutter-mobile);
     --grid-gap: var(--grid-gap-mobile);
+    --nav-h: 64px;
   }
 
   .section { padding-block: var(--section-major-mobile); }

@@ -1,4 +1,4 @@
-import { Container, Disclosure, Grid, Section } from "@/components/foundation";
+import { Container, Disclosure, Section } from "@/components/foundation";
 import type { FaqItem } from "@/lib/content/homepage";
 
 import { cx } from "@/lib/cx";
@@ -9,35 +9,36 @@ type FaqSectionProps = {
   /** Supplied by the page from lib/content. Each page passes its own set. */
   items: readonly FaqItem[];
   /**
-   * Optional. The homepage FAQ is written without one, so no heading is
-   * invented for it; pages that do have one pass it here.
+   * Optional. Pages written without one get no invented heading; the questions
+   * become h2 so the heading order has no hole in it.
    */
   headline?: string;
 };
 
 /**
- * A ruled accordion, shared by the homepage and the secondary pages.
+ * A ruled accordion: four columns of heading, eight of rows.
  *
- * Built on the Disclosure primitive: a real button carrying aria-expanded, with
- * the panel kept in the document and toggled by the hidden attribute, so open
- * and closed markup differ by one attribute.
+ * Built on the Disclosure primitive — a real button carrying aria-expanded,
+ * with the panel toggled by one attribute, so open and closed markup differ by
+ * one thing and both are keyboard operable.
  *
- * Questions are h2 when the section has no heading of its own — seven h3s with
- * nothing above them would leave a hole in the heading order — and h3 when a
- * headline is supplied.
+ * The block closes on its own last rule, so there is no blank region under the
+ * final answer waiting for the next section to start.
  */
 export function FaqSection({ items, headline }: FaqSectionProps) {
   return (
     <Section dense labelledBy={headline ? "faq-headline" : undefined}>
       <Container>
-        <Grid>
-          <div className={styles.list}>
-            {headline ? (
+        <div className={cx(styles.layout, !headline && styles.layoutBare)}>
+          {headline ? (
+            <div className={styles.intro}>
               <h2 id="faq-headline" className={cx("section-headline", styles.headline)}>
                 {headline}
               </h2>
-            ) : null}
+            </div>
+          ) : null}
 
+          <div className={styles.list}>
             {items.map((item) => (
               <Disclosure
                 key={item.id}
@@ -48,7 +49,7 @@ export function FaqSection({ items, headline }: FaqSectionProps) {
               </Disclosure>
             ))}
           </div>
-        </Grid>
+        </div>
       </Container>
     </Section>
   );

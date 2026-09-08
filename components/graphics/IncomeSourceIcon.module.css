@@ -1,0 +1,63 @@
+/* The shared stroke language for the four income drawings, and for anything
+   else on the page drawn in the same register.
+
+   One weight, one join, one cap. `currentColor` throughout, so a drawing takes
+   the text colour of whatever surface it is placed on. */
+
+.icon {
+  display: block;
+  width: 64px;
+  height: 48px;
+  overflow: visible;
+  color: var(--ink);
+}
+
+.stroke,
+.sheet,
+.accentStroke,
+.fill {
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+}
+
+.stroke {
+  fill: none;
+  stroke: currentColor;
+}
+
+/* A sheet that has to occlude the one behind it. Filled with the surface, not
+   with white, so it works on paper and on the white document surface alike. */
+.sheet {
+  fill: var(--paper);
+  stroke: currentColor;
+}
+
+/* The one accented stroke: heavier, and in a held-back acid that still reads
+   against paper. Acid at full strength on a hairline vibrates. */
+.accentStroke {
+  fill: none;
+  stroke: var(--acid-line);
+  stroke-width: 2.5;
+}
+
+/* The one filled acid detail: where the money lands. Outlined in ink so it
+   holds its edge on any surface — acid alone is about 1.2:1 on paper. */
+.fill {
+  fill: var(--acid);
+  stroke: currentColor;
+}
+
+/* On the white document surface a paper-filled sheet would show as a tint. */
+:global(.surface-white) .sheet {
+  fill: var(--white);
+}
+
+:global(.surface-ink) .icon {
+  color: var(--paper);
+}
+
+:global(.surface-ink) .sheet {
+  fill: var(--ink);
+}

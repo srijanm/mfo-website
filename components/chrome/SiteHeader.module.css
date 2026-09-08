@@ -1,12 +1,9 @@
 /* §9. Sticky, paper, 1px bottom rule. No shadow and no backdrop filter — the
    bar sits on the page rather than floating above it. */
 
-/* Heights are literals from §9 rather than tokens, because the canonical token
-   sheet is a verbatim copy of docs/design-tokens.css and defines no nav height. */
+/* The height is `--nav-h` from the token sheet, so the hero, the scroll
+   offset and the bar itself cannot disagree about how tall the header is. */
 .header {
-  --nav-h-desktop: 64px;
-  --nav-h-mobile: 60px;
-
   position: sticky;
   top: 0;
   z-index: 10;
@@ -18,8 +15,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  height: var(--nav-h-desktop);
+  gap: var(--sp-4);
+  height: var(--nav-h);
 }
 
 .nav {
@@ -146,8 +143,7 @@
   }
 }
 
-@media (max-width: 767px) {
-  .bar {
-    height: var(--nav-h-mobile);
-  }
+/* The wordmark must never be squeezed by the CTA beside it. */
+.bar > :first-child {
+  flex: none;
 }

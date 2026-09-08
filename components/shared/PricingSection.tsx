@@ -1,4 +1,4 @@
-import { Button, Container, Grid, Section } from "@/components/foundation";
+import { Button, Container, Section } from "@/components/foundation";
 import { formatAnnualPrice, type PricingContent } from "@/lib/content/pricing";
 import { approvedPlanScope } from "@/lib/content/pricing-scope";
 import { primaryCta } from "@/lib/content/navigation";
@@ -16,65 +16,66 @@ type PricingSectionProps = {
 
 /**
  * The pricing system, shared by the homepage and every secondary page that ends
- * on price. One ruled object: shared top rule, dividers between tiers, shared
- * closing rule.
+ * on price.
+
+ * Three aligned price columns on the paper surface, divided by understated
+ * rules rather than boxed as cards: the amount dominant, the period beside it
+ * at a clearly subordinate size, and the plan label beneath.
  *
- * `approvedPlanScope` is null, so tiers are price-first with no plan names and
- * no inclusion claims. The comparison matrix is wired but never mounted in that
- * state, so revealing it later is a data change rather than a redesign.
- *
- * Every action here is a button. The three tier actions are outlined rather
- * than acid — three acid buttons in one viewport would break the rule in §10
- * that only one dominant acid call to action appears at a time, and all three
- * lead to the same place — and the section's own closing action is the acid
- * one, because that is the action the section is asking for.
+ * `approvedPlanScope` is null — there is no reviewed mapping of which annual
+ * price includes which work — so the columns carry no inclusion claims. What
+ * fills that space instead is the approved explanation that the applicable
+ * price depends on scope, plus one shared action, rather than fabricated plan
+ * distinctions. No "most popular" badge, no recommended tier, no saving claim,
+ * no monthly equivalent, and no visual favouring of the middle column. The
+ * comparison matrix below is wired but never mounted in that state, so
+ * revealing it later is a data change rather than a redesign.
  */
 export function PricingSection({ content, id = "pricing" }: PricingSectionProps) {
   return (
     <Section id={id} labelledBy={content.headline ? `${id}-headline` : undefined}>
       <Container>
-        <Grid>
-          {content.headline ? (
-            <h2 id={`${id}-headline`} className={cx("section-headline", styles.headline)}>
-              {content.headline}
-            </h2>
-          ) : null}
-          {content.intro ? <p className={styles.intro}>{content.intro}</p> : null}
-
-          <ul className={cx("rule-grid", styles.tiers)}>
-            {content.points.map((amount) => (
-              <li key={amount}>
-                <p className={`${styles.price} data-number`}>
-                  {formatAnnualPrice(amount)}{" "}
-                  <span className={styles.perYear}>{content.perYear}</span>
-                </p>
-                <p className={styles.planLabel}>{content.planLabel}</p>
-                {/* No scope area while approvedPlanScope is null: rule 2 makes
-                    the tiers price-first, and an empty slot must not render as
-                    a marker a visitor can see. */}
-                <div className={styles.action}>
-                  <Button href={content.cta.href} tone="secondary">
-                    {content.cta.label}
-                  </Button>
-                </div>
-              </li>
-            ))}
-          </ul>
-
-          {approvedPlanScope !== null ? (
-            <div style={{ gridColumn: "1 / -1" }}>
-              <PlanComparisonMatrix plans={approvedPlanScope} />
-            </div>
-          ) : null}
-
-          <div className={styles.closing}>
-            <p className={styles.closingText}>{content.closing}</p>
-
-            <div className={styles.sectionAction}>
-              <Button href={primaryCta.href}>{primaryCta.label}</Button>
-            </div>
+        {/* Heading and explanation stay together as one block. */}
+        {content.headline || content.intro ? (
+          <div className={styles.intro}>
+            {content.headline ? (
+              <h2 id={`${id}-headline`} className={cx("section-headline", styles.headline)}>
+                {content.headline}
+              </h2>
+            ) : null}
+            {content.intro ? <p className={styles.introText}>{content.intro}</p> : null}
           </div>
-        </Grid>
+        ) : null}
+
+        <ul className={styles.tiers}>
+          {content.points.map((amount) => (
+            <li key={amount} className={styles.tier}>
+              {/* The space between the amount and the period is a real space,
+                  not a flex gap: a gap is not a word break, so the accessible
+                  name read "₹19,999/ year". */}
+              <p className={cx(styles.price, "data-number")}>
+                {formatAnnualPrice(amount)}{" "}
+                <span className={styles.perYear}>{content.perYear}</span>
+              </p>
+              <p className={styles.planLabel}>{content.planLabel}</p>
+            </li>
+          ))}
+        </ul>
+
+        {approvedPlanScope !== null ? (
+          <PlanComparisonMatrix plans={approvedPlanScope} />
+        ) : null}
+
+        <div className={styles.closing}>
+          <p className={styles.closingText}>{content.closing}</p>
+
+          <div className={styles.actions}>
+            <Button href={primaryCta.href}>{primaryCta.label}</Button>
+            <Button href={content.cta.href} tone="secondary">
+              {content.cta.label}
+            </Button>
+          </div>
+        </div>
       </Container>
     </Section>
   );

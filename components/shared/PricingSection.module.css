@@ -1,99 +1,141 @@
-/* H10, §22. One ruled pricing system, three adjacent desktop columns.
-   No floating cards, no shadows, no radius — the columns are divided by rules
-   and share a single top rule, so they read as one object rather than three. */
+/* H10. Three aligned price columns on the paper surface.
 
-/* Type comes from the canonical .section-headline; this only places it. */
-.headline {
-  grid-column: 1 / span 7;
-}
+   Divided by rules, not boxed as cards, and all three identical in weight: no
+   badge, no raised middle column, nothing implying one of them is the one to
+   pick. What distinguishes them is the amount, which is the only thing about
+   them that has been approved. */
 
 .intro {
-  grid-column: 1 / span 5;
-  margin: 24px 0 0;
-  max-width: 50ch;
+  max-width: 820px;
+}
+
+.headline {
+  max-width: 20ch;
+}
+
+/* The explanation belongs with the heading, at a tighter measure. */
+.introText {
+  margin: var(--sp-3) 0 0;
+  max-width: 58ch;
   font-size: var(--fs-body);
-  line-height: 1.52;
+  line-height: 1.56;
   color: var(--ink-2);
 }
 
-/* Without a headline above it the tier block opens the section, so it does not
-   carry the top margin that separates it from one. */
-.tiers:first-child {
-  margin-top: 0;
-}
-
 .tiers {
-  --rule-grid-pad-block: 32px;
-  --rule-grid-pad-inline: 32px;
-
-  grid-column: 1 / -1;
-  margin: 64px 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: var(--sp-7) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
 }
 
-@media (min-width: 1024px) {
-  .tiers {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+.tier {
+  padding: var(--sp-5) var(--sp-5) var(--sp-5) 0;
+  min-width: 0;
+}
+
+/* One divider between neighbours, never two. */
+.tier + .tier {
+  padding-left: var(--sp-5);
+  border-left: 1px solid var(--rule);
 }
 
 .price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
   margin: 0;
   font-size: var(--fs-h2);
   font-weight: 400;
-  line-height: 1;
-  letter-spacing: -.035em;
+  line-height: 1.05;
+  letter-spacing: -.028em;
 }
 
+/* The period sits beside the amount, clearly subordinate. */
 .perYear {
-  font-size: var(--fs-lead);
+  font-size: var(--fs-ui);
+  font-weight: 400;
+  letter-spacing: -.006em;
   color: var(--muted);
-  letter-spacing: -.018em;
 }
 
 .planLabel {
-  margin: 16px 0 0;
+  margin: var(--sp-2) 0 0;
+  max-width: 34ch;
   font-size: var(--fs-small);
-  font-weight: 500;
+  font-weight: 400;
+  line-height: 1.45;
   color: var(--muted);
 }
 
-.action {
-  margin-top: 24px;
-}
-
-/* The tier block closes itself, so the closing line carries no rule: a second
-   rule one row-gap below the first would read as a stray line. */
 .closing {
-  grid-column: 1 / -1;
-  padding-top: 8px;
-}
-
-/* Section-ending action, beneath the closing line. Named apart from `.action`,
-   which is the per-tier call to action: one class for both silently changed
-   the tiers' spacing. */
-.sectionAction {
-  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-4) var(--sp-6);
+  margin-top: var(--sp-5);
 }
 
 .closingText {
   margin: 0;
-  max-width: 64ch;
+  max-width: 56ch;
   font-size: var(--fs-body);
-  line-height: 1.52;
+  line-height: 1.56;
   color: var(--ink-2);
 }
 
-@media (max-width: 1023px) {
-  .headline,
-  .intro {
-    grid-column: 1 / -1;
-  }
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
 
-  /* §5: vertical rules come out and the plans stack against horizontal ones. */
+@media (max-width: 899px) {
   .tiers {
-    --rule-grid-pad-block: 28px;
-
-    margin-top: 48px;
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: var(--sp-6);
   }
 
+  .tier {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-4);
+    padding: var(--sp-4) 0;
+  }
+
+  /* Stacked, the divider becomes horizontal. */
+  .tier + .tier {
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .planLabel {
+    margin: 0;
+    text-align: right;
+  }
+}
+
+@media (max-width: 479px) {
+  .tier {
+    display: block;
+  }
+
+  .planLabel {
+    margin-top: var(--sp-1);
+    text-align: left;
+  }
+
+  .actions :global(.button-primary),
+  .actions :global(.button-secondary) {
+    flex: 1 1 auto;
+  }
 }

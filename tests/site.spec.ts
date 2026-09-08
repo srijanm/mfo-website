@@ -257,22 +257,44 @@ test.describe("homepage architecture", () => {
   });
 });
 
-/** §24 sets the accordion's minimum row heights. */
+/**
+ * The FAQ accordion.
+ *
+ * Scoped to the FAQ section rather than to `main`: the dark chapter's narrow
+ * presentation is also a set of aria-expanded controls, and matching those too
+ * meant measuring elements that are display:none at the width under test.
+ */
 test.describe("FAQ", () => {
-  test("triggers meet the minimum row height and expose state", async ({ page }) => {
+  const faqTriggers = (page: Page) =>
+    page.locator("section", { has: page.locator("#faq-headline") })
+      .locator("button[aria-expanded]");
+
+  test("rows are comfortably sized, and the whole row is the target", async ({ page }) => {
     await page.goto("/");
 
-    const triggers = page.locator("main button[aria-expanded]");
+    const triggers = faqTriggers(page);
     expect(await triggers.count()).toBe(7);
 
     for (let i = 0; i < 7; i += 1) {
-      const box = await triggers.nth(i).boundingBox();
-      expect(box!.height, `FAQ row ${i + 1} is under 64px`).toBeGreaterThanOrEqual(64);
+      const trigger = triggers.nth(i);
+      const box = (await trigger.boundingBox())!;
+      expect(box.height, `FAQ row ${i + 1} is under 72px`).toBeGreaterThanOrEqual(72);
+      expect(box.height, `FAQ row ${i + 1} is over 88px closed`).toBeLessThanOrEqual(88);
+
+      /* The row is the trigger. Anything the row occupies that the trigger
+         does not is space that looks clickable and is not. */
+      const row = trigger.locator("xpath=ancestor::div[1]");
+      const rowBox = (await row.boundingBox())!;
+      expect(rowBox.height - box.height).toBeLessThanOrEqual(2);
     }
 
+    /* Clicked by coordinate at the far left, well away from the marker, so
+       "the row is the target" is what is actually tested. */
     const first = triggers.first();
+    await first.scrollIntoViewIfNeeded();
+    const box = (await first.boundingBox())!;
     await expect(first).toHaveAttribute("aria-expanded", "false");
-    await first.click();
+    await page.mouse.click(box.x + 8, box.y + box.height / 2);
     await expect(first).toHaveAttribute("aria-expanded", "true");
   });
 });
@@ -874,7 +896,10 @@ test.describe("motion", () => {
   test("the FAQ opens within the specified window", async ({ page }) => {
     await page.goto("/");
 
-    const trigger = page.locator("main button[aria-expanded]").first();
+    const trigger = page
+      .locator("section", { has: page.locator("#faq-headline") })
+      .locator("button[aria-expanded]")
+      .first();
     await trigger.scrollIntoViewIfNeeded();
 
     const panelId = await trigger.getAttribute("aria-controls");
@@ -894,69 +919,174 @@ test.describe("motion", () => {
 });
 
 /**
- * The Income Axis.
+ * The Income Axis — the one ink chapter, rebuilt as five user-controlled
+ * stages.
  *
- * One static vertical progression on the ink chapter, identical in structure
- * at every viewport, motion preference and scripting state. The sticky
- * scroll-scrub composition is gone: it double-painted stages during every
- * exchange and held a multi-viewport black band open.
+ * The properties that matter, and that broke each other while this was being
+ * built: every stage is reachable without a scroll sequence; only one of the
+ * two presentations is in the document at a time, so nothing is announced
+ * twice; nothing pins; and switching stages does not move the page under the
+ * reader.
  */
 test.describe("income axis", () => {
-  const axisSection = (page: import("@playwright/test").Page) =>
+  const axisSection = (page: Page) =>
     page.locator("main > section").filter({ has: page.locator("#income-axis") });
 
-  const expectsStaticComposition = (label: string) => {
-    test(`${label} renders the static vertical progression`, async ({ page }) => {
-      await page.goto("/");
+  test("five stages, on demand, without pinning or a scroll sequence", async ({ page }) => {
+    await page.goto("/");
+    await axisSection(page).scrollIntoViewIfNeeded();
+    await page.waitForTimeout(400);
 
-      /* The rows reveal on first entry when scripted; measure the resting
-         state after the section has been reached, which is the state a
-         reader ever sees. */
+    const tabs = page.locator('[role="tab"]');
+    expect(await tabs.count()).toBe(5);
+
+    const shape = await axisSection(page).evaluate((el) => ({
+      sticky: [...el.querySelectorAll("*")].filter(
+        (n) => getComputedStyle(n).position === "sticky",
+      ).length,
+      height: el.getBoundingClientRect().height,
+      viewport: window.innerHeight,
+    }));
+
+    expect(shape.sticky, "nothing in the section may pin itself").toBe(0);
+    /* A chapter, not a scroll-jack: it must not hold viewports open, and the
+       brief puts it at roughly 620-760px of content plus its padding. */
+    expect(shape.height).toBeLessThan(shape.viewport * 1.6);
+
+    /* Every stage reachable directly, each one changing the panel, and the
+       panel never jumping the page: the stated stability requirement. */
+    const heights: number[] = [];
+    for (let i = 0; i < 5; i += 1) {
+      await tabs.nth(i).click();
+      await page.waitForTimeout(260);
+      const state = await page.evaluate(() => {
+        const selected = document.querySelector('[role="tab"][aria-selected="true"]')!;
+        const panel = document.querySelector('[role="tabpanel"]')!;
+        return {
+          labelled: panel.getAttribute("aria-labelledby") === selected.id,
+          title: panel.querySelector("h3")?.textContent ?? "",
+          tab: (selected.textContent ?? "").trim(),
+          height: Math.round(panel.getBoundingClientRect().height),
+        };
+      });
+      expect(state.labelled, "the panel must name the tab describing it").toBe(true);
+      expect(state.tab).toContain(state.title);
+      heights.push(state.height);
+    }
+    expect(Math.max(...heights) - Math.min(...heights),
+      "switching stages must not move the page under the reader").toBeLessThanOrEqual(24);
+  });
+
+  test("arrow keys move through the stages and keep focus with selection", async ({ page }) => {
+    await page.goto("/");
+    const tabs = page.locator('[role="tab"]');
+    await tabs.first().click();
+    await page.keyboard.press("ArrowRight");
+    await page.waitForTimeout(220);
+
+    const after = await page.evaluate(() => ({
+      selected: (document.querySelector('[role="tab"][aria-selected="true"]')!.textContent ?? "").trim(),
+      focusedIsSelected:
+        document.activeElement === document.querySelector('[role="tab"][aria-selected="true"]'),
+      ring: getComputedStyle(document.activeElement!).outlineStyle,
+    }));
+
+    expect(after.selected).toContain("First year");
+    expect(after.focusedIsSelected).toBe(true);
+    expect(after.ring, "the focused tab must show a ring").not.toBe("none");
+  });
+
+  test("only one presentation is in the document at a time", async ({ page }) => {
+    for (const [width, expected] of [[1440, "tabs"], [390, "accordion"]] as const) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/");
+      await page.waitForTimeout(250);
+
+      const present = await axisSection(page).evaluate((el) => {
+        const shown = (node: Element | null) =>
+          node !== null && node.getClientRects().length > 0;
+        return {
+          tabs: shown(el.querySelector('[role="tablist"]')),
+          accordion: shown(el.querySelector('[aria-expanded]')),
+        };
+      });
+
+      expect(present.tabs, `${width}px`).toBe(expected === "tabs");
+      expect(present.accordion, `${width}px`).toBe(expected === "accordion");
+    }
+  });
+
+  test("the narrow accordion opens one stage at a time, first open by default", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+
+    const triggers = axisSection(page).locator("button[aria-expanded]");
+    expect(await triggers.count()).toBe(5);
+
+    const states = () =>
+      triggers.evaluateAll((els) => els.map((e) => e.getAttribute("aria-expanded")));
+
+    expect(await states()).toEqual(["true", "false", "false", "false", "false"]);
+
+    await triggers.nth(3).click();
+    await page.waitForTimeout(250);
+    expect(await states()).toEqual(["false", "false", "false", "true", "false"]);
+
+    /* The opened panel actually reveals its content rather than an empty box. */
+    const revealed = await axisSection(page).evaluate((el) => {
+      const open = el.querySelector('button[aria-expanded="true"]')!;
+      const panel = document.getElementById(open.getAttribute("aria-controls")!)!;
+      return { h: panel.getBoundingClientRect().height, text: panel.textContent!.length };
+    });
+    expect(revealed.h).toBeGreaterThan(200);
+    expect(revealed.text).toBeGreaterThan(80);
+  });
+
+  const stageContentIsPresent = (label: string) => {
+    test(`${label}: the opening stage is complete at rest`, async ({ page }) => {
+      await page.goto("/");
       await axisSection(page).scrollIntoViewIfNeeded();
       await page.waitForTimeout(900);
 
       const state = await axisSection(page).evaluate((el) => {
-        const milestones = [...el.querySelectorAll("li")];
-        const sticky = [...el.querySelectorAll("*")].filter(
-          (node) => getComputedStyle(node).position === "sticky",
-        );
+        const hidden = [...el.querySelectorAll("h2, h3, p, li")].filter((node) => {
+          const cs = getComputedStyle(node);
+          return (
+            node.textContent!.trim().length > 8 &&
+            cs.visibility !== "hidden" &&
+            parseFloat(cs.opacity) < 0.5
+          );
+        });
         return {
-          total: milestones.length,
-          hidden: milestones.filter((item) => {
-            const style = getComputedStyle(item);
-            return style.opacity === "0" || style.visibility === "hidden";
-          }).length,
-          sticky: sticky.length,
-          height: el.getBoundingClientRect().height,
-          viewport: window.innerHeight,
+          text: el.textContent!.trim().length,
+          hidden: hidden.map((n) => n.textContent!.trim().slice(0, 30)),
         };
       });
 
-      expect(state.total).toBe(5);
-      expect(state.hidden).toBe(0);
-      expect(state.sticky, "nothing in the section may pin itself").toBe(0);
-      // A chapter, not a scroll-jack: it must not hold multiple viewports open.
-      expect(state.height).toBeLessThan(state.viewport * 3.5);
+      /* Whatever the scripting or motion state, the stage the section opens on
+         is readable without touching anything. */
+      expect(state.hidden).toEqual([]);
+      expect(state.text).toBeGreaterThan(200);
     });
   };
 
   test.describe("desktop, scripted", () => {
-    expectsStaticComposition("desktop");
+    stageContentIsPresent("desktop");
   });
 
   test.describe("with reduced motion", () => {
     test.use({ contextOptions: { reducedMotion: "reduce" } });
-    expectsStaticComposition("reduced motion");
+    stageContentIsPresent("reduced motion");
   });
 
   test.describe("on mobile", () => {
     test.use({ viewport: { width: 375, height: 800 } });
-    expectsStaticComposition("mobile");
+    stageContentIsPresent("mobile");
   });
 
   test.describe("without JavaScript", () => {
     test.use({ javaScriptEnabled: false });
-    expectsStaticComposition("no JavaScript");
+    stageContentIsPresent("no JavaScript");
   });
 });
 
@@ -1271,16 +1401,22 @@ test.describe("flair", () => {
     expect(state.noteRule).not.toBe("rgba(0, 0, 0, 0)");
   });
 
-  test("with JavaScript off the record is complete", async ({ browser }) => {
+  test("with JavaScript off the hero composition is complete", async ({ browser }) => {
     const ctx = await browser.newContext({
       javaScriptEnabled: false,
       viewport: { width: 1440, height: 900 },
     });
     const page = await ctx.newPage();
     await page.goto("/");
+
+    /* Every word in the illustration is real text, so all of it is present
+       with no script at all — including the label that says it is
+       illustrative and the qualification on the docket. */
     const text = await page.locator("main figure").first().textContent();
-    expect(text).toContain("Incoming payment");
+    expect(text).toContain("Illustrative payment");
     expect(text).toContain("$5,000.00");
+    expect(text).toContain("The work around it");
+    expect(text).toContain("Scope depends on your setup.");
     await ctx.close();
   });
 });

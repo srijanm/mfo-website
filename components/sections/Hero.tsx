@@ -1,34 +1,38 @@
-import { Button, Container, Grid } from "@/components/foundation";
+import { Button, Container } from "@/components/foundation";
+import { PaymentComposition } from "@/components/graphics";
 import { MaskedText, Reveal } from "@/components/motion";
-import { IncomingPaymentRecord } from "@/components/objects";
 import { hero } from "@/lib/content/homepage";
 
-import { MeasureField } from "./MeasureField";
 import styles from "./Hero.module.css";
 
 /**
  * H01 — the hero.
  *
- * Every string comes from lib/content/homepage.ts, including the payment
- * annotation, which is an approved wording and is quoted rather than rewritten.
+ * One composition, not two stacked blocks: a seven-column text area and a
+ * five-column illustration area, with the illustration centred against the
+ * whole of the heading, paragraph and actions rather than hanging below them.
+ * That was the single largest defect in the old hero — the payment object began
+ * level with the paragraph, which left a screen-wide void under the headline
+ * and another under the buttons.
  *
- * The hero animates once on load and then stops permanently: the headline's
- * words rise out of their masks, the copy and actions follow, and the payment
- * object's rows resolve in sequence. Nothing here replays, and nothing moves
- * again afterwards.
+ * The page-wide measure field that used to sit behind all of this is gone. The
+ * warm paper is the canvas; the only document rules on the page belong inside
+ * the illustration, where they mean something.
  *
- * DOM order is headline, copy and actions, then the payment object. That is
- * both the reading order and the mobile stacking order, so no source ordering
- * has to be undone at a breakpoint.
+ * Every string comes from lib/content. The payment annotation is an approved
+ * wording and is quoted, not rewritten: it is the substantive qualification on
+ * the illustration and stays in text beside it rather than inside the graphic,
+ * where it would compete with the document's own labels.
+ *
+ * DOM order is headline, copy, actions, illustration — the reading order and
+ * the mobile stacking order, so no source order has to be undone at a
+ * breakpoint.
  */
 export function Hero() {
-  const { paymentExample } = hero;
-
   return (
     <section className={styles.hero} aria-labelledby="hero-headline">
-      <MeasureField />
       <Container className={styles.inner}>
-        <Grid className={styles.grid}>
+        <div className={styles.text}>
           <MaskedText
             as="h1"
             id="hero-headline"
@@ -37,37 +41,25 @@ export function Hero() {
             className={`display-1 ${styles.headline}`}
           />
 
-          <div className={styles.copy}>
-            <Reveal as="p" delay={160} className={styles.subhead}>
-              {hero.subhead}
-            </Reveal>
-            <Reveal delay={280} className={styles.actions}>
-              <Button href={hero.primaryCta.href}>{hero.primaryCta.label}</Button>
-              <Button href={hero.secondaryCta.href} tone="secondary">
-                {hero.secondaryCta.label}
-              </Button>
-            </Reveal>
-          </div>
+          <Reveal as="p" delay={160} className={styles.subhead}>
+            {hero.subhead}
+          </Reveal>
 
-          <div className={styles.object}>
-            <IncomingPaymentRecord
-              amount={paymentExample.amount}
-              amountValue={paymentExample.amountValue}
-              amountFormat="incomingPayment"
-              from={paymentExample.from}
-              received={paymentExample.received()}
-              into={paymentExample.into}
-              frequency={paymentExample.frequency}
-              indianPayroll={paymentExample.indianPayroll}
-              indiaSideSetup={paymentExample.indiaSideSetup}
-              note={hero.paymentAnnotation}
-              /* The object is what the hero is showing, so it builds itself at
-                 the slower pace: the figure counts for 1.5s and the rows arrive
-                 130ms apart rather than 50ms. */
-              pace="slow"
-            />
-          </div>
-        </Grid>
+          <Reveal delay={280} className={styles.actions}>
+            <Button href={hero.primaryCta.href}>{hero.primaryCta.label}</Button>
+            <Button href={hero.secondaryCta.href} tone="secondary">
+              {hero.secondaryCta.label}
+            </Button>
+          </Reveal>
+
+          <Reveal as="p" delay={360} className={styles.qualification}>
+            {hero.paymentAnnotation}
+          </Reveal>
+        </div>
+
+        <Reveal delay={220} className={styles.graphic}>
+          <PaymentComposition />
+        </Reveal>
       </Container>
     </section>
   );

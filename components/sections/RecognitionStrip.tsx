@@ -1,18 +1,27 @@
 import Link from "next/link";
 
 import { Container, Section } from "@/components/foundation";
-import { EventField } from "@/components/plates";
+import { IncomeSourceIcon, YearComparison } from "@/components/graphics";
+import { incomeSourceIcons } from "@/lib/content/graphics";
 import { recognitionClosing, recognitionLead } from "@/lib/content/homepage";
 import { recognition } from "@/lib/content/site-content";
 
 import styles from "./RecognitionStrip.module.css";
 
 /**
- * H02 — recognition, doubling as navigation.
+ * H02 — how the money reaches you.
  *
- * A heading, four linked cells, and the conclusion beneath them. Each cell
- * names a way of earning and routes to the audience page that owns it — the
- * whole cell is the link, so the target is the card and not a glyph inside it.
+ * A four-column editorial row rather than four outlined cards: a small line
+ * drawing above each label, modest vertical separators between them, and no
+ * border boxing each entry. The boxes were the reason this section read as
+ * filler — four empty rectangles carrying two words each.
+ *
+ * Every entry is a real link to the audience page that owns it, so the whole
+ * entry is the target rather than a glyph inside it. No static entry is dressed
+ * up as an interactive one.
+ *
+ * The heading sits directly on the container grid; the large boxed geometric
+ * mark that used to stand beside it and steal its width is gone.
  */
 export function RecognitionStrip() {
   return (
@@ -22,12 +31,17 @@ export function RecognitionStrip() {
           {recognitionLead}
         </h2>
 
-        <ul className={styles.cards}>
-          {recognition.map((item) => (
-            <li key={item.label} className={styles.card}>
-              <Link href={item.href} className={styles.cardLink}>
-                <span className={styles.cardLabel}>{item.label}</span>
-                <span aria-hidden="true" className={styles.cardArrow}>
+        <ul className={styles.sources}>
+          {recognition.map((item, index) => (
+            <li key={item.label} className={styles.source}>
+              <Link href={item.href} className={styles.sourceLink}>
+                {/* Decorative: the label directly beneath says the same thing. */}
+                <IncomeSourceIcon
+                  name={incomeSourceIcons[index] ?? incomeSourceIcons[0]}
+                  className={styles.icon}
+                />
+                <span className={styles.sourceLabel}>{item.label}</span>
+                <span aria-hidden="true" className={styles.sourceArrow}>
                   →
                 </span>
               </Link>
@@ -35,14 +49,9 @@ export function RecognitionStrip() {
           ))}
         </ul>
 
-        <div className={styles.closing}>
-          <p className={styles.closingText}>{recognitionClosing}</p>
-        </div>
+        <p className={styles.closing}>{recognitionClosing}</p>
 
-        {/* The closing line, drawn. Two illustrative years side by side: the
-            shape a salaried year has, and the shape one without that system
-            has. The caption says plainly that they are shapes. */}
-        <EventField className={styles.field} />
+        <YearComparison className={styles.comparison} />
       </Container>
     </Section>
   );

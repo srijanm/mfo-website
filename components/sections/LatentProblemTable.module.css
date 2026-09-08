@@ -1,40 +1,145 @@
-/* H03, §15. Large proposition on top, 3-column ruled table below.
-   No warning red — the section states a consequence once and moves on.
+/* H03. Statement left, timeline right, tops aligned, no card framing on either.
 
-   Two renderings, chosen by whether the three-column content exists:
+   Two renderings, chosen by whether the three-column content exists. `.table`
+   is the specified §15 table and appears the moment `columns` is populated on
+   every example; `.timeline` is what shows until then, and is the composition
+   the redesign describes. */
 
-   - `.table` is the specified table: What started / Why it matters later /
-     What the customer notices, headers once in small muted text, one bounded
-     ruled block. It is what the section is; it renders the moment
-     `columns` is populated on every example.
-   - `.split` is what shows until then. The copy doc supplies one approved
-     sentence per example and nothing for the three columns, so rendering the
-     table today would print twelve empty cells and drop four lines of approved
-     copy. The proposition takes the left five columns and the sentences the
-     right seven instead. */
-
-/* ---------------------------------------------- the specified table */
-
-.proposition {
-  grid-column: 1 / span 8;
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--sp-6);
+  align-items: start;
 }
 
-/* The second half of the proposition: the sentence the heading sets up. A step
-   below the heading, in muted, so the heading is unambiguously the heading —
-   the section title itself is now the same size as every other on the site. */
+/* ------------------------------------------------------------ statement */
+
+.statement {
+  min-width: 0;
+}
+
+/* The strongest typographic emphasis in the section. */
+.headline {
+  max-width: 14ch;
+}
+
+/* The second sentence: a step down and muted, but at a size that is
+   comfortably readable rather than a caption. */
 .follow {
-  margin: 14px 0 0;
-  max-width: 30ch;
+  margin: var(--sp-3) 0 0;
+  max-width: 26ch;
   font-size: var(--fs-h3);
   font-weight: 400;
-  line-height: 1.14;
-  letter-spacing: -.028em;
+  line-height: 1.18;
+  letter-spacing: -.022em;
   color: var(--muted);
   text-wrap: balance;
 }
 
+.intro {
+  margin: var(--sp-4) 0 0;
+  max-width: 46ch;
+  font-size: var(--fs-body);
+  line-height: 1.56;
+  color: var(--ink-2);
+}
+
+/* ------------------------------------------------------------- timeline */
+
+/* A slim vertical rule with the entries hung off it. The rule is on the list,
+   so it runs the height of the group rather than being reassembled per row. */
+/* The rail is drawn inside the list rather than as its left border. As a
+   border it was a rule on a grid child standing beside the layout's 48px
+   column gap, which is the one thing the site's rule system forbids: the line
+   terminated in empty space instead of on something. As a pseudo-element it
+   belongs to the list's own box and meets the markers it carries. */
+.timeline {
+  --marker: 9px;
+
+  position: relative;
+  margin: 6px 0 0;
+  padding: 0 0 0 var(--sp-4);
+  list-style: none;
+  min-width: 0;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--rule);
+}
+
+.entry {
+  position: relative;
+}
+
+/* Ordinal, not calendar. It opens the group of entries it names. */
+.year {
+  margin: 0;
+  padding: var(--sp-4) 0 var(--sp-1);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.entry:first-child .year {
+  padding-top: 0;
+}
+
+.entryBody {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: 20px 0;
+  border-top: 1px solid var(--rule);
+}
+
+/* The first entry of a year group opens directly under its annotation, so it
+   takes no rule of its own. */
+.entry:first-child .entryBody,
+.entryLate .entryBody {
+  border-top: 0;
+  padding-top: var(--sp-1);
+}
+
+/* Sits on the rail. Decorative — the entry beside it is the content. */
+.marker {
+  flex: none;
+  width: var(--marker);
+  height: var(--marker);
+  margin-left: calc(var(--sp-4) * -1 - var(--marker) / 2 - 1px);
+  margin-top: 8px;
+  border: 1.5px solid var(--rule-strong);
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+/* The one emphasised marker: the entry that surfaces years after it started,
+   which is the section's whole proposition. Filled rather than coloured text,
+   and the "Year three" label above it says the same thing in words. */
+.entryLate .marker {
+  border-color: var(--ink);
+  background: var(--acid);
+}
+
+.entryText {
+  margin: 0;
+  max-width: 54ch;
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+/* --------------------------------------------------- the specified table */
+
 .table {
-  margin-top: 64px;
+  min-width: 0;
 }
 
 .headRow,
@@ -43,11 +148,9 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-/* Cell borders, never a gap beside them: the dividers run the height of the
-   block and terminate on its top and bottom rules. */
 .headRow > *,
 .row > * {
-  padding: 22px 28px;
+  padding: 20px 24px;
 }
 
 .headRow > * + *,
@@ -65,19 +168,18 @@
   padding-right: 0;
 }
 
-/* The headings sit once, inside the block below its opening rule. */
 .headRow > * {
-  padding-block: 16px;
+  padding-block: 14px;
 }
 
 .row {
   border-top: 1px solid var(--rule);
 }
 
-.heading {
+.heading,
+.cellLabel {
   margin: 0;
   font-size: var(--fs-small);
-  /* Data label: --fs-small, --muted, weight 400 — CLAUDE.md typography. */
   font-weight: 400;
   color: var(--muted);
 }
@@ -85,24 +187,16 @@
 .cell {
   margin: 0;
   font-size: var(--fs-ui);
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
-/* A cell with nothing in it yet carries the same empty marker the information
-   objects use — §11 — rather than collapsing the row. */
 .cellEmpty {
   color: var(--muted);
 }
 
-/* Stacked, each value needs the heading the head row carried; on desktop that
-   label stays in the accessibility tree but off screen. */
 .cellLabel {
   display: block;
   margin-bottom: 6px;
-  font-size: var(--fs-small);
-  /* Data label: --fs-small, --muted, weight 400 — CLAUDE.md typography. */
-  font-weight: 400;
-  color: var(--muted);
 }
 
 @media (min-width: 1024px) {
@@ -118,145 +212,23 @@
   }
 }
 
-/* ------------------------------------- the interim single-column form */
-
-.split {
-  --rule-grid-pad-block: 0px;
-  --rule-grid-pad-inline: 40px;
-}
-
-/* The copy column carries the whole proposition — heading, its second line and
-   the section's lede. The lede used to sit in the other column above the
-   examples, wedged against the block's top rule with 8px above it and nothing
-   holding it to anything; here it is under the sentence it explains. */
-.splitCopy {
-  padding-block: 40px 44px;
-}
-
-/* ------------------------------------------------------- the time rail
-   A line down the examples, with a node on each. What it says — that these
-   surface later than they start — is the section's own proposition, stated in
-   words in the column beside it. The line and nodes are decorative; the two
-   end markers are content and are ordinary text. */
-
-.rail {
-  position: relative;
-}
-
-.sentinels {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-auto-rows: 1fr;
-  pointer-events: none;
-}
-
-/* One example. No padding on the row itself: the row's rule has to run the
-   full width of the cell and terminate on the divider, so the inset goes on
-   the text inside it — a rule and a reading measure never share an element. */
-.summaryRow {
-  position: relative;
-  /* If this padding changes, --node-y below changes with it. */
-  padding: 24px 0;
-  border-top: 1px solid var(--rule);
-
-  /* Where the rail stands, and how far down the row its node sits. Declared
-     once here so the line segments, the node and the end markers cannot drift
-     apart — which is exactly how the two markers ended up on different
-     offsets before.
-
-     --node-y is the vertical centre of the sentence's first line: the row's
-     top padding plus half the first line box (--fs-body at 1.5). A fixed 30px
-     sat the node — and the marker centred on it — visibly above the text it
-     belongs to. */
-  --rail-x: 104px;
-  --node-y: calc(24px + (var(--fs-body) * 1.5) / 2);
-}
-
-/* The line, in two segments per row: above the node and below it. Built this
-   way rather than as one absolutely-positioned line down the whole rail
-   because that line could only end at the container's bottom edge — which is
-   the foot of the last row, not its node, so it ran on past the last marker
-   into empty space. */
-.summaryRow::before,
-.summaryRow::after {
-  content: "";
-  position: absolute;
-  left: var(--rail-x);
-  width: 1px;
-  background: var(--rule);
-}
-
-.summaryRow::before {
-  top: 0;
-  height: var(--node-y);
-}
-
-.summaryRow::after {
-  top: var(--node-y);
-  bottom: 0;
-}
-
-/* The line starts at the first node and stops at the last. */
-.summaryRowFirst::before,
-.summaryRowLast::after {
-  content: none;
-}
-
-/* On the rail, centred on the line. */
-.rowNode {
-  position: absolute;
-  left: var(--rail-x);
-  top: var(--node-y);
-  transform: translate(-50%, -50%);
-}
-
-/* The rail runs behind every node, and the dot itself is hollow —
-   transparent — so left alone the line showed straight through each circle.
-   Filled with the surface, the node punches a clean bead out of the line and
-   the rail reads as one continuous stroke from "Year one" to "Year three".
-   Selected the way ThresholdNode publishes its parts; the acid fill for a
-   passed node is declared later and still wins. */
-.rowNode :global(span[class*="dot"]) {
-  background: var(--paper);
-}
-
-/* The two end markers. In the rail's gutter, in the row whose node they name,
-   vertically centred on that node — which is itself centred on the sentence's
-   first line, so marker, node and text line up however many lines the
-   sentence runs to. The column stops 26px short of the rail: wide enough for
-   both markers to sit on one line at every breakpoint the rail exists at, with
-   clear air between the label and its dot. */
-.rowMarker {
-  position: absolute;
-  left: 0;
-  top: var(--node-y);
-  width: calc(var(--rail-x) - 26px);
-  transform: translateY(-50%);
-  font-size: var(--fs-small);
-  font-weight: 500;
-  line-height: 1.2;
-  color: var(--muted);
-}
-
-/* The scenarios are the content the lede introduces, so they sit a step below
-   it: body rather than lead. At the same size as the lede nothing read as
-   subordinate and the section was five equal paragraphs. */
-.summaryText {
-  margin: 0;
-  padding-left: calc(var(--rail-x) + 32px);
-  max-width: 66ch;
-  font-size: var(--fs-body);
-  line-height: 1.5;
-}
+/* ---------------------------------------------------------------- narrow */
 
 @media (max-width: 1023px) {
-  .proposition {
-    grid-column: 1 / -1;
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    /* 32px between the stacked statement and timeline. */
+    gap: var(--sp-5);
   }
 
-  .table {
-    margin-top: 48px;
+  .headline,
+  .follow,
+  .intro {
+    max-width: 46ch;
+  }
+
+  .timeline {
+    margin-top: 0;
   }
 
   .headRow {
@@ -273,87 +245,5 @@
 
   .row > * + * {
     border-left: 0;
-  }
-
-  .row > :first-child {
-    padding-top: 20px;
-  }
-
-  .row > :last-child {
-    padding-bottom: 20px;
-  }
-
-  /* §5: the divider comes out below desktop and the block stacks. */
-  .split {
-    --rule-grid-pad-block: 28px;
-  }
-
-  .splitCopy {
-    padding-block: 0 28px;
-  }
-
-  /* The gutter narrows to what the markers need and the text follows it, so
-     the rail keeps its geometry rather than being switched off. 92px leaves
-     the marker column 66px — "Year three" on one line, with air before the
-     node. */
-  .summaryRow {
-    --rail-x: 92px;
-  }
-
-  .summaryText {
-    padding-left: calc(var(--rail-x) + 24px);
-  }
-}
-
-@media (max-width: 599px) {
-  /* Below this the gutter costs more width than the two markers are worth, so
-     the rail comes out and the markers become ordinary labels above the first
-     and last sentence. */
-  .summaryRow {
-    --rail-x: 0px;
-    --node-y: 0px;
-    padding: 20px 0;
-  }
-
-  .summaryRow::before,
-  .summaryRow::after,
-  .rowNode {
-    display: none;
-  }
-
-  .rowMarker {
-    position: static;
-    display: block;
-    width: auto;
-    transform: none;
-  }
-
-  .rowMarker:not(:empty) {
-    margin-bottom: 8px;
-  }
-
-  .summaryText {
-    padding-left: 0;
-  }
-}
-
-/* The passed portion of the rail, and the acid nodes. Both exist only where
-   the reader's position is actually known: scripted, and where motion is
-   welcome. Everywhere else the rail is present and unfilled, which is a
-   correct resting state rather than a broken one. */
-@media (prefers-reduced-motion: no-preference) {
-  :global(html.js) .summaryRow::before,
-  :global(html.js) .summaryRow::after {
-    transition: background var(--motion-slow) var(--ease-system);
-  }
-
-  :global(html.js) .segAbovePassed::before,
-  :global(html.js) .segBelowPassed::after {
-    background: var(--acid);
-  }
-
-  :global(html.js) .rowNodePassed :global(span[class*="dot"]) {
-    background: var(--acid);
-    transition: background var(--motion-normal) var(--ease-system);
   }
 }
