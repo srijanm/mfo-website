@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
+import type { CtaPlacement } from "@/lib/analytics/events";
 import { cx } from "@/lib/cx";
 
 import styles from "./Button.module.css";
@@ -19,6 +20,12 @@ type CommonProps = {
   tone?: ButtonTone;
   /** Trailing arrow. On for link buttons, off for form controls. */
   arrow?: boolean;
+  /**
+   * Where on the page this action sits. Rendered as a data attribute and read
+   * by the one delegated listener in CtaTracker, so the button itself stays a
+   * server component and no per-button click handler exists.
+   */
+  placement?: CtaPlacement;
   className?: string;
   children: ReactNode;
 };
@@ -43,7 +50,7 @@ type ButtonProps = ButtonAsLink | ButtonAsButton;
  * 2px radius come from the canonical .button-primary.
  */
 export function Button(props: ButtonProps) {
-  const { tone = "acid", className, children } = props;
+  const { tone = "acid", className, children, placement } = props;
   const isLink = props.href !== undefined;
   /* An arrow means "this goes somewhere", so it is on for link buttons and off
      for anything that submits or advances in place. */
@@ -56,6 +63,14 @@ export function Button(props: ButtonProps) {
     tone === "secondary" && styles.secondary,
     className,
   );
+
+  /* Only the placement and the label. Never a destination with a query on it. */
+  const analytics = placement
+    ? {
+        "data-cta-placement": placement,
+        "data-cta-label": typeof children === "string" ? children : undefined,
+      }
+    : {};
 
   const content = (
     <>
@@ -70,7 +85,7 @@ export function Button(props: ButtonProps) {
 
   if (props.href !== undefined) {
     return (
-      <Link href={props.href} className={classes}>
+      <Link href={props.href} className={classes} {...analytics}>
         {content}
       </Link>
     );
@@ -79,7 +94,13 @@ export function Button(props: ButtonProps) {
   const { type = "button", disabled, onClick } = props;
 
   return (
-    <button type={type} disabled={disabled} onClick={onClick} className={classes}>
+    <button
+      type={type}
+      disabled={disabled}
+      onClick={onClick}
+      className={classes}
+      {...analytics}
+    >
       {content}
     </button>
   );

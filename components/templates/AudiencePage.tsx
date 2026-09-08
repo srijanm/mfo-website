@@ -1,9 +1,12 @@
-import { Button, Container, Grid, Section } from "@/components/foundation";
+import { Button, Container, Section } from "@/components/foundation";
+import { RecordSheet } from "@/components/graphics";
 import { IncomingPaymentRecord } from "@/components/objects";
 import { FaqSection, FinalCtaSection } from "@/components/shared";
 import { cx } from "@/lib/cx";
-import type { Audience, AudienceRow } from "@/lib/content/audiences";
+import type { Audience } from "@/lib/content/audiences";
+import { recordSheets } from "@/lib/content/graphics";
 import { homepageFaqHeadline } from "@/lib/content/homepage";
+import { conversionAssurance, enquiryHref, primaryCta } from "@/lib/content/navigation";
 import { formatAnnualPrice } from "@/lib/content/pricing";
 import { howWeBehave, priceBlock, standardClose } from "@/lib/content/standard-blocks";
 
@@ -14,107 +17,141 @@ type AudiencePageProps = {
 };
 
 /**
- * One template for the three audience pages, per the final structure doc:
- * hero · what's actually different here · what we run for you · how we
- * behave · price · questions · close. Every block after the hero renders
- * from the audience's own content or from the standard blocks, so the pages
- * differ by content, never by code.
+ * One template for the three audience pages.
+ *
+ * Two things were wrong with it. The hero reserved five columns for an
+ * illustration whether or not one existed, so the freelancers and creators
+ * pages had a headline squeezed into seven columns beside nothing at all. And
+ * everything below the hero was the same shape — three consecutive lists of
+ * large title/body rows, which made a specific page read as a generic one.
+ *
+ * Now: a hero that has two deliberate layouts and never reserves an empty
+ * column, then four visually distinct blocks — situations, the work, a compact
+ * accountability strip, and price context.
+ *
+ * The enquiry link carries which page it was pressed on, as context for the
+ * person who reads it. It is never treated as an answer: nothing here infers
+ * how somebody is paid from the page they happened to be on.
  */
-
-type RowListSectionProps = {
-  id: string;
-  label: string;
-  title: string;
-  rows: readonly AudienceRow[];
-};
-
-/**
- * The page's one repeating shape: a labelled section whose content is a
- * bounded list of title/body rows split on the 4/8 line.
- */
-function RowListSection({ id, label, title, rows }: RowListSectionProps) {
-  return (
-    <Section dense labelledBy={id}>
-      <Container>
-        <p className="section-label">{label}</p>
-        <h2 id={id} className="section-headline section-headline--wide">
-          {title}
-        </h2>
-        <ul className={styles.rows}>
-          {rows.map((row) => (
-            <li key={row.id} className={styles.row}>
-              <h3 className={styles.rowTitle}>{row.title}</h3>
-              <p className={styles.rowBody}>{row.body}</p>
-            </li>
-          ))}
-        </ul>
-      </Container>
-    </Section>
-  );
-}
-
 export function AudiencePage({ audience }: AudiencePageProps) {
   const close = audience.closeHeadline
     ? { ...standardClose, headline: audience.closeHeadline }
     : standardClose;
 
+  const sheet = audience.sheet ? recordSheets[audience.sheet] : null;
+  const illustrated = Boolean(audience.record || sheet);
+  const enquire = enquiryHref(audience.slug);
+
   return (
     <>
-      <section className={styles.hero} aria-labelledby="audience-headline">
-        <Container>
-          <Grid>
-            <div className={styles.copy}>
-              <h1 id="audience-headline" className={styles.headline}>
-                {audience.hero.headline}
-              </h1>
-              <p className={styles.lead}>{audience.hero.lead}</p>
-              <div className={styles.actions}>
-                <Button href="/get-started">See what I need</Button>
-                <Button href="/pricing" tone="secondary">
-                  View pricing
-                </Button>
-              </div>
+      <section
+        className={cx(styles.hero, illustrated ? styles.heroIllustrated : styles.heroTextLed)}
+        aria-labelledby="audience-headline"
+      >
+        <Container className={styles.heroInner}>
+          <div className={styles.copy}>
+            <h1 id="audience-headline" className={styles.headline}>
+              {audience.hero.headline}
+            </h1>
+            <p className={styles.lead}>{audience.hero.lead}</p>
+            <div className={styles.actions}>
+              <Button href={enquire} placement="hero">
+                {primaryCta.label}
+              </Button>
+              <Button href="/pricing" tone="secondary" placement="hero">
+                View pricing
+              </Button>
             </div>
+            <p className={styles.assurance}>{conversionAssurance}</p>
+          </div>
 
-            {audience.record ? (
-              <div className={styles.record}>
-                <IncomingPaymentRecord
-                  amount={audience.record.amount}
-                  from={audience.record.from}
-                  received={audience.record.received()}
-                  into={audience.record.into}
-                  frequency={audience.record.frequency}
-                  indianPayroll={audience.record.indianPayroll}
-                  indiaSideSetup={audience.record.indiaSideSetup}
-                  note={audience.record.note}
-                />
-              </div>
-            ) : null}
-          </Grid>
+          {/* Rendered only when there is something to render. The column does
+              not exist otherwise, rather than existing and standing empty. */}
+          {audience.record ? (
+            <div className={styles.graphic}>
+              <IncomingPaymentRecord
+                amount={audience.record.amount}
+                from={audience.record.from}
+                received={audience.record.received()}
+                into={audience.record.into}
+                frequency={audience.record.frequency}
+                indianPayroll={audience.record.indianPayroll}
+                indiaSideSetup={audience.record.indiaSideSetup}
+                note={audience.record.note}
+              />
+            </div>
+          ) : sheet ? (
+            <div className={styles.graphic}>
+              <RecordSheet sheet={sheet} />
+            </div>
+          ) : null}
         </Container>
       </section>
 
-      <RowListSection
-        id="situation"
-        label={audience.situation.label}
-        title={audience.situation.title}
-        rows={audience.situation.rows}
-      />
+      {/* 1. The situations someone recognises themselves in. */}
+      <Section dense labelledBy="situation">
+        <Container>
+          <p className="section-label">{audience.situation.label}</p>
+          <h2 id="situation" className="section-headline section-headline--wide">
+            {audience.situation.title}
+          </h2>
+          <ol className={styles.situations}>
+            {audience.situation.rows.map((row) => (
+              <li key={row.id} className={styles.situation}>
+                <h3 className={styles.situationTitle}>{row.title}</h3>
+                <p className={styles.situationBody}>{row.body}</p>
+              </li>
+            ))}
+          </ol>
+        </Container>
+      </Section>
 
-      <RowListSection
-        id="scope"
-        label={audience.scope.label}
-        title={audience.scope.title}
-        rows={audience.scope.rows}
-      />
+      {/* 2. The work, as a compact two-column list rather than a third
+             identical stack of large rows. */}
+      <Section dense labelledBy="scope">
+        <Container>
+          <div className={styles.scopeLayout}>
+            <div className={styles.scopeIntro}>
+              <p className="section-label">{audience.scope.label}</p>
+              <h2 id="scope" className={cx("section-headline", styles.scopeHeadline)}>
+                {audience.scope.title}
+              </h2>
+              {/* The qualification, never omitted: no mapping of price to
+                  inclusions exists, so nothing here may read as one. */}
+              <p className={styles.scopeNote}>{audience.scope.note}</p>
+            </div>
 
-      <RowListSection
-        id="behave"
-        label={howWeBehave.label}
-        title={howWeBehave.title}
-        rows={howWeBehave.rows}
-      />
+            <ul className={styles.scopeList}>
+              {audience.scope.rows.map((row) => (
+                <li key={row.id} className={styles.scopeRow}>
+                  <h3 className={styles.scopeRowTitle}>{row.title}</h3>
+                  <p className={styles.scopeRowBody}>{row.body}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Container>
+      </Section>
 
+      {/* 3. Accountability, compacted into a strip. */}
+      <Section dense labelledBy="behave">
+        <Container>
+          <p className="section-label">{howWeBehave.label}</p>
+          <h2 id="behave" className="section-headline section-headline--wide">
+            {howWeBehave.title}
+          </h2>
+          <ul className={styles.proof}>
+            {howWeBehave.rows.map((row) => (
+              <li key={row.id} className={styles.proofItem}>
+                <h3 className={styles.proofTitle}>{row.title}</h3>
+                <p className={styles.proofBody}>{row.body}</p>
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </Section>
+
+      {/* 4. Price context, and the route to the full explanation. */}
       <Section labelledBy="price" dense>
         <Container>
           <h2 id="price" className="section-headline section-headline--wide">
@@ -126,7 +163,7 @@ export function AudiencePage({ audience }: AudiencePageProps) {
           </p>
           <p className={styles.priceClosing}>{priceBlock.closing}</p>
           <div className={styles.priceAction}>
-            <Button href={priceBlock.cta.href} tone="secondary">
+            <Button href={priceBlock.cta.href} tone="secondary" placement="pricing">
               {priceBlock.cta.label}
             </Button>
           </div>
@@ -135,7 +172,7 @@ export function AudiencePage({ audience }: AudiencePageProps) {
 
       <FaqSection items={audience.questions} headline={homepageFaqHeadline} />
 
-      <FinalCtaSection content={close} />
+      <FinalCtaSection content={close} enquiryHref={enquire} />
     </>
   );
 }

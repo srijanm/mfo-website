@@ -1,0 +1,168 @@
+/* The consolidated supporting section: statement, four examples on a rail, the
+   drawn comparison, and one sentence of fit with a way to read more.
+
+   Deliberately one section rather than two. It is supporting material, so it
+   takes the supporting rhythm and never competes with the service above it. */
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--sp-6);
+  align-items: start;
+}
+
+.statement {
+  min-width: 0;
+}
+
+.headline {
+  max-width: 14ch;
+}
+
+/* The second sentence: a step down and muted, still comfortably readable. */
+.follow {
+  margin: var(--sp-3) 0 0;
+  max-width: 26ch;
+  font-size: var(--fs-h3);
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: -.022em;
+  color: var(--muted);
+  text-wrap: balance;
+}
+
+.intro {
+  margin: var(--sp-4) 0 0;
+  max-width: 46ch;
+  font-size: var(--fs-body);
+  line-height: 1.56;
+  color: var(--ink-2);
+}
+
+/* The rail is drawn inside the list, not as its left border: a border on a
+   grid child stands beside the column gap and terminates in empty space. */
+.timeline {
+  --marker: 9px;
+
+  position: relative;
+  margin: 6px 0 0;
+  padding: 0 0 0 var(--sp-4);
+  list-style: none;
+  min-width: 0;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--rule);
+}
+
+.entry {
+  position: relative;
+}
+
+/* Ordinal, not calendar. It opens the group of entries it names. */
+.year {
+  margin: 0;
+  padding: var(--sp-4) 0 var(--sp-1);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.entry:first-child .year {
+  padding-top: 0;
+}
+
+.entryBody {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: 18px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.entry:first-child .entryBody,
+.entryLate .entryBody {
+  border-top: 0;
+  padding-top: var(--sp-1);
+}
+
+.marker {
+  flex: none;
+  width: var(--marker);
+  height: var(--marker);
+  margin-left: calc(var(--sp-4) * -1 - var(--marker) / 2 - 1px);
+  margin-top: 8px;
+  border: 1.5px solid var(--rule-strong);
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+/* The one emphasised marker: the entry that surfaces years after it started,
+   which is the section's whole proposition. The "Year three" label above it
+   says the same thing in words. */
+.entryLate .marker {
+  border-color: var(--ink);
+  background: var(--acid);
+}
+
+.entryText {
+  margin: 0;
+  max-width: 54ch;
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.comparison {
+  margin-top: var(--sp-7);
+}
+
+/* The mismatch, in one sentence, with the full comparison a click away. */
+.closing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4) var(--sp-6);
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--rule);
+}
+
+.closingText {
+  margin: 0;
+  max-width: 62ch;
+  font-size: var(--fs-lead);
+  line-height: 1.5;
+  letter-spacing: -.012em;
+  color: var(--ink-2);
+}
+
+@media (max-width: 1023px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-5);
+  }
+
+  .headline,
+  .follow,
+  .intro {
+    max-width: 46ch;
+  }
+
+  .timeline {
+    margin-top: 0;
+  }
+
+  .comparison {
+    margin-top: var(--sp-6);
+  }
+}

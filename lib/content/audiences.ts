@@ -3,6 +3,7 @@
 
 import { hero as homepageHero } from "./homepage";
 import type { FaqItem } from "./homepage";
+import { recordSheets } from "./graphics";
 
 export type AudienceRecord = {
   amount: string;
@@ -34,6 +35,13 @@ export type Audience = {
   };
   /** The incoming-payment document object, only where the spec places one. */
   record: AudienceRecord | null;
+  /**
+   * The illustrative record sheet, for audiences whose situation is better
+   * explained by the records it produces than by a single payment. Exactly one
+   * of `record` and `sheet` is set — the hero layout depends on there being a
+   * graphic, and it must never reserve a column for one that does not exist.
+   */
+  sheet: keyof typeof recordSheets | null;
   situation: {
     label: string;
     title: string;
@@ -42,6 +50,8 @@ export type Audience = {
   scope: {
     label: string;
     title: string;
+    /** The qualification under the list. Never omitted. */
+    note: string;
     rows: readonly AudienceRow[];
   };
   questions: readonly FaqItem[];
@@ -54,8 +64,17 @@ export type Audience = {
 
 const SITUATION_LABEL = "Your situation";
 const SITUATION_TITLE = "What’s actually different here";
-const SCOPE_LABEL = "Included in the annual fee";
+/**
+ * Was "Included in the annual fee", which claimed a mapping that does not
+ * exist: `approvedPlanScope` is null, so nothing on this site knows which of
+ * the three annual figures includes which work. This says what is true — these
+ * are the areas the firm handles — and the line below it says when the
+ * applicable scope is actually settled.
+ */
+const SCOPE_LABEL = "The work we can handle";
 const SCOPE_TITLE = "What we run for you";
+const SCOPE_NOTE =
+  "Which of these apply to you, and what that costs, is agreed in writing before any engagement starts.";
 
 export const audiences: readonly Audience[] = [
   {
@@ -71,6 +90,7 @@ export const audiences: readonly Audience[] = [
       ...homepageHero.paymentExample,
       note: homepageHero.paymentAnnotation,
     },
+    sheet: null,
     situation: {
       label: SITUATION_LABEL,
       title: SITUATION_TITLE,
@@ -99,6 +119,7 @@ export const audiences: readonly Audience[] = [
     },
     scope: {
       label: SCOPE_LABEL,
+      note: SCOPE_NOTE,
       title: SCOPE_TITLE,
       rows: [
         {
@@ -166,6 +187,7 @@ export const audiences: readonly Audience[] = [
       lead: "MyFinanceOfficer is a CA firm for freelancers, consultants and independent professionals. We set up and run the tax and compliance side, so you know what needs doing before you need to ask.",
     },
     record: null,
+    sheet: "freelancers",
     situation: {
       label: SITUATION_LABEL,
       title: SITUATION_TITLE,
@@ -194,6 +216,7 @@ export const audiences: readonly Audience[] = [
     },
     scope: {
       label: SCOPE_LABEL,
+      note: SCOPE_NOTE,
       title: SCOPE_TITLE,
       rows: [
         {
@@ -261,6 +284,7 @@ export const audiences: readonly Audience[] = [
       lead: "MyFinanceOfficer is a CA firm for creators. Brand deals, platform payments, products sent instead of fees — we set up and run the tax and compliance side, so you know what needs doing before you need to ask.",
     },
     record: null,
+    sheet: "creators",
     situation: {
       label: SITUATION_LABEL,
       title: SITUATION_TITLE,
@@ -291,6 +315,7 @@ export const audiences: readonly Audience[] = [
     },
     scope: {
       label: SCOPE_LABEL,
+      note: SCOPE_NOTE,
       title: SCOPE_TITLE,
       rows: [
         {

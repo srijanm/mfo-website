@@ -117,3 +117,124 @@
     padding-block: var(--section-major-mobile);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   The client journey, split at the point where someone becomes a client.
+   --------------------------------------------------------------------------- */
+
+.phases {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: var(--sp-6);
+  margin-top: var(--sp-6);
+  align-items: start;
+}
+
+.phase {
+  min-width: 0;
+}
+
+/* The two phases are not the same thing, and the labels say so. */
+.phaseLabel {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+  border-top: 1px solid var(--rule);
+}
+
+.step {
+  position: relative;
+  counter-increment: step;
+  padding: var(--sp-4) 0 var(--sp-4) var(--sp-6);
+  border-bottom: 1px solid var(--rule);
+}
+
+.step::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: calc(var(--sp-4) + 3px);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: .06em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The second phase continues the count rather than starting again at one. */
+.phase:last-child .steps {
+  counter-reset: step 3;
+}
+
+.stepTitle {
+  margin: 0;
+  font-size: var(--fs-lead);
+  font-weight: 500;
+  line-height: 1.28;
+  letter-spacing: -.014em;
+}
+
+.stepBody {
+  margin: 6px 0 0;
+  max-width: 46ch;
+  font-size: var(--fs-ui);
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+/* --------------------------------------------------- who provides what */
+
+.responsibilities {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-6);
+  margin-top: var(--sp-5);
+}
+
+.responsibility {
+  min-width: 0;
+}
+
+.responsibilityTitle {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-ui);
+  font-weight: 500;
+}
+
+.responsibilityList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.responsibilityRow {
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule);
+  max-width: 46ch;
+  font-size: var(--fs-ui);
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+@media (max-width: 1023px) {
+  .phases,
+  .responsibilities {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-5);
+  }
+
+  .phase:last-child .steps {
+    counter-reset: step 3;
+  }
+}

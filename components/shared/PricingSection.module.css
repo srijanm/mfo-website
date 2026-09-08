@@ -139,3 +139,78 @@
     flex: 1 1 auto;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   What is knowable now, beside what follows from a review.
+
+   Two plain columns of ruled rows. This is the space a comparison table would
+   occupy if an approved mapping existed; while none does, the space explains
+   the arrangement rather than announcing the absence of a table.
+   --------------------------------------------------------------------------- */
+
+.explain {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-6);
+  margin-top: var(--sp-6);
+}
+
+.explainBlock {
+  min-width: 0;
+}
+
+.explainTitle {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-ui);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -.008em;
+}
+
+.explainList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.explainRow {
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.explainRowTitle {
+  margin: 0;
+  font-size: var(--fs-ui);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.explainRowBody {
+  margin: 4px 0 0;
+  max-width: 44ch;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* The assurance sits with the action it qualifies. */
+.assurance {
+  margin: var(--sp-2) 0 0;
+  max-width: 42ch;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.actions {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+@media (max-width: 899px) {
+  .explain {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-5);
+  }
+}

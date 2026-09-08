@@ -135,3 +135,62 @@
     border-bottom-color: var(--rule-strong);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   The three commitments, above the eight areas.
+
+   They are what the service does, stated before the list of where it does it —
+   the page reaches the offer here rather than six sections down.
+   --------------------------------------------------------------------------- */
+
+.commitments {
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.commitment {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* An acid square: the same mark the document graphics use for a line of work
+   MyFinanceOfficer owns. Decorative — the title beside it carries the meaning. */
+.commitmentMark {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  margin-top: 8px;
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  background: var(--acid);
+}
+
+.commitmentTitle {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 500;
+  line-height: 1.34;
+  letter-spacing: -.012em;
+}
+
+.commitmentBody {
+  margin: 4px 0 0;
+  max-width: 44ch;
+  font-size: var(--fs-ui);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* The assurance sits with the action it qualifies. */
+.assurance {
+  margin: var(--sp-3) 0 0;
+  max-width: 40ch;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--muted);
+}

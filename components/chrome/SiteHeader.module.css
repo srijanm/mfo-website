@@ -62,8 +62,18 @@
   }
 }
 
+/* The page you are on. Carried visibly as well as through aria-current: a nav
+   where the current entry looks like every other entry tells the reader
+   nothing. */
 .current {
   color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.dropdownLinkCurrent {
+  color: var(--ink);
+  font-weight: 500;
+  background: var(--paper);
 }
 
 /* -----------------------------------------------------------------------

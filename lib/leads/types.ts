@@ -1,4 +1,10 @@
-import { intakeSteps } from "@/lib/content/get-started";
+import {
+  MAX,
+  trimmed,
+  validateChoices,
+  validateContactFields,
+  type LeadField,
+} from "./validation";
 
 export type LeadPayload = {
   paidBy: string;
@@ -7,38 +13,45 @@ export type LeadPayload = {
   needs: string[];
   name: string;
   email: string;
+  /** Optional. Empty string means "not given", never "invalid". */
   phone: string;
   note: string;
+  /**
+   * Which page the enquiry started from. Context for the person reading it,
+   * never a fact about the enquirer: it says where they were, not how they are
+   * paid. Nothing downstream may infer a tax position from it.
+   */
+  sourcePage: string;
 };
 
-export type FieldErrors = Partial<Record<keyof LeadPayload | "form", string>>;
+export type FieldErrors = Partial<Record<LeadField | "form", string>>;
 
-const MAX = { name: 100, email: 254, phone: 32, note: 2000 } as const;
+/** Validated separately so an unknown value cannot become page context. */
+const SOURCE_MAX = 128;
 
-/** Deliberately permissive: shape only, never a claim that an address exists. */
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-function optionsFor(id: "paidBy" | "stage" | "needs"): readonly string[] {
-  return intakeSteps.find((step) => step.id === id)!.options;
-}
-
-function text(value: unknown): string {
-  return typeof value === "string" ? value.trim() : "";
+function sourcePageOf(value: unknown): string {
+  const raw = trimmed(value);
+  /* A site-relative path and nothing else: no origin, no query string, no
+     fragment. Anything else is dropped rather than recorded. */
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "";
+  if (raw.includes("?") || raw.includes("#") || raw.includes("://")) return "";
+  return raw.slice(0, SOURCE_MAX);
 }
 
 /**
  * The multi-select arrives as an array; a lone string is still accepted so a
- * pre-multi-select client (or a hand-rolled POST in the old shape) keeps
- * working. Deduplicated, so a replayed value cannot inflate the list.
+ * hand-rolled POST in the old shape keeps working. Deduplicated, so a replayed
+ * value cannot inflate the list.
  */
 function textList(value: unknown): string[] {
-  const list = Array.isArray(value) ? value.map(text) : [text(value)];
+  const list = Array.isArray(value) ? value.map(trimmed) : [trimmed(value)];
   return [...new Set(list.filter((item) => item.length > 0))];
 }
 
 /**
- * Server-side validation. The browser validates too, but this is the copy that
- * decides — a request can always arrive without ever touching the form.
+ * Server-side validation. The browser validates too, using the same rules from
+ * lib/leads/validation.ts, but this is the copy that decides — a request can
+ * always arrive without ever touching the form.
  *
  * Choice fields are checked against the canonical option lists rather than
  * merely being non-empty, so a hand-rolled POST cannot introduce values the
@@ -48,44 +61,37 @@ export function validateLead(input: unknown): {
   payload?: LeadPayload;
   errors: FieldErrors;
 } {
-  const errors: FieldErrors = {};
-
   if (typeof input !== "object" || input === null) {
     return { errors: { form: "The submission was not readable." } };
   }
 
   const raw = input as Record<string, unknown>;
 
-  const paidBy = text(raw.paidBy);
-  const stage = text(raw.stage);
-  const needs = textList(raw.needs);
-  const name = text(raw.name);
-  const email = text(raw.email);
-  const phone = text(raw.phone);
-  const note = text(raw.note);
+  const fields = {
+    paidBy: trimmed(raw.paidBy),
+    stage: trimmed(raw.stage),
+    needs: textList(raw.needs),
+    name: trimmed(raw.name),
+    email: trimmed(raw.email),
+    phone: trimmed(raw.phone),
+    note: trimmed(raw.note),
+  };
 
-  if (!optionsFor("paidBy").includes(paidBy)) errors.paidBy = "Choose how you are paid.";
-  if (!optionsFor("stage").includes(stage)) errors.stage = "Choose where you are now.";
-
-  /* At least one, and every one an option the intake actually offered. */
-  if (needs.length === 0 || !needs.every((item) => optionsFor("needs").includes(item)))
-    errors.needs = "Choose what you need help with.";
-
-  if (!name) errors.name = "Tell us your name.";
-  else if (name.length > MAX.name) errors.name = "That name is too long.";
-
-  if (!email) errors.email = "Tell us your email.";
-  else if (email.length > MAX.email || !EMAIL.test(email))
-    errors.email = "That does not look like an email address.";
-
-  if (!phone) errors.phone = "Tell us your phone number.";
-  else if (phone.length > MAX.phone) errors.phone = "That phone number is too long.";
-
-  if (note.length > MAX.note) errors.note = "That note is too long.";
+  const errors: FieldErrors = {
+    ...validateChoices(fields),
+    ...validateContactFields(fields),
+  };
 
   if (Object.keys(errors).length > 0) return { errors };
 
-  return { payload: { paidBy, stage, needs, name, email, phone, note }, errors: {} };
+  return {
+    payload: {
+      ...fields,
+      note: fields.note.slice(0, MAX.note),
+      sourcePage: sourcePageOf(raw.sourcePage),
+    },
+    errors: {},
+  };
 }
 
 /** Field a real person never sees and never fills. */

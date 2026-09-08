@@ -8,6 +8,11 @@ import styles from "./FinalCtaSection.module.css";
 type FinalCtaSectionProps = {
   /** Supplied by the page from lib/content. */
   content: FinalCtaContent;
+  /**
+   * Overrides the destination so the enquiry carries which page it started
+   * from. Context for whoever reads it — never an answer to a question.
+   */
+  enquiryHref?: string;
 };
 
 /**
@@ -21,7 +26,7 @@ type FinalCtaSectionProps = {
  * vanish against acid. `.surface-acid` supplies the background, the text colour
  * and the rule colour together.
  */
-export function FinalCtaSection({ content }: FinalCtaSectionProps) {
+export function FinalCtaSection({ content, enquiryHref }: FinalCtaSectionProps) {
   return (
     <section
       className={cx("section", "surface-acid", styles.section)}
@@ -39,7 +44,7 @@ export function FinalCtaSection({ content }: FinalCtaSectionProps) {
 
         <Reveal variant="rows" delay={120} className={styles.aside}>
           <p className={styles.support}>{content.support}</p>
-          <Button href={content.cta.href} tone="ink">
+          <Button href={enquiryHref ?? content.cta.href} tone="ink" placement="closing">
             {content.cta.label}
           </Button>
         </Reveal>

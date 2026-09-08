@@ -8,6 +8,11 @@ import { pricingPoints } from "./site-content";
    import path. Every price on the site goes through it. */
 export { formatAnnualPrice } from "./format";
 
+export type PricingBlock = {
+  title: string;
+  rows: readonly { id: string; title: string; body: string }[];
+};
+
 export type PricingContent = {
   /** Omitted where the page hero already carries the proposition. */
   headline?: string;
@@ -17,6 +22,14 @@ export type PricingContent = {
   planLabel: string;
   cta: { href: string; label: string };
   closing: string;
+  /**
+   * What a visitor can establish from the page alone, and what only follows
+   * from a person reading their situation. Optional, because the compact
+   * pricing block on an audience page states the figures and links onward
+   * rather than explaining the arrangement in full.
+   */
+  knownNow?: PricingBlock;
+  afterReview?: PricingBlock;
 };
 
 /**
@@ -33,9 +46,59 @@ export const pricing = {
   points: pricingPoints,
 
   perYear: "/ year",
-  planLabel: "Annual plan",
 
-  cta: { href: primaryCta.href, label: "Find the right plan" },
+  /**
+   * These are fee levels, not three named plans a visitor picks between.
+   * `approvedPlanScope` is null — no reviewed mapping of price to inclusions
+   * exists — so the label says what is actually true of all three rather than
+   * implying a difference nobody has defined.
+   */
+  planLabel: "Annual fee level",
+
+  cta: { href: primaryCta.href, label: primaryCta.label },
+
+  /**
+   * What a visitor can know now, and what is confirmed after we have read their
+   * situation. This replaced a line that dismissed comparison tables without
+   * explaining the offer — telling someone what you are not going to show them
+   * is not the same as telling them anything.
+   */
+  knownNow: {
+    title: "What you can know before you talk to us",
+    rows: [
+      {
+        id: "levels",
+        title: "The three annual figures on this page.",
+        body: "One fee for the year. Not an estimate, and not a headline number that grows.",
+      },
+      {
+        id: "categories",
+        title: "The categories of work we run.",
+        body: "Listed below. Which of them apply to you depends on your facts.",
+      },
+      {
+        id: "process",
+        title: "How the fee is settled.",
+        body: "You describe your situation, we put the scope and the fee in writing, and you decide.",
+      },
+    ],
+  },
+
+  afterReview: {
+    title: "What we confirm after reading your situation",
+    rows: [
+      {
+        id: "which-level",
+        title: "Which of the three applies to you.",
+        body: "It follows from the work you actually need, not from a tier you select.",
+      },
+      {
+        id: "scope",
+        title: "What that fee covers, in writing.",
+        body: "Including the parts that don’t apply to you yet, and what would change that.",
+      },
+    ],
+  },
 
   closing:
     "We tell you which plan fits before you commit. If you do not need the broader scope, we do not pretend you do.",
@@ -66,12 +129,12 @@ export const additionalSupportSection = {
  */
 export const pricingPage = {
   headline: "Three annual prices. The scope is agreed before you start.",
-  lead: "No estimates, no headline price that grows, and nothing to work out from a table of tick marks.",
+  lead: "One fee for the year, agreed in writing before anything starts. Which of the three applies follows from the work you actually need.",
 
   tiers: {
     points: pricingPoints,
     perYear: "/ year",
-    planLabel: "Annual plan. Your exact scope is confirmed before you sign up.",
+    planLabel: "Annual fee level. Your exact scope is confirmed before you sign up.",
     cta: pricing.cta,
     closing:
       "We tell you which plan fits before you commit. If you don’t need the broader scope, we don’t pretend you do.",

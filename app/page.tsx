@@ -3,48 +3,38 @@ import {
   CoreScopeMatrix,
   Hero,
   IncomeAxis,
-  LatentProblemTable,
   RecognitionStrip,
-  StructuralMismatch,
   TrustLedger,
+  WhyItMatters,
 } from "@/components/sections";
 import { FaqSection, FinalCtaSection, PricingSection } from "@/components/shared";
 import { finalCta, homepageFaq, homepageFaqHeadline } from "@/lib/content/homepage";
 import { pricing } from "@/lib/content/pricing";
 
 /**
- * The homepage argument.
+ * The homepage.
  *
- * The order is the argument: recognition before problem, problem before
- * mismatch, mismatch before the system, and the whole core relationship before
- * price.
+ * The order is the argument, and the argument changed: the page used to spend
+ * two full sections on what goes wrong and how other options fall short before
+ * saying what MyFinanceOfficer actually does. The service now arrives third.
  *
- * 1. Hero
- * 2. Recognition
- * 3. Latent problem
- * 4. Structural mismatch
- * 5. Income Axis
- * 6. Core CA/compliance scope
- * 7. Pricing
- * 8. FAQ
- * 9. Final acid CTA
- * 10. Footer (in the root layout)
+ * 1. Hero — the offer, and the two actions
+ * 2. Recognition — four ways of earning, each a link to the page that owns it
+ * 3. What we take responsibility for — three commitments, then eight areas
+ * 4. How the work changes as a situation changes (the ink chapter)
+ * 5. Why that matters — the delayed-problem examples and the mismatch, once
+ * 6. What we commit to before filing anything
+ * 7. The annual fee levels
+ * 8. Questions people ask
+ * 9. The closing enquiry
  *
- * Three sections that MASTER_BUILD_SPEC.md §12 places here stay cut on the
- * owner's instruction: the operating model (H06), the managed calendar (H07)
- * and additional financial support (H11) — the last still runs on /pricing.
- * The trust ledger (H09) is back per the final structure doc, carrying the
- * amended signatory row and the filing sequence that moved here when
- * /how-it-works was retired.
+ * Two sections were consolidated into one and the full alternatives comparison
+ * moved to /how-we-work, where a reader who wants it has already chosen to
+ * look. The page is shorter than it was, not longer.
  *
- * Surfaces follow the contract: paper is the default, white is reserved for
- * literal document objects, and the ink chapter and acid close sit where
- * CLAUDE.md puts them — at most one of each, never adjacent.
- */
-/**
- * The hero's example payment is dated today, so this page cannot be a build
- * artefact that keeps its build date forever. An hour is far finer than the
- * day the date is stated to, and the page is otherwise entirely static.
+ * Surfaces: paper is the default, white is reserved for literal document
+ * objects, and there is at most one ink block and one acid block, never
+ * adjacent.
  */
 export const revalidate = 3600;
 
@@ -57,10 +47,9 @@ export default function HomePage() {
 
       <Hero />
       <RecognitionStrip />
-      <LatentProblemTable />
-      <StructuralMismatch />
-      <IncomeAxis />
       <CoreScopeMatrix />
+      <IncomeAxis />
+      <WhyItMatters />
       <TrustLedger />
       <PricingSection content={pricing} />
       <FaqSection items={homepageFaq} headline={homepageFaqHeadline} />

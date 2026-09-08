@@ -5,6 +5,87 @@ export const howWeWork = {
   headline: "How we work, and what we won’t do.",
   lead: "A CA firm built for work that became normal before most CA practices were built for it.",
 
+  /**
+   * What actually happens, in order, from an enquiry to a filed return.
+   *
+   * Every step is a compression of approved material already in lib/content:
+   * steps 1-3 are the scope-agreement sequence from pricing.ts, step 4 is the
+   * core scope and the calendar commitment, step 5 is the trust ledger's
+   * "You see the draft first."
+   *
+   * The `phase` split is the point of the block. The first three steps happen
+   * before anyone is a client and before any fee is owed; the last two are what
+   * being a client consists of. Running them together made a four-step
+   * pre-sales process look like the whole service.
+   *
+   * No step names a channel, a turnaround or a service level, because none has
+   * been approved.
+   */
+  journey: {
+    label: "What happens",
+    title: "From your first message to a filed return",
+    phases: [
+      {
+        id: "before",
+        label: "Before you commit to anything",
+        steps: [
+          {
+            id: "tell-us",
+            title: "Tell us how you earn.",
+            body: "Where the money comes from, how it reaches you, how many clients, and what has already been set up.",
+          },
+          {
+            id: "we-review",
+            title: "We review what is relevant.",
+            body: "A person reads it. Including the parts that don’t apply to you yet, and what would change that.",
+          },
+          {
+            id: "in-writing",
+            title: "Scope and fee are agreed in writing.",
+            body: "One number for the year, and a list of what it covers. You decide from there.",
+          },
+        ],
+      },
+      {
+        id: "after",
+        label: "Once you are a client",
+        steps: [
+          {
+            id: "run-the-year",
+            title: "We set up and track the agreed work.",
+            body: "The dates that apply to you sit on our calendar. You hear from us before you would have remembered.",
+          },
+          {
+            id: "drafts",
+            title: "You review drafts before filing.",
+            body: "You read what is going to be filed before it goes anywhere. If something looks wrong, it is still a draft.",
+          },
+        ],
+      },
+    ],
+  },
+
+  /** What you do, and what we own. Neither list invents a delivery channel. */
+  responsibilities: {
+    title: "What you provide, and what we own",
+    yours: {
+      title: "You provide",
+      rows: [
+        "A description of how you earn, and the documents behind it when we ask.",
+        "A decision on the scope and fee before anything starts.",
+        "A read of the draft before it is filed.",
+      ],
+    },
+    ours: {
+      title: "We own",
+      rows: [
+        "Working out what applies to your facts, and what does not yet.",
+        "Keeping the relevant dates and doing the work they belong to.",
+        "The professional responsibility for what is filed, and the name against it.",
+      ],
+    },
+  },
+
   sections: [
     {
       id: "why",
@@ -29,8 +110,12 @@ export const howWeWork = {
       id: "who-signs",
       title: "Who signs your return",
       paragraphs: [
+        /* The sentence announcing that the team is not published "yet" came out:
+           it made the firm sound half-built, and it is not information anyone
+           needed. Whether individual profiles are published is an owner
+           decision held in lib/content/firm.ts, and the site says nothing about
+           people either way until it is populated. */
         "Every return we file is signed by an ICAI-registered chartered accountant. You’ll know who that is before anything is filed — the name is on your engagement, not just on the return.",
-        "We don’t publish the team on this site yet. When that changes, it’ll change here first.",
       ],
     },
     {

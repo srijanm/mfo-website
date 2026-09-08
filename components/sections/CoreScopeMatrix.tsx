@@ -1,6 +1,6 @@
 import { Button, Container, Section } from "@/components/foundation";
 import { coreScopeSection } from "@/lib/content/homepage";
-import { primaryCta } from "@/lib/content/navigation";
+import { conversionAssurance, primaryCta } from "@/lib/content/navigation";
 import { cx } from "@/lib/cx";
 
 import styles from "./CoreScopeMatrix.module.css";
@@ -32,7 +32,7 @@ type CoreScopeMatrixProps = {
  * verbatim.
  */
 export function CoreScopeMatrix({ label, headline, showAction = true }: CoreScopeMatrixProps) {
-  const { items } = coreScopeSection;
+  const { items, commitments } = coreScopeSection;
 
   return (
     <Section id="core-scope" dense labelledBy="core-scope-headline">
@@ -44,13 +44,28 @@ export function CoreScopeMatrix({ label, headline, showAction = true }: CoreScop
               {headline ?? coreScopeSection.headline}
             </h2>
 
-            {/* The way out of the section, beside the heading rather than
-                stranded under the list. */}
+            {/* What the service actually commits to, in three lines, before
+                the eight areas below. The homepage used to reach this point
+                only after two sections of problem — the offer now arrives
+                third. */}
+            <ul className={styles.commitments}>
+              {commitments.map((commitment) => (
+                <li key={commitment.id} className={styles.commitment}>
+                  <span aria-hidden="true" className={styles.commitmentMark} />
+                  <div>
+                    <h3 className={styles.commitmentTitle}>{commitment.title}</h3>
+                    <p className={styles.commitmentBody}>{commitment.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
             {showAction ? (
               <div className={styles.action}>
-                <Button href={primaryCta.href} tone="secondary">
+                <Button href={primaryCta.href} tone="secondary" placement="section">
                   {primaryCta.label}
                 </Button>
+                <p className={styles.assurance}>{conversionAssurance}</p>
               </div>
             ) : null}
           </div>

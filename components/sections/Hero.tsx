@@ -2,6 +2,7 @@ import { Button, Container } from "@/components/foundation";
 import { PaymentComposition } from "@/components/graphics";
 import { MaskedText, Reveal } from "@/components/motion";
 import { hero } from "@/lib/content/homepage";
+import { conversionAssurance, enquiryHref, primaryCta } from "@/lib/content/navigation";
 
 import styles from "./Hero.module.css";
 
@@ -46,10 +47,16 @@ export function Hero() {
           </Reveal>
 
           <Reveal delay={280} className={styles.actions}>
-            <Button href={hero.primaryCta.href}>{hero.primaryCta.label}</Button>
-            <Button href={hero.secondaryCta.href} tone="secondary">
+            <Button href={enquiryHref("home")} placement="hero">
+              {primaryCta.label}
+            </Button>
+            <Button href={hero.secondaryCta.href} tone="secondary" placement="hero">
               {hero.secondaryCta.label}
             </Button>
+          </Reveal>
+
+          <Reveal as="p" delay={320} className={styles.assurance}>
+            {conversionAssurance}
           </Reveal>
 
           <Reveal as="p" delay={360} className={styles.qualification}>

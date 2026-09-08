@@ -52,12 +52,16 @@ export function PageRail() {
               onBlur={() => setHovered((current) => (current === index ? null : current))}
             >
               <ThresholdNode active={index <= active} />
-              {/* Only the section being pointed at, or the one the reader is
-                  level with, names itself. Rendering all nine and hiding eight
-                  would leave text at zero opacity, which is the failure mode
-                  the motion rules exist to prevent. */}
+              {/* The name is always in the accessibility tree, whether or not
+                  it is on screen: a link whose only content is a decorative
+                  node has no accessible name at all, which is what every
+                  inactive entry used to be. The visible label still appears
+                  only for the section being pointed at or read. */}
+              <span className={styles.srOnly}>{entry.label}</span>
               {index === active || index === hovered ? (
-                <span className={styles.label}>{entry.label}</span>
+                <span aria-hidden="true" className={styles.label}>
+                  {entry.label}
+                </span>
               ) : null}
             </a>
           </li>

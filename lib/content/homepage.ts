@@ -15,8 +15,13 @@ export const hero = {
      emphasis exists on the site — a second would stop it meaning anything. */
   headlineEmphasis: "you do",
 
+  /* Tightened, not rewritten: same claim, same qualifications, two sentences
+     instead of one long one. The category (a CA firm), the customer
+     (freelancers, creators, consultants, professionals paid from India or
+     abroad) and the benefit (we run the India-side work, you are told before
+     you have to ask) now land in the first line rather than the third. */
   subhead:
-    "MyFinanceOfficer is a modern CA firm for freelancers, creators, consultants and professionals working in both global & Indian firms. We set up and run all your India-side tax and compliance, so you know what needs to be done before you need to ask.",
+    "A CA firm for freelancers, creators, consultants and professionals — paid by Indian or overseas companies. We set up and run your India-side tax and compliance, so you know what needs doing before you have to ask.",
 
   primaryCta,
 
@@ -414,7 +419,65 @@ if (leakedIntoCoreScope.length > 0) {
 
 export const coreScopeSection = {
   headline: "The CA and compliance work we are built to run.",
+
+  /**
+   * The three commitments that introduce the service, before the eight areas
+   * beneath them. Each is a compression of material already approved elsewhere
+   * in lib/content, not a new promise:
+   *
+   *  - setup      — coreScope "Setup & registrations"
+   *  - calendar   — coreScope "Advance tax" / "Drafts & filing", and the
+   *                 milestone copy in site-content ("The dates that matter sit
+   *                 on our calendar, and we come to you")
+   *  - drafts     — trustLedger "You see the draft first." and "Support is
+   *                 agreed upfront."
+   *
+   * Nothing here names a rule, a date, a threshold or a plan inclusion.
+   */
+  commitments: [
+    {
+      id: "setup",
+      title: "Get the relevant setup in place.",
+      body: "What you need now, what you do not need yet, and what would make that change.",
+    },
+    {
+      id: "calendar",
+      title: "Track the year’s relevant work.",
+      body: "The dates that apply to you sit on our calendar, and we come to you rather than the other way round.",
+    },
+    {
+      id: "drafts",
+      title: "Show drafts and agree scope before proceeding.",
+      body: "You see what is being filed before it is filed, and the fee is agreed before the work starts.",
+    },
+  ],
+
   items: coreScope,
+} as const;
+
+/* --------------------------------------------------- H03 + H04 consolidated */
+
+/**
+ * The supporting section that used to be two.
+ *
+ * The homepage previously spent one full section on delayed problems and
+ * another comparing four alternatives, both before the service had been
+ * described at all. They made the same point, so they are one section now: the
+ * statement, the four approved examples, and one line about fit. The full
+ * alternatives comparison moved to /how-we-work, where a reader who wants it
+ * has already decided to look.
+ */
+export const whyItMatters = {
+  headline: latentProblem.headline,
+  follow: latentProblem.follow,
+  intro: latentProblem.intro,
+  railStart: latentProblem.railStart,
+  railEnd: latentProblem.railEnd,
+  examples: latentProblem.examples,
+
+  /** The mismatch, in one sentence rather than a section. */
+  closing: structuralMismatch.body[1],
+  closingCta: { href: "/how-we-work", label: "How we work" },
 } as const;
 
 /* ------------------------------------------------------------------ H09 */

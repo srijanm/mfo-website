@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Container, Section } from "@/components/foundation";
-import { IncomeSourceIcon, YearComparison } from "@/components/graphics";
+import { IncomeSourceIcon } from "@/components/graphics";
 import { incomeSourceIcons } from "@/lib/content/graphics";
 import { recognitionClosing, recognitionLead } from "@/lib/content/homepage";
 import { recognition } from "@/lib/content/site-content";
@@ -22,6 +22,10 @@ import styles from "./RecognitionStrip.module.css";
  *
  * The heading sits directly on the container grid; the large boxed geometric
  * mark that used to stand beside it and steal its width is gone.
+ *
+ * The two illustrative years used to sit here too. They are evidence for the
+ * point the supporting section makes, so they moved there with it — this
+ * section's job is recognition and routing, and it is short.
  */
 export function RecognitionStrip() {
   return (
@@ -50,8 +54,6 @@ export function RecognitionStrip() {
         </ul>
 
         <p className={styles.closing}>{recognitionClosing}</p>
-
-        <YearComparison className={styles.comparison} />
       </Container>
     </Section>
   );

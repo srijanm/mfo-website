@@ -1,145 +1,349 @@
-/* One layout for the three audience pages. */
+/* The audience page: one template, two hero layouts, and four visually
+   distinct blocks below it.
 
-/* No bottom rule: the section that follows draws its own top rule on the
-   same line, and the two together rendered as a doubled 2px rule. */
+   The old template gave the hero a fixed seven-column text area and a
+   five-column illustration area whether or not an illustration existed, so two
+   of the three pages had a headline squeezed into seven columns beside an empty
+   half-screen. There is no empty column here: the illustrated layout is a
+   two-column grid, and the text-led layout is a single deliberate measure. */
+
 .hero {
-  padding-block: var(--section-major-desktop);
+  position: relative;
+}
+
+.heroInner {
+  padding-block: var(--sp-8) var(--sp-7);
+}
+
+/* Illustrated: balanced text and graphic, centred against each other. */
+.heroIllustrated .heroInner {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  gap: var(--sp-6);
+  align-items: center;
 }
 
 .copy {
-  grid-column: 1 / span 7;
+  min-width: 0;
+  max-width: 640px;
+}
+
+/* Text-led: the width is used on purpose rather than left over. The headline
+   takes a display measure and the supporting copy sits at a reading one, so the
+   block reads as a composition instead of a column with a gap beside it. */
+.heroTextLed .copy {
+  max-width: 900px;
 }
 
 .headline {
   margin: 0;
-  max-width: 18ch;
-  font-size: var(--fs-h1);
+  font-size: var(--fs-display-2);
   font-weight: 400;
-  line-height: 1;
-  letter-spacing: -.04em;
+  line-height: 1.04;
+  letter-spacing: -.032em;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+.heroTextLed .headline {
+  max-width: 20ch;
 }
 
 .lead {
-  margin: 28px 0 0;
-  max-width: 54ch;
+  margin: var(--sp-4) 0 0;
+  max-width: 56ch;
   font-size: var(--fs-lead);
-  line-height: 1.44;
-  letter-spacing: -.018em;
+  line-height: 1.5;
+  letter-spacing: -.012em;
   color: var(--ink-2);
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 36px;
+  gap: var(--sp-2);
+  margin-top: var(--sp-5);
 }
 
-.record {
-  grid-column: 8 / -1;
-  align-self: center;
-  justify-self: end;
-  width: 100%;
+.assurance {
+  margin: var(--sp-3) 0 0;
+  max-width: 46ch;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--muted);
 }
 
-/* The repeating shape: title/body rows split on the 5/7 line, bounded by the
-   list. The section heading sits 40px above the first rule. */
-.rows {
-  margin: 40px 0 0;
+.graphic {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+/* ----------------------------------------------------- 1. the situations */
+
+.situations {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: var(--sp-5) 0 0;
   padding: 0;
   list-style: none;
+  counter-reset: situation;
   border-top: 1px solid var(--rule);
+}
+
+.situation {
+  counter-increment: situation;
+  padding: var(--sp-4) var(--sp-4) var(--sp-4) 0;
   border-bottom: 1px solid var(--rule);
+  min-width: 0;
 }
 
-.row {
-  display: grid;
-  grid-template-columns: 1fr;
-  padding-block: 26px;
+.situation + .situation {
+  padding-left: var(--sp-4);
+  border-left: 1px solid var(--rule);
 }
 
-@media (min-width: 1024px) {
-  .row {
-    grid-template-columns: calc((100% * 5 - 1 * var(--grid-gap)) / 12) minmax(0, 1fr);
-    column-gap: var(--grid-gap);
-  }
-}
-
-.row + .row {
-  border-top: 1px solid var(--rule);
-}
-
-.rowTitle {
+.situationTitle {
   margin: 0;
   font-size: var(--fs-body);
   font-weight: 500;
-  line-height: 1.4;
-  max-width: 34ch;
+  line-height: 1.34;
+  letter-spacing: -.012em;
 }
 
-.rowBody {
-  margin: 0;
-  max-width: 58ch;
-  font-size: var(--fs-body);
-  line-height: 1.52;
+.situationTitle::before {
+  content: counter(situation, decimal-leading-zero);
+  display: block;
+  margin-bottom: 8px;
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: .06em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.situationBody {
+  margin: 8px 0 0;
+  font-size: var(--fs-ui);
+  line-height: 1.55;
   color: var(--ink-2);
 }
 
-@media (max-width: 1023px) {
-  .rowBody {
-    margin-top: 8px;
-  }
+/* ------------------------------------------------------- 2. what we run */
+
+.scopeLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: var(--sp-6);
+  align-items: start;
 }
 
-/* Price block. */
+.scopeIntro {
+  min-width: 0;
+}
+
+.scopeHeadline {
+  max-width: 16ch;
+}
+
+/* The qualification. It is not decoration: without an approved mapping of price
+   to inclusions, this is the sentence that keeps the list honest. */
+.scopeNote {
+  margin: var(--sp-3) 0 0;
+  max-width: 40ch;
+  padding-left: var(--sp-3);
+  border-left: 3px solid var(--acid);
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.scopeList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 0;
+}
+
+.scopeRow {
+  padding: var(--sp-3) var(--sp-5) var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.scopeRow:nth-child(1),
+.scopeRow:nth-child(2) {
+  border-top: 1px solid var(--rule);
+}
+
+.scopeRow:nth-child(even) {
+  padding-right: 0;
+  padding-left: var(--sp-5);
+  border-left: 1px solid var(--rule);
+}
+
+.scopeRowTitle {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 500;
+  line-height: 1.32;
+}
+
+.scopeRowBody {
+  margin: 4px 0 0;
+  max-width: 40ch;
+  font-size: var(--fs-ui);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* ------------------------------------------------- 3. accountability strip */
+
+/* Four short commitments across one row, not a fourth stack of large rows. */
+.proof {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-5);
+  margin: var(--sp-5) 0 0;
+  padding: var(--sp-4) 0 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.proofItem {
+  min-width: 0;
+}
+
+.proofTitle {
+  margin: 0;
+  font-size: var(--fs-ui);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.proofBody {
+  margin: 6px 0 0;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* ------------------------------------------------------------- 4. price */
+
 .prices {
-  margin: 36px 0 0;
+  margin: var(--sp-4) 0 0;
   font-size: var(--fs-h3);
   font-weight: 400;
-  letter-spacing: -.028em;
-  line-height: 1.2;
+  letter-spacing: -.022em;
 }
 
 .perYear {
-  font-size: var(--fs-body);
+  font-size: var(--fs-ui);
   color: var(--muted);
 }
 
 .priceClosing {
-  margin: 16px 0 0;
-  max-width: 52ch;
+  margin: var(--sp-3) 0 0;
+  max-width: 56ch;
   font-size: var(--fs-body);
-  line-height: 1.52;
+  line-height: 1.56;
   color: var(--ink-2);
 }
 
 .priceAction {
-  margin-top: 28px;
+  margin-top: var(--sp-4);
 }
 
+/* ---------------------------------------------------------------- narrow */
+
 @media (max-width: 1023px) {
-  .hero {
-    padding-block: var(--section-major-tablet);
+  .heroIllustrated .heroInner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-6);
+    align-items: start;
+  }
+
+  .heroInner {
+    padding-block: var(--sp-7) var(--sp-6);
   }
 
   .copy,
-  .record {
-    grid-column: 1 / -1;
+  .heroTextLed .copy {
+    max-width: none;
   }
 
-  .record {
-    justify-self: start;
-    max-width: 420px;
-    margin-top: 40px;
+  .graphic {
+    justify-content: flex-start;
+    max-width: 460px;
+  }
+
+  .scopeLayout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-5);
+  }
+
+  .proof {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-4);
   }
 }
 
 @media (max-width: 767px) {
-  .hero {
-    padding-block: var(--section-major-mobile);
+  .heroInner {
+    padding-block: var(--sp-6) var(--sp-6);
   }
 
-  .record {
+  .headline,
+  .heroTextLed .headline {
     max-width: none;
+  }
+
+  .graphic {
+    max-width: none;
+  }
+
+  .situations {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .situation,
+  .situation + .situation {
+    padding: var(--sp-4) 0;
+    border-left: 0;
+  }
+
+  .scopeList {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .scopeRow,
+  .scopeRow:nth-child(even) {
+    padding-inline: 0;
+    border-left: 0;
+  }
+
+  .scopeRow:nth-child(2) {
+    border-top: 0;
+  }
+
+  /* Stacked, the four commitments are separated by rules rather than by a
+     gap. A gap with a border beside it leaves each rule terminating in empty
+     space, which is the one thing the site's rule system forbids — the spacing
+     goes inside the item instead. */
+  .proof {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .proofItem {
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .proofItem:first-child {
+    padding-top: 0;
   }
 }

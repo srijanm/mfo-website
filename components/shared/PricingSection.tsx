@@ -1,7 +1,7 @@
 import { Button, Container, Section } from "@/components/foundation";
 import { formatAnnualPrice, type PricingContent } from "@/lib/content/pricing";
 import { approvedPlanScope } from "@/lib/content/pricing-scope";
-import { primaryCta } from "@/lib/content/navigation";
+import { conversionAssurance } from "@/lib/content/navigation";
 import { cx } from "@/lib/cx";
 
 import { PlanComparisonMatrix } from "./PlanComparisonMatrix";
@@ -66,14 +66,39 @@ export function PricingSection({ content, id = "pricing" }: PricingSectionProps)
           <PlanComparisonMatrix plans={approvedPlanScope} />
         ) : null}
 
+        {/* What is knowable now, beside what follows from a person reading
+            the enquiry. This is where a comparison table would go if there
+            were an approved mapping; there is not, so the space explains the
+            arrangement instead of dismissing the table. */}
+        {content.knownNow && content.afterReview ? (
+          <div className={styles.explain}>
+            {[content.knownNow, content.afterReview].map((block) => (
+              <section key={block.title} className={styles.explainBlock}>
+                <h3 className={styles.explainTitle}>{block.title}</h3>
+                <ul className={styles.explainList}>
+                  {block.rows.map((row) => (
+                    <li key={row.id} className={styles.explainRow}>
+                      <p className={styles.explainRowTitle}>{row.title}</p>
+                      <p className={styles.explainRowBody}>{row.body}</p>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+        ) : null}
+
         <div className={styles.closing}>
           <p className={styles.closingText}>{content.closing}</p>
 
+          {/* One action. There were two adjacent buttons here — "Find the right
+              plan" and the primary CTA — with different labels and the same
+              destination, which reads as a choice and is not one. */}
           <div className={styles.actions}>
-            <Button href={primaryCta.href}>{primaryCta.label}</Button>
-            <Button href={content.cta.href} tone="secondary">
+            <Button href={content.cta.href} placement="pricing">
               {content.cta.label}
             </Button>
+            <p className={styles.assurance}>{conversionAssurance}</p>
           </div>
         </div>
       </Container>

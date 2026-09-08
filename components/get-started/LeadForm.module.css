@@ -406,8 +406,16 @@
   border-color: var(--ink);
 }
 
+/* The control's own box, so the focus underline below can be anchored to the
+   bottom of the input rather than to the bottom of the field — which now also
+   holds the optional hint and the error message. */
+.inputWrap {
+  position: relative;
+  display: block;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  :global(html.js) .field::after {
+  :global(html.js) .inputWrap::after {
     content: "";
     position: absolute;
     left: 0;
@@ -421,7 +429,107 @@
     pointer-events: none;
   }
 
-  :global(html.js) .field:focus-within::after {
+  :global(html.js) .field:focus-within .inputWrap::after {
     transform: scaleX(1);
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Added by the conversion pass: the error summary, inline hints, the optional
+   marker, page context, and the reassurance line above the send button.
+   --------------------------------------------------------------------------- */
+
+/* Announced, never seen. Used for the sending/success live region. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Sits above the fields when a step has something to fix, so the reason is
+   visible before the reader hunts for the red field. */
+.errorSummary {
+  margin: 0 0 var(--sp-3);
+  padding: 10px 14px;
+  border-left: 3px solid var(--error);
+  background: var(--paper-2);
+  font-size: var(--fs-ui);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* A quiet instruction under a question or field — "Select all that apply",
+   "Only if you would rather we called". */
+.hint {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-small);
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.field .hint {
+  margin: 6px 0 0;
+}
+
+.optional {
+  margin-left: 8px;
+  font-size: var(--fs-small);
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* An invalid field is marked by more than its message: the border changes too,
+   so the field itself is findable without reading every label. */
+.inputInvalid {
+  border-color: var(--error);
+}
+
+/* Where the reader came from. Informational, and it says so. */
+.sourceNote {
+  margin: var(--sp-2) 0 0;
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.sourceLabel {
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+/* The promise made where the commitment is asked for. */
+.reassurance {
+  margin: var(--sp-5) 0 0;
+  max-width: 52ch;
+  padding-left: var(--sp-3);
+  border-left: 3px solid var(--acid);
+  font-size: var(--fs-ui);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* Success and failure are one block, so the live region wraps both lines. */
+.outcomeBlock {
+  max-width: 56ch;
+}
+
+/* How the enquiry is used. Short, factual, and directly above the send button
+   rather than buried in a footer link. */
+.privacy {
+  margin: var(--sp-3) 0 0;
+  max-width: 52ch;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.privacy a {
+  color: var(--ink-2);
 }

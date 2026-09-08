@@ -1,0 +1,143 @@
+/* The same document language as the hero composition: an acid plate offset up
+   and to the right, a white sheet on it, ruled rows, and a qualification at the
+   foot. The offset is carried as padding on the figure so the plate never
+   paints outside the illustration's own bounds. */
+
+.figure {
+  --offset: 14px;
+
+  position: relative;
+  margin: 0;
+  padding: var(--offset) var(--offset) 0 0;
+  width: 100%;
+  max-width: 520px;
+}
+
+.backing {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: var(--offset);
+  bottom: var(--offset);
+  background: var(--acid);
+  border-radius: var(--radius-object);
+}
+
+.sheet {
+  position: relative;
+  padding: 24px 24px 20px;
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-object);
+  box-shadow: var(--shadow-object);
+}
+
+.head {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.title {
+  margin: 8px 0 0;
+  font-size: var(--fs-lead);
+  font-weight: 500;
+  line-height: 1.24;
+  letter-spacing: -.014em;
+}
+
+/* Column names. Decorative: each row below is a dt/dd pair, so the association
+   is already in the accessibility tree without them. */
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  padding: 12px 0 8px;
+  font-size: var(--fs-micro);
+  color: var(--muted);
+}
+
+.rows {
+  margin: 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: baseline;
+  padding: 11px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.arrangement {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  font-size: var(--fs-ui);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+/* An open square, the same mark the docket uses: a record that exists, never a
+   box that has been ticked. */
+.marker {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid var(--ink);
+  border-radius: 1px;
+  transform: translateY(-1px);
+}
+
+.record {
+  margin: 0;
+  font-size: var(--fs-ui);
+  line-height: 1.35;
+  color: var(--ink-2);
+}
+
+.footer {
+  margin: 16px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-micro);
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+@media (max-width: 767px) {
+  .figure {
+    --offset: 10px;
+    max-width: none;
+  }
+
+  .sheet {
+    padding: 20px 18px 16px;
+  }
+
+  /* Stacked, the record sits under the arrangement it belongs to rather than
+     being squeezed into half a phone. */
+  .row,
+  .columns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .record {
+    padding-left: 18px;
+  }
+
+  .columns {
+    display: none;
+  }
+}

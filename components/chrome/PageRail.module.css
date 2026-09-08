@@ -88,3 +88,17 @@
     display: none;
   }
 }
+
+/* The persistent accessible name. Every entry carries one whether or not its
+   visible label is currently rendered — a link containing only a decorative
+   node is a link with no name. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

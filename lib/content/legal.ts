@@ -36,6 +36,18 @@ export const legalPages: readonly LegalPage[] = [
   },
 ];
 
+/**
+ * Whether a real approved document has been supplied for a slug.
+ *
+ * The site links to a legal page only when this is true. While `document` is
+ * null the page still exists and still says plainly that the document is being
+ * prepared — but nothing else on the site points at it as though it were an
+ * answer, because it is not one yet.
+ */
+export function legalPublished(slug: string): boolean {
+  return Boolean(legalPageBySlug(slug)?.document);
+}
+
 export function legalPageBySlug(slug: string): LegalPage | undefined {
   return legalPages.find((page) => page.slug === slug);
 }

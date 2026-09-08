@@ -8,3 +8,4 @@ export { RecognitionStrip } from "./RecognitionStrip";
 export { StructuralMismatch } from "./StructuralMismatch";
 export { TemporalLedger } from "./TemporalLedger";
 export { TrustLedger } from "./TrustLedger";
+export { WhyItMatters } from "./WhyItMatters";

@@ -3,12 +3,13 @@ import { isNavGroup, primaryCta, primaryNav } from "@/lib/content/navigation";
 
 import { MobileMenu } from "./MobileMenu";
 import { NavDropdown } from "./NavDropdown";
+import { NavLink } from "./NavLink";
 import { Wordmark } from "./Wordmark";
 import styles from "./SiteHeader.module.css";
 
 /**
- * The site navigation landmark. 64px desktop, 60px mobile, sticky against a
- * paper background with a single 1px bottom rule.
+ * The site navigation landmark: sticky, paper, one 1px bottom rule, height from
+ * the shared --nav-h token.
  *
  * There is one navigation landmark. The desktop row and the mobile disclosure
  * are two presentations inside it, only ever one of them displayed, rather than
@@ -27,12 +28,12 @@ export function SiteHeader() {
                 isNavGroup(entry) ? (
                   <NavDropdown key={entry.label} label={entry.label} items={entry.children} />
                 ) : (
-                  <a key={entry.href} href={entry.href} className={styles.link}>
-                    {entry.label}
-                  </a>
+                  <NavLink key={entry.href} href={entry.href} label={entry.label} />
                 ),
               )}
-              <Button href={primaryCta.href}>{primaryCta.label}</Button>
+              <Button href={primaryCta.href} placement="header">
+                {primaryCta.label}
+              </Button>
             </div>
 
             <MobileMenu />

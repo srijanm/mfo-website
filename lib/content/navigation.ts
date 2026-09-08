@@ -5,11 +5,31 @@ export const site = {
   descriptor: "A modern CA firm for modern professions",
 } as const;
 
-/** Every primary action on the site routes here — CLAUDE.md rule 9. */
+/**
+ * Every primary action on the site routes here, under one label.
+ *
+ * The site previously used four wordings for the same destination — "See what
+ * I need", "Get started", "Find the right plan", "Tell us how you earn" — which
+ * made adjacent buttons look like different offers. One label, everywhere.
+ */
 export const primaryCta = {
   href: "/get-started",
-  label: "See what I need",
+  label: "Tell us how you earn",
 } as const;
+
+/**
+ * The sentence that sits near a prominent conversion point. It says what
+ * happens next and what does not: a person reviews the enquiry, and nothing is
+ * committed to until scope and fee are agreed. It promises no turnaround,
+ * because none has been approved.
+ */
+export const conversionAssurance =
+  "We’ll review your situation and explain the relevant scope and fee before you commit.";
+
+/** The enquiry link, carrying which page it was pressed on as context. */
+export function enquiryHref(from?: string): string {
+  return from ? `${primaryCta.href}?from=${from}` : primaryCta.href;
+}
 
 export type NavItem = {
   href: string;
@@ -48,11 +68,12 @@ export type FooterColumn = {
 
 export const footerColumns: readonly FooterColumn[] = [
   {
-    id: "product",
-    title: "Product",
+    /* "Product" is software-company language. This is a CA firm. */
+    id: "services",
+    title: "Services",
     links: [
       { href: "/pricing", label: "Pricing" },
-      { href: primaryCta.href, label: "Get started" },
+      { href: "/how-we-work", label: "How we work" },
     ],
   },
   {
@@ -64,7 +85,7 @@ export const footerColumns: readonly FooterColumn[] = [
     id: "company",
     title: "Company",
     links: [
-      { href: "/how-we-work", label: "How we work" },
+      { href: primaryCta.href, label: "Start an enquiry" },
       { href: "/contact", label: "Contact" },
     ],
   },
@@ -96,11 +117,11 @@ export const copyrightSince = 2026;
  * do not exist.
  */
 export const sectionIndex = [
-  { id: "latent-problem", label: "What goes wrong" },
-  { id: "structural-mismatch", label: "The mismatch" },
-  { id: "income-axis", label: "As things change" },
+  { id: "recognition-headline", label: "Who it's for" },
   { id: "core-scope-headline", label: "What we run" },
+  { id: "income-axis", label: "As things change" },
+  { id: "latent-problem", label: "Why it matters" },
   { id: "trust-ledger", label: "Before we file" },
   { id: "pricing", label: "Pricing" },
-  { id: "final-cta", label: "Get started" },
+  { id: "final-cta", label: "Start an enquiry" },
 ] as const;

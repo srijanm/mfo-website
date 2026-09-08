@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 
+import { CtaTracker } from "@/components/analytics";
 import { SiteFooter, SiteHeader, SkipLink } from "@/components/chrome";
 import { site } from "@/lib/content/navigation";
 import { absoluteUrl, isIndexable, siteUrl } from "@/lib/site-url";
@@ -77,6 +78,10 @@ export default function RootLayout({
       </head>
       <body>
         <SkipLink />
+        {/* One delegated click listener for every call to action on the site.
+            Renders nothing, and does nothing at all unless a provider is
+            already present on the page. */}
+        <CtaTracker />
         <SiteHeader />
         <main id="main">{children}</main>
         <SiteFooter />

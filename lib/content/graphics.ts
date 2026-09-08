@@ -155,3 +155,42 @@ export const docketGraphic = {
   /** Rendered as "02 / 05". Never a date. */
   ofLabel: "/",
 } as const;
+
+/* ------------------------------------------------- audience page graphics */
+
+/**
+ * Illustrative record sheets for the two audience pages that had no graphic.
+ *
+ * They explain the *situation*, not a transaction: each row pairs a way of
+ * being paid with the record it produces. There are deliberately no amounts, no
+ * totals, no dates, no tax treatment and no outcomes — nothing here could be
+ * mistaken for a statement about a real person's affairs, and the eyebrow on
+ * each sheet says it is illustrative.
+ */
+export const recordSheets = {
+  freelancers: {
+    eyebrow: "Illustrative client records",
+    title: "Three clients, three kinds of record",
+    columns: { arrangement: "How you are billed", record: "What that leaves behind" },
+    rows: [
+      { id: "retainer", arrangement: "Monthly retainer", record: "A recurring invoice" },
+      { id: "project", arrangement: "Project fee", record: "One invoice, one scope" },
+      { id: "overseas", arrangement: "Client abroad", record: "An invoice and a currency trail" },
+    ],
+    footer: "Which of these you have changes what needs keeping. Tell us yours.",
+  },
+  creators: {
+    eyebrow: "Illustrative income records",
+    title: "Four arrangements, four kinds of record",
+    columns: { arrangement: "The arrangement", record: "What that leaves behind" },
+    rows: [
+      { id: "brand", arrangement: "Brand campaign", record: "A contract and an invoice" },
+      { id: "platform", arrangement: "Platform payout", record: "A platform statement" },
+      { id: "agency", arrangement: "Through an agency", record: "Someone else’s paperwork" },
+      { id: "non-cash", arrangement: "Paid in product, not money", record: "An arrangement, still" },
+    ],
+    footer: "The last one is the one people forget to mention. It still counts as an arrangement.",
+  },
+} as const;
+
+export type RecordSheet = (typeof recordSheets)[keyof typeof recordSheets];

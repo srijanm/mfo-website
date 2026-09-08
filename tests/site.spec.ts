@@ -155,8 +155,8 @@ test.describe("Layer B never appears in the core scope section", () => {
       ).toBe(false);
     }
 
-    // The eight core categories are all present.
-    expect(await section.locator("h3").count()).toBe(8);
+    /* Three commitments introduce the service, then the eight core areas. */
+    expect(await section.locator("h3").count()).toBe(11);
   });
 });
 
@@ -173,26 +173,33 @@ test.describe("Layer B never appears in the core scope section", () => {
  * test below this one asserts directly.
  */
 test.describe("homepage architecture", () => {
+  /* The order is the argument, and the argument changed on the owner's
+     instruction: the service now arrives third rather than sixth, and the
+     delayed-problem and alternatives sections were consolidated into one
+     supporting section placed *after* the offer. */
   const LOCKED_ORDER = [
-    "Half the work you do",                    // 1. Hero
-    "Different sources of income",             // 2. Recognition
-    "Nothing goes wrong in your first year",   // 3. Latent problem
-    "Your work changed",                       // 4. Structural mismatch
-    "Your obligations change",                 // 5. Income Axis
-    "The CA and compliance work we are built to run",  // 6. Core scope
-    "Judge us by what happens before we file anything", // 7. Trust ledger
-    "Transparent pricing without any nasty surprises", // 8. Pricing
-    "I don’t earn enough for this yet",        // 9. FAQ
-    "Tell us how you earn",                    // 10. Final CTA
+    "Half the work you do",                            // 1. Hero
+    "How your money reaches you",                      // 2. Recognition
+    "The CA and compliance work we are built to run",  // 3. What we run
+    "Your obligations change",                         // 4. Income Axis
+    "Nothing goes wrong in your first year",           // 5. Why it matters
+    "Judge us by what happens before we file anything", // 6. Trust ledger
+    "Transparent pricing without any nasty surprises", // 7. Pricing
+    "I don’t earn enough for this yet",                // 8. FAQ
+    "Tell us how you earn. We’ll tell you what you actually need", // 9. Close
   ];
 
   /* Cut from this page. Each is asserted absent rather than merely dropped from
      the list above, so re-adding one is a deliberate act with a failing test
-     behind it rather than something that quietly reappears. */
+     behind it rather than something that quietly reappears.
+
+     "Your work changed" is the alternatives comparison: it did not disappear,
+     it moved to /how-we-work, and a test below asserts it is there. */
   const REMOVED = [
     "You shouldn’t have to know which question to ask",
     "Your work has deadlines",
     "And when something else comes up",
+    "Your work changed. Most CA practices",
   ];
 
   test("sections appear in the order locked by section 12", async ({ page }) => {
@@ -428,11 +435,114 @@ test.describe("get-started intake", () => {
       route.fulfill({ status: 502, contentType: "application/json", body: JSON.stringify({ ok: false, errors: { form: "Provider responded 500." } }) }),
     );
 
-    await page.getByRole("button", { name: "Send" }).click();
+    await page.getByRole("button", { name: "Send enquiry" }).click();
 
     await expect(page.getByText("That did not send.")).toBeVisible();
     await expect(page.getByText("Got it. We’ll review how you earn")).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "Get in touch" })).toBeVisible();
+
+    /* No link to /contact. That page's only content was a button back to this
+       form, so offering it here sent a failed submission round in a circle. */
+    await expect(page.getByRole("link", { name: "Get in touch" })).toHaveCount(0);
+
+    /* Retrying returns to the form with every answer still in place — a
+       delivery failure must not cost someone the four steps they just did. */
+    await page.getByRole("button", { name: "Try again" }).click();
+    await expect(page.getByLabel("Name")).toHaveValue("Test Person");
+    await expect(page.getByLabel("Email")).toHaveValue("test@example.com");
+  });
+
+  test("a timeout is reported as uncertain, not as a definite failure", async ({ page }) => {
+    await page.goto("/get-started");
+
+    await choose(page, "A mix");
+    await choose(page, "Longer than that");
+    await choose(page, "Catching up on something I think I’ve missed");
+
+    await page.getByLabel("Name").fill("Test Person");
+    await page.getByLabel("Email").fill("test@example.com");
+
+    /* 504: the provider was still thinking when we stopped waiting, so
+       delivery status is genuinely unknown. */
+    await page.route("**/api/leads", (route) =>
+      route.fulfill({
+        status: 504,
+        contentType: "application/json",
+        body: JSON.stringify({ ok: false, errors: { form: "timeout" } }),
+      }),
+    );
+
+    await page.getByRole("button", { name: "Send enquiry" }).click();
+
+    await expect(page.getByText("We didn’t get a confirmation.")).toBeVisible();
+    /* It must not claim either outcome. */
+    await expect(page.getByText("That did not send.")).toHaveCount(0);
+    await expect(page.getByText("Got it. We’ll review how you earn")).toHaveCount(0);
+  });
+
+  test("a server validation error keeps the form on screen", async ({ page }) => {
+    await page.goto("/get-started");
+
+    await choose(page, "A mix");
+    await choose(page, "Longer than that");
+    await choose(page, "Catching up on something I think I’ve missed");
+
+    await page.getByLabel("Name").fill("Test Person");
+    await page.getByLabel("Email").fill("test@example.com");
+
+    /* 422 is "understood but not acceptable". It used to fall through to the
+       generic delivery-failure screen, which told the person their enquiry had
+       not sent when in fact one field was wrong. */
+    await page.route("**/api/leads", (route) =>
+      route.fulfill({
+        status: 422,
+        contentType: "application/json",
+        body: JSON.stringify({
+          ok: false,
+          errors: { email: "That does not look like an email address." },
+        }),
+      }),
+    );
+
+    await page.getByRole("button", { name: "Send enquiry" }).click();
+
+    await expect(page.getByText("That did not send.")).toHaveCount(0);
+    await expect(
+      page.getByText("That does not look like an email address."),
+    ).toBeVisible();
+    /* Still on the form, with the answer intact. */
+    await expect(page.getByLabel("Email")).toHaveValue("test@example.com");
+  });
+
+  test("phone is optional and an invalid email is caught before sending", async ({ page }) => {
+    let requests = 0;
+    await page.route("**/api/leads", (route) => {
+      requests += 1;
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ ok: true }),
+      });
+    });
+
+    await page.goto("/get-started");
+    await choose(page, "A mix");
+    await choose(page, "Longer than that");
+    await choose(page, "Setting things up properly");
+
+    /* A missing name and a malformed email are both caught client-side, with
+       `noValidate` set — so no request is made at all. */
+    await page.getByLabel("Email").fill("not-an-email");
+    await page.getByRole("button", { name: "Send enquiry" }).click();
+    await expect(page.getByText("Tell us your name.")).toBeVisible();
+    await expect(page.getByText("That does not look like an email address.")).toBeVisible();
+    expect(requests).toBe(0);
+
+    /* Phone left entirely empty: it is optional, and the send goes through. */
+    await page.getByLabel("Name").fill("Test Person");
+    await page.getByLabel("Email").fill("test@example.com");
+    await page.getByRole("button", { name: "Send enquiry" }).click();
+    await expect(page.getByText("Got it. We’ll review how you earn")).toBeVisible();
+    expect(requests).toBe(1);
   });
 
   test("shows the success state only when the send succeeds", async ({ page }) => {
@@ -450,7 +560,7 @@ test.describe("get-started intake", () => {
       route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) }),
     );
 
-    await page.getByRole("button", { name: "Send" }).click();
+    await page.getByRole("button", { name: "Send enquiry" }).click();
 
     await expect(
       page.getByText("Got it. We’ll review how you earn and tell you what makes sense from here."),
@@ -579,18 +689,48 @@ test.describe("navigation", () => {
   });
 });
 
-/** No stock photography anywhere; /how-we-work is honest about anonymity. */
+/** No stock photography anywhere; /how-we-work leads with what happens to you. */
 test.describe("how we work", () => {
   test("ships no photography and states the signing commitment plainly", async ({ page }) => {
     await page.goto("/how-we-work");
 
     await expect(page.locator("main img")).toHaveCount(0);
     await expect(
-      page.getByText("We don’t publish the team on this site yet."),
-    ).toBeVisible();
-    await expect(
       page.getByText("Every return we file is signed by an ICAI-registered chartered accountant."),
     ).toBeVisible();
+
+    /* The sentence announcing that the team is "not published yet" was removed:
+       it made the firm read as half-built, and whether individual profiles are
+       published is an owner decision held in lib/content/firm.ts. Asserted
+       absent so it cannot quietly return, and nothing invented replaced it. */
+    await expect(page.getByText("not publish the team")).toHaveCount(0);
+  });
+
+  test("leads with the client journey, split before and after engagement", async ({ page }) => {
+    await page.goto("/how-we-work");
+
+    const body = (await page.locator("main").innerText())
+      .replace(/\s+/g, " ")
+      .toLowerCase();
+    const order = [
+      "before you commit to anything",
+      "tell us how you earn.",
+      "scope and fee are agreed in writing.",
+      "once you are a client",
+      "you review drafts before filing.",
+      /* The comparison moved here off the homepage. */
+      "your work changed. most ca practices",
+      /* Origin story and software sit below the answers, not in front. */
+      "why this firm exists",
+    ];
+
+    let cursor = -1;
+    for (const marker of order) {
+      const at = body.indexOf(marker.replace(/\s+/g, " ").toLowerCase());
+      expect(at, `"${marker}" was not found`).toBeGreaterThan(-1);
+      expect(at, `"${marker}" is out of order`).toBeGreaterThan(cursor);
+      cursor = at;
+    }
   });
 });
 
@@ -1897,7 +2037,13 @@ test.describe("QA checklist", () => {
 
       for (const cta of ctas) {
         if (cta.dominant) {
-          if (cta.href !== "/get-started") strays.push(`${route}: "${cta.text}" -> ${cta.href}`);
+          /* The destination is unchanged; a `?from=` may ride along, carrying
+             which page the action was pressed on as context for whoever reads
+             the enquiry. It is validated against a closed list on arrival and
+             never carries anything a person typed, so the pathname is what is
+             asserted here. */
+          const path = (cta.href ?? "").split("?")[0];
+          if (path !== "/get-started") strays.push(`${route}: "${cta.text}" -> ${cta.href}`);
         } else if (!cta.href?.startsWith("/")) {
           /* A secondary action may go elsewhere on the site; it may not leave
              it, and it may not be an anchor with nowhere to go. */
@@ -1934,5 +2080,260 @@ test.describe("QA checklist", () => {
       for (const b of bare) missing.push(`${route}: <${b.toLowerCase()}> without width/height`);
     }
     expect(missing, "a media element without dimensions is a layout shift").toEqual([]);
+  });
+});
+
+
+/* ===========================================================================
+   The conversion pass: navigation state, the contact loop, duplicate sends,
+   rate limiting, and the guarantee that analytics never carries personal data.
+   =========================================================================== */
+
+/** Click the label, the way a person does: the control itself is visually
+    hidden behind the styled marker. */
+const pickOption = async (page: Page, option: string) => {
+  await page
+    .locator("label")
+    .filter({ hasText: new RegExp(`^${option.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`) })
+    .click();
+};
+
+const choose = async (page: Page, option: string) => {
+  await pickOption(page, option);
+  await page.getByRole("button", { name: "Continue" }).click();
+};
+
+test.describe("navigation state", () => {
+  test("the current page is marked, visibly and for assistive tech", async ({ page }) => {
+    await page.goto("/pricing");
+
+    /* Both nav presentations are in the document and only one is ever
+       displayed, so this asks about what is actually on screen. */
+    const current = page.locator('header [aria-current="page"]:visible');
+    await expect(current).toHaveCount(1);
+    await expect(current).toHaveText("Pricing");
+
+    /* Carried visibly too: a nav where the current entry looks identical to
+       every other entry tells a sighted reader nothing. */
+    const underlined = await current.evaluate(
+      (el) => getComputedStyle(el).borderBottomColor,
+    );
+    expect(underlined).not.toBe("rgba(0, 0, 0, 0)");
+  });
+
+  test("an audience page marks its group, not just itself", async ({ page }) => {
+    await page.goto("/creators");
+    /* The group is not itself a page, so it carries aria-current="true". */
+    await expect(page.locator('header summary[aria-current="true"]')).toHaveCount(1);
+  });
+});
+
+test.describe("mobile navigation", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("opens, traps focus, and Escape returns focus to the trigger", async ({ page }) => {
+    await page.goto("/");
+
+    const toggle = page.getByRole("button", { name: "Menu" });
+    await toggle.click();
+
+    const panelLinks = page.locator("header a:visible");
+    expect(await panelLinks.count()).toBeGreaterThan(3);
+
+    /* Focus lands inside the menu rather than staying at the top of the page. */
+    await expect
+      .poll(async () => page.evaluate(() => document.activeElement?.tagName))
+      .toBe("A");
+
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("button", { name: "Menu" })).toBeVisible();
+
+    /* And focus comes back to the control that opened it, rather than being
+       left inside a panel that is no longer visible. Restored on the next
+       frame, so this polls rather than reading once. */
+    await expect
+      .poll(async () =>
+        page.evaluate(
+          () => (document.activeElement as HTMLElement | null)?.textContent?.trim() ?? "",
+        ),
+      )
+      .toContain("Menu");
+  });
+});
+
+test.describe("the contact route does not loop", () => {
+  test("with no public contact, /contact says so and the form does not link to it", async ({
+    page,
+  }) => {
+    await page.goto("/contact");
+    const body = await page.locator("main").innerText();
+
+    /* It used to say details were "being finalised" and offer only a button
+       back to the enquiry form — the page the form sent you here *from*. */
+    expect(body).not.toContain("being finalised");
+    expect(body).toContain("only way to reach us");
+
+    /* And the form no longer advertises this page as an alternative. */
+    await page.goto("/get-started");
+    await expect(page.getByText("Would you rather not use a form?")).toHaveCount(0);
+  });
+});
+
+test.describe("enquiry delivery behaviour", () => {
+  const fill = async (page: Page) => {
+    await page.goto("/get-started");
+    await choose(page, "A mix");
+    await choose(page, "Longer than that");
+    await choose(page, "Setting things up properly");
+    await page.getByLabel("Name").fill("Test Person");
+    await page.getByLabel("Email").fill("test@example.com");
+  };
+
+  test("repeated clicks send exactly one request", async ({ page }) => {
+    let requests = 0;
+    await page.route("**/api/leads", async (route) => {
+      requests += 1;
+      /* Slow enough that a second click lands while the first is in flight. */
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ ok: true }),
+      });
+    });
+
+    await fill(page);
+    const send = page.getByRole("button", { name: /Send enquiry|Sending/ });
+    await send.click();
+    await send.click({ force: true }).catch(() => {});
+    await send.click({ force: true }).catch(() => {});
+
+    await expect(page.getByText("Got it. We’ll review how you earn")).toBeVisible();
+    expect(requests).toBe(1);
+  });
+
+  test("rate limiting tells the reader how long to wait", async ({ page }) => {
+    await page.route("**/api/leads", (route) =>
+      route.fulfill({
+        status: 429,
+        contentType: "application/json",
+        body: JSON.stringify({
+          ok: false,
+          errors: { form: "rate-limited" },
+          retryAfterSeconds: 45,
+        }),
+      }),
+    );
+
+    await fill(page);
+    await page.getByRole("button", { name: "Send enquiry" }).click();
+
+    await expect(page.getByText("Try again in about 45 seconds")).toBeVisible();
+    /* Still on the form, answers intact — not the failure screen. */
+    await expect(page.getByLabel("Email")).toHaveValue("test@example.com");
+  });
+
+  test("a retry of the same enquiry reuses its submission id", async ({ page }) => {
+    const ids: string[] = [];
+    let attempt = 0;
+
+    await page.route("**/api/leads", (route) => {
+      const body = JSON.parse(route.request().postData() ?? "{}");
+      ids.push(body.submissionId);
+      attempt += 1;
+      /* Fail once, then accept. */
+      return route.fulfill({
+        status: attempt === 1 ? 502 : 200,
+        contentType: "application/json",
+        body: JSON.stringify(attempt === 1 ? { ok: false, errors: { form: "x" } } : { ok: true }),
+      });
+    });
+
+    await fill(page);
+    await page.getByRole("button", { name: "Send enquiry" }).click();
+    await expect(page.getByText("That did not send.")).toBeVisible();
+    await page.getByRole("button", { name: "Try again" }).click();
+    await page.getByRole("button", { name: "Send enquiry" }).click();
+    await expect(page.getByText("Got it. We’ll review how you earn")).toBeVisible();
+
+    expect(ids).toHaveLength(2);
+    /* Same key both times, so the provider's idempotency suppresses a
+       duplicate email for what is one enquiry. */
+    expect(ids[0]).toBe(ids[1]);
+    expect(ids[0]).toBeTruthy();
+  });
+});
+
+test.describe("analytics carries no personal data", () => {
+  test("the whole enquiry produces events with no name, email, phone or answer", async ({
+    page,
+  }) => {
+    /* A stand-in provider, installed before any script runs. The adapter is
+       provider-neutral and picks up whatever is on window, so this is exactly
+       the path a real provider would take. */
+    await page.addInitScript(() => {
+      (window as unknown as { __events: unknown[] }).__events = [];
+      (window as unknown as { plausible: unknown }).plausible = (
+        name: string,
+        options?: { props?: Record<string, unknown> },
+      ) => {
+        (window as unknown as { __events: unknown[] }).__events.push({
+          name,
+          props: options?.props ?? {},
+        });
+      };
+    });
+
+    await page.route("**/api/leads", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ ok: true }),
+      }),
+    );
+
+    await page.goto("/get-started?from=creators");
+    await choose(page, "Brand or creator income");
+    await choose(page, "First year");
+    await choose(page, "Setting things up properly");
+    await page.getByLabel("Name").fill("Ada Lovelace");
+    await page.getByLabel("Email").fill("ada@example.com");
+    await page.getByLabel("Phone").fill("9876543210");
+    await page.getByRole("button", { name: "Send enquiry" }).click();
+    await expect(page.getByText("Got it. We’ll review how you earn")).toBeVisible();
+
+    const events = await page.evaluate(
+      () => (window as unknown as { __events: { name: string; props: Record<string, unknown> }[] }).__events,
+    );
+
+    /* The funnel actually reported. */
+    const names = events.map((e) => e.name);
+    expect(names).toContain("enquiry_start");
+    expect(names).toContain("enquiry_step_complete");
+    expect(names).toContain("enquiry_submit_attempt");
+    expect(names).toContain("enquiry_submit_success");
+
+    /* Fired once, not once per rerender. */
+    expect(names.filter((n) => n === "enquiry_start")).toHaveLength(1);
+
+    /* And nothing personal is anywhere in any payload. */
+    const serialised = JSON.stringify(events);
+    for (const secret of [
+      "Ada Lovelace",
+      "ada@example.com",
+      "9876543210",
+      "Brand or creator income",
+      "First year",
+      "Setting things up properly",
+    ]) {
+      expect(serialised, `"${secret}" must never reach analytics`).not.toContain(secret);
+    }
+
+    /* No forbidden key survived, whatever its value. */
+    for (const event of events) {
+      for (const key of Object.keys(event.props)) {
+        expect(["name", "email", "phone", "note", "paidBy", "stage", "needs"]).not.toContain(key);
+      }
+    }
   });
 });

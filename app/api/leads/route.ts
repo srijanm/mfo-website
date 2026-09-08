@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { NextResponse } from "next/server";
 
 import { LIMITS, rateLimit } from "@/lib/leads/rate-limit";
@@ -7,9 +9,35 @@ import { HONEYPOT_FIELD, validateLead } from "@/lib/leads/types";
 /** Leads are sent, never rendered, so this route is always dynamic. */
 export const dynamic = "force-dynamic";
 
+/**
+ * Stable public messages.
+ *
+ * The client is told what happened in terms it can act on. It is never told
+ * which environment variable is missing or what the provider said — that is
+ * operator information and it goes to the server log, keyed by submission id.
+ */
+const PUBLIC = {
+  unreadable: "The submission was not readable.",
+  delivery: "We could not send your enquiry just now.",
+  timeout: "timeout",
+  rateLimited: "rate-limited",
+} as const;
+
 function clientKey(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for");
   return forwarded?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
+}
+
+/**
+ * The client may supply a submission id so that a retry of the *same* enquiry
+ * reuses it and the provider's idempotency key suppresses a duplicate send.
+ * Validated rather than trusted: anything that is not a plain uuid is replaced.
+ */
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function submissionIdOf(body: unknown): string {
+  const raw = (body as Record<string, unknown> | null)?.submissionId;
+  return typeof raw === "string" && UUID.test(raw) ? raw : randomUUID();
 }
 
 export async function POST(request: Request) {
@@ -21,7 +49,11 @@ export async function POST(request: Request) {
 
   if (!requestLimit.allowed) {
     return NextResponse.json(
-      { ok: false, errors: { form: "rate-limited" } },
+      {
+        ok: false,
+        errors: { form: PUBLIC.rateLimited },
+        retryAfterSeconds: requestLimit.retryAfterSeconds,
+      },
       { status: 429, headers: { "Retry-After": String(requestLimit.retryAfterSeconds) } },
     );
   }
@@ -31,7 +63,7 @@ export async function POST(request: Request) {
     body = await request.json();
   } catch {
     return NextResponse.json(
-      { ok: false, errors: { form: "The submission was not readable." } },
+      { ok: false, errors: { form: PUBLIC.unreadable } },
       { status: 400 },
     );
   }
@@ -47,7 +79,10 @@ export async function POST(request: Request) {
   const { payload, errors } = validateLead(body);
 
   if (!payload) {
-    return NextResponse.json({ ok: false, errors }, { status: 400 });
+    /* 422, not 400: the request was understood, its contents were not
+       acceptable. The client distinguishes this from a delivery failure and
+       keeps the form on screen with the errors attached to their fields. */
+    return NextResponse.json({ ok: false, errors }, { status: 422 });
   }
 
   /* Tight ceiling on actual sends, applied only once a payload is valid. */
@@ -55,18 +90,34 @@ export async function POST(request: Request) {
 
   if (!deliveryLimit.allowed) {
     return NextResponse.json(
-      { ok: false, errors: { form: "rate-limited" } },
+      {
+        ok: false,
+        errors: { form: PUBLIC.rateLimited },
+        retryAfterSeconds: deliveryLimit.retryAfterSeconds,
+      },
       { status: 429, headers: { "Retry-After": String(deliveryLimit.retryAfterSeconds) } },
     );
   }
 
-  const result = await submitLead(payload);
+  const submissionId = submissionIdOf(body);
+  const outcome = await submitLead(payload, submissionId);
 
-  if (!result.ok) {
-    /* Never report success for something that did not send. The payload is in
-       the server log either way, so the lead itself is not lost. */
-    return NextResponse.json({ ok: false, errors: { form: result.reason } }, { status: 502 });
+  if (outcome.status === "delivered") {
+    /* Success is reported only on a confirmed acceptance by the provider. */
+    return NextResponse.json({ ok: true, submissionId });
   }
 
-  return NextResponse.json({ ok: true });
+  if (outcome.status === "timeout") {
+    /* We do not know whether it arrived. 504 and a distinct code, so the form
+       can say so honestly instead of claiming it definitely failed. */
+    return NextResponse.json(
+      { ok: false, errors: { form: PUBLIC.timeout }, submissionId },
+      { status: 504 },
+    );
+  }
+
+  return NextResponse.json(
+    { ok: false, errors: { form: PUBLIC.delivery }, submissionId },
+    { status: 502 },
+  );
 }
