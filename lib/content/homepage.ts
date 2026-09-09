@@ -448,7 +448,7 @@ export const coreScopeSection = {
     {
       id: "drafts",
       title: "Show drafts and agree scope before proceeding.",
-      body: "You see what is being filed before it is filed, and the fee is agreed before the work starts.",
+      body: "You see what is being filed, and the fee is agreed, before any of it starts.",
     },
   ],
 
@@ -482,54 +482,40 @@ export const whyItMatters = {
 
 /* ------------------------------------------------------------------ H09 */
 
-export const trustLedger = {
-  headline: "Judge us by what happens before we file anything.",
-  columnHeadings: {
-    whatWeDo: "What we do",
-    whyItMatters: "Why it matters",
-  },
-  rows: [
+/**
+ * The reassurance strip beside pricing.
+ *
+ * There used to be a whole section here — "Judge us by what happens before we
+ * file anything", five ruled rows, and a four-state filing sequence — arguing
+ * a case the reader had not made against us. It was also the third place on
+ * the page to say some version of "before you commit", and the same four
+ * commitments appeared again on every audience page.
+ *
+ * Three statements now, in the copy doc's own wording, sitting quietly next to
+ * the fee. No heading and no eyebrow: a strip that has to announce itself is
+ * doing the opposite of reassuring. The full sequence is explained on
+ * /how-we-work, attached to the step of the work it belongs to.
+ */
+export const reassurance = {
+  points: [
     {
-      id: "draft-first",
-      whatWeDo: "You see the draft first.",
-      whyItMatters:
-        "You read it before it goes anywhere. If something looks wrong, it is still a draft.",
+      id: "fee-agreed",
+      title: "Scope and fee agreed upfront.",
+      body: "One number for the year, in writing, before anything starts.",
     },
     {
-      id: "contact-details",
-      whatWeDo: "Your contact details stay yours.",
-      whyItMatters:
-        "The messages come to your phone, not to an office you have never been to.",
+      id: "drafts",
+      title: "You review drafts before filing.",
+      body: "You read it before it goes anywhere. If something looks wrong, it is still a draft.",
     },
     {
-      id: "who-signs",
-      whatWeDo: "You’ll know who signs your return.",
-      whyItMatters:
-        "An ICAI-registered chartered accountant signs it, and you’ll know who before anything is filed.",
-    },
-    {
-      id: "support-upfront",
-      whatWeDo: "Support is agreed upfront.",
-      whyItMatters:
-        "You know what is covered before there is a problem, not while you are in one.",
-    },
-    {
-      id: "not-yet",
-      whatWeDo: "Sometimes the answer is “you don’t need that yet.”",
-      whyItMatters:
-        "We would rather tell you that now than sell you something you will not use.",
+      id: "access",
+      title: "Your portal access stays yours.",
+      body: "Your phone number and email remain on your own portals.",
     },
   ],
-
-  /**
-   * The filing sequence, moved here from /how-it-works when that page was
-   * deleted. Four states of one return, in order. Labels only — no dates and
-   * nothing about what falls due when.
-   */
-  filingSequence: {
-    label: "Before anything is filed",
-    states: ["Draft", "Sent to you", "Approved", "Filed"],
-  },
+  /** Where the sequence is actually explained. */
+  more: { href: "/how-we-work", label: "How working with us works" },
 } as const;
 
 /* ------------------------------------------------------------------ H12 */

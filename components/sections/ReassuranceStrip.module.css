@@ -1,0 +1,68 @@
+/* Three statements, quietly, beside the fee.
+
+   Not three cards: no borders around each point, no shadow, no fill. One rule
+   above the row and hairlines between the columns, which is the same device the
+   rest of the site uses for a set of peers. */
+
+.strip {
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--rule);
+}
+
+.points {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.point {
+  min-width: 0;
+  padding-right: var(--sp-5);
+}
+
+/* One hairline between neighbours, never a box. */
+.point + .point {
+  padding-left: var(--sp-5);
+  border-left: 1px solid var(--rule);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--fs-ui);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.body {
+  margin: 6px 0 0;
+  max-width: 40ch;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+@media (max-width: 767px) {
+  /* Stacked, the hairline turns horizontal and the spacing moves inside the
+     item — a rule beside a gap terminates in empty space. */
+  .points {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .point,
+  .point + .point {
+    padding: var(--sp-3) 0;
+    border-left: 0;
+  }
+
+  .point:first-child {
+    padding-top: 0;
+  }
+
+  .point + .point {
+    border-top: 1px solid var(--rule);
+  }
+}

@@ -2,7 +2,7 @@
 // structure doc; one content object per audience, one template.
 
 import { hero as homepageHero } from "./homepage";
-import type { FaqItem } from "./homepage";
+import { homepageFaq, type FaqItem } from "./homepage";
 import { recordSheets } from "./graphics";
 
 export type AudienceRecord = {
@@ -43,12 +43,10 @@ export type Audience = {
    */
   sheet: keyof typeof recordSheets | null;
   situation: {
-    label: string;
     title: string;
     rows: readonly AudienceRow[];
   };
   scope: {
-    label: string;
     title: string;
     /** The qualification under the list. Never omitted. */
     note: string;
@@ -62,19 +60,17 @@ export type Audience = {
   closeHeadline: string | null;
 };
 
-const SITUATION_LABEL = "Your situation";
+/* The eyebrows came off both blocks. "Your situation" sat above a heading that
+   already said what the situation was, and "The work we can handle" said the
+   same thing as "What we run for you" one line below it. A label that restates
+   its own heading is a line of noise between the reader and the point. */
 const SITUATION_TITLE = "What’s actually different here";
-/**
- * Was "Included in the annual fee", which claimed a mapping that does not
- * exist: `approvedPlanScope` is null, so nothing on this site knows which of
- * the three annual figures includes which work. This says what is true — these
- * are the areas the firm handles — and the line below it says when the
- * applicable scope is actually settled.
- */
-const SCOPE_LABEL = "The work we can handle";
 const SCOPE_TITLE = "What we run for you";
+/* The qualification, which is the part that had to survive: no reviewed mapping
+   of price to inclusions exists, so nothing may read as one. It is body text
+   now rather than an eyebrow, because that is what it is. */
 const SCOPE_NOTE =
-  "Which of these apply to you, and what that costs, is agreed in writing before any engagement starts.";
+  "Which of these apply to you is agreed in writing, with the fee, before anything starts.";
 
 export const audiences: readonly Audience[] = [
   {
@@ -92,7 +88,6 @@ export const audiences: readonly Audience[] = [
     },
     sheet: null,
     situation: {
-      label: SITUATION_LABEL,
       title: SITUATION_TITLE,
       rows: [
         {
@@ -104,13 +99,7 @@ export const audiences: readonly Audience[] = [
           id: "three-trails",
           title: "The money can arrive three different ways and leave three different trails.",
           body: "A direct transfer, a platform like Deel, a service like Wise. What your bank records, and what you can prove later, is not the same in each case.",
-        },
-        {
-          id: "bank-asks",
-          title: "Your bank may ask about a payment long after it arrived.",
-          body: "Sometimes years later. What you can produce at that point depends on what was kept at the time.",
-        },
-        {
+        },        {
           id: "contract-abroad",
           title: "Your contract is with a company that has never dealt with India.",
           body: "They’re not being difficult. They’ve genuinely never been asked for the documents you’ll eventually need.",
@@ -118,7 +107,6 @@ export const audiences: readonly Audience[] = [
       ],
     },
     scope: {
-      label: SCOPE_LABEL,
       note: SCOPE_NOTE,
       title: SCOPE_TITLE,
       rows: [
@@ -189,7 +177,6 @@ export const audiences: readonly Audience[] = [
     record: null,
     sheet: "freelancers",
     situation: {
-      label: SITUATION_LABEL,
       title: SITUATION_TITLE,
       rows: [
         {
@@ -206,16 +193,9 @@ export const audiences: readonly Audience[] = [
           id: "out-of-order",
           title: "The questions arrive out of order.",
           body: "A client asks for something you’ve never heard of. You find the answer, and it raises two more. There’s no obvious person to ask, so it waits.",
-        },
-        {
-          id: "first-in-family",
-          title: "You are the first person in your family to earn this way.",
-          body: "Which means the people you’d normally ask have genuinely never had to know.",
-        },
-      ],
+        },      ],
     },
     scope: {
-      label: SCOPE_LABEL,
       note: SCOPE_NOTE,
       title: SCOPE_TITLE,
       rows: [
@@ -286,7 +266,6 @@ export const audiences: readonly Audience[] = [
     record: null,
     sheet: "creators",
     situation: {
-      label: SITUATION_LABEL,
       title: SITUATION_TITLE,
       rows: [
         {
@@ -306,15 +285,9 @@ export const audiences: readonly Audience[] = [
           title: "The records are inconsistent because the payers are inconsistent.",
           body: "A large brand’s finance team and a founder paying you from a personal account are not going to produce the same records.",
         },
-        {
-          id: "changes-shape",
-          title: "Your income can change shape twice in a year.",
-          body: "Which makes “what did you do last year” a much less useful question than most accountants think it is.",
-        },
       ],
     },
     scope: {
-      label: SCOPE_LABEL,
       note: SCOPE_NOTE,
       title: SCOPE_TITLE,
       rows: [
@@ -373,6 +346,29 @@ export const audiences: readonly Audience[] = [
     closeHeadline: null,
   },
 ];
+
+/**
+ * The questions on an audience page, minus anything the homepage already
+ * answers for everyone.
+ *
+ * Three of the site's questions are general objections — "I don't earn enough
+ * for this yet", "My family already has a CA", "Why not just use filing
+ * software?" — and they belong to the homepage, which is where someone
+ * weighing up the firm as a whole reads them. Repeating them verbatim on an
+ * audience page is the kind of duplication this pass exists to remove.
+ *
+ * Filtered by question text against the homepage set rather than by a flag, so
+ * moving a question between the two lists cannot leave a stale marker behind.
+ *
+ * `/freelancers` currently has nothing left after this filter: all three of its
+ * questions are the general ones. Its FAQ block therefore does not render, and
+ * that is recorded as a content dependency rather than papered over with an
+ * invented question.
+ */
+export function audienceQuestions(audience: Audience): readonly FaqItem[] {
+  const general = new Set(homepageFaq.map((item) => item.question));
+  return audience.questions.filter((item) => !general.has(item.question));
+}
 
 export function audienceBySlug(slug: string): Audience | undefined {
   return audiences.find((audience) => audience.slug === slug);

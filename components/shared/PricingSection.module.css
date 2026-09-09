@@ -73,13 +73,16 @@
   color: var(--muted);
 }
 
+/* The closing line and the action start on the same line. Aligned to the
+   bottom they did not: the assurance sentence under the button made the right
+   column taller, so the left one hung below it. */
 .closing {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--sp-4) var(--sp-6);
-  margin-top: var(--sp-5);
+  margin-top: var(--sp-6);
 }
 
 .closingText {

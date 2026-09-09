@@ -183,10 +183,9 @@ test.describe("homepage architecture", () => {
     "The CA and compliance work we are built to run",  // 3. What we run
     "Your obligations change",                         // 4. Income Axis
     "Nothing goes wrong in your first year",           // 5. Why it matters
-    "Judge us by what happens before we file anything", // 6. Trust ledger
-    "Transparent pricing without any nasty surprises", // 7. Pricing
-    "I don’t earn enough for this yet",                // 8. FAQ
-    "Tell us how you earn. We’ll tell you what you actually need", // 9. Close
+    "Transparent pricing without any nasty surprises", // 6. Pricing + strip
+    "I don’t earn enough for this yet",                // 7. FAQ
+    "Tell us how you earn. We’ll tell you what you actually need", // 8. Close
   ];
 
   /* Cut from this page. Each is asserted absent rather than merely dropped from
@@ -200,6 +199,12 @@ test.describe("homepage architecture", () => {
     "Your work has deadlines",
     "And when something else comes up",
     "Your work changed. Most CA practices",
+    /* The standalone trust section. It argued against an objection nobody had
+       raised and repeated a promise the page had already made twice; three of
+       its statements survive as a quiet strip beside the fee, and the filing
+       sequence is explained on /how-we-work. */
+    "Judge us by what happens before we file anything",
+    "Before anything is filed",
   ];
 
   test("sections appear in the order locked by section 12", async ({ page }) => {
@@ -635,14 +640,47 @@ test.describe("audience pages", () => {
       seen.add(text);
 
       const body = (await page.locator("main").innerText()).replace(/\s+/g, " ");
+
+      /* What an audience page is for: your situation, and the work around it. */
       for (const marker of [
         "What’s actually different here",
         "What we run for you",
-        "How we behave",
-        "Three annual prices",
-        "Questions people ask before they start",
+        "One annual fee, agreed before anything starts",
       ]) {
         expect(body, `${path} is missing "${marker}"`).toContain(marker);
+      }
+
+      /* And what it is not for. Each of these is owned by another page and was
+         being reproduced here in full — the four behaviour commitments, the
+         three annual figures, and the general objection list. Asserted absent
+         so they cannot quietly come back. */
+      for (const marker of [
+        "How we behave",
+        "Three annual prices",
+        "₹19,999",
+        "I don’t earn enough for this yet",
+        "My family already has a CA",
+      ]) {
+        expect(body, `${path} still repeats "${marker}"`).not.toContain(marker);
+      }
+
+      /* Every removed block leaves a link to the page that owns it. */
+      const hrefs = await page.locator("main a").evaluateAll((els) =>
+        els.map((el) => el.getAttribute("href") ?? ""),
+      );
+      expect(hrefs.some((h) => h === "/pricing")).toBe(true);
+      expect(hrefs.some((h) => h === "/how-we-work")).toBe(true);
+      expect(hrefs.some((h) => h.startsWith("/get-started"))).toBe(true);
+    }
+  });
+
+  test("the audience pages carry no redundant eyebrow labels", async ({ page }) => {
+    for (const path of AUDIENCES) {
+      await page.goto(path);
+      const body = (await page.locator("main").innerText()).replace(/\s+/g, " ");
+      /* Each of these sat directly above a heading that said the same thing. */
+      for (const label of ["Your situation", "The work we can handle", "Before we file anything"]) {
+        expect(body, `${path} still shows the "${label}" eyebrow`).not.toContain(label);
       }
     }
   });
@@ -695,18 +733,20 @@ test.describe("how we work", () => {
     await page.goto("/how-we-work");
 
     await expect(page.locator("main img")).toHaveCount(0);
+
+    /* Professional responsibility now sits with the step it belongs to rather
+       than in a block of its own. */
     await expect(
-      page.getByText("Every return we file is signed by an ICAI-registered chartered accountant."),
+      page.getByText("An ICAI-registered chartered accountant signs it", { exact: false }),
     ).toBeVisible();
 
     /* The sentence announcing that the team is "not published yet" was removed:
        it made the firm read as half-built, and whether individual profiles are
-       published is an owner decision held in lib/content/firm.ts. Asserted
-       absent so it cannot quietly return, and nothing invented replaced it. */
+       published is an owner decision held in lib/content/firm.ts. */
     await expect(page.getByText("not publish the team")).toHaveCount(0);
   });
 
-  test("leads with the client journey, split before and after engagement", async ({ page }) => {
+  test("is five steps, split before and after engagement, and nothing else", async ({ page }) => {
     await page.goto("/how-we-work");
 
     const body = (await page.locator("main").innerText())
@@ -715,13 +755,9 @@ test.describe("how we work", () => {
     const order = [
       "before you commit to anything",
       "tell us how you earn.",
-      "scope and fee are agreed in writing.",
+      "we agree the scope and fee.",
       "once you are a client",
       "you review drafts before filing.",
-      /* The comparison moved here off the homepage. */
-      "your work changed. most ca practices",
-      /* Origin story and software sit below the answers, not in front. */
-      "why this firm exists",
     ];
 
     let cursor = -1;
@@ -730,6 +766,22 @@ test.describe("how we work", () => {
       expect(at, `"${marker}" was not found`).toBeGreaterThan(-1);
       expect(at, `"${marker}" is out of order`).toBeGreaterThan(cursor);
       cursor = at;
+    }
+
+    /* Step four is the recurring part. Without saying so the page reads as a
+       sequence that finishes after one filing. */
+    expect(body).toContain("every year");
+
+    /* Gone: the origin story, the alternatives comparison, and the two blocks
+       that argued the trust case a second and third time. Each was owned by
+       another page or folded into the steps above. */
+    for (const marker of [
+      "why this firm exists",
+      "your work changed. most ca practices",
+      "how we behave",
+      "what we won’t do",
+    ]) {
+      expect(body, `"${marker}" is still on /how-we-work`).not.toContain(marker);
     }
   });
 });

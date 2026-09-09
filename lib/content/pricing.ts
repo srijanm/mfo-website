@@ -64,7 +64,11 @@ export const pricing = {
    * is not the same as telling them anything.
    */
   knownNow: {
-    title: "What you can know before you talk to us",
+    /* Was "What you can know before you talk to us" — a heading that described
+       the reader's state of knowledge rather than the section's subject, and
+       another instance of the site's "before you..." tic. These rows explain how
+       the fee is settled, so that is what the heading says. */
+    title: "How we agree your fee",
     rows: [
       {
         id: "levels",
@@ -85,7 +89,7 @@ export const pricing = {
   },
 
   afterReview: {
-    title: "What we confirm after reading your situation",
+    title: "What we confirm once we have read it",
     rows: [
       {
         id: "which-level",
@@ -100,8 +104,11 @@ export const pricing = {
     ],
   },
 
+  /* The safeguard is stated once on this page, in the block that explains how
+     the fee is settled. Here it says the other half — that we will tell you
+     when the broader scope is not for you. */
   closing:
-    "We tell you which plan fits before you commit. If you do not need the broader scope, we do not pretend you do.",
+    "If you do not need the broader scope, we do not pretend you do.",
 
   /** Column headings for the comparison matrix, once a mapping exists. */
   comparisonHeadings: {
@@ -134,10 +141,10 @@ export const pricingPage = {
   tiers: {
     points: pricingPoints,
     perYear: "/ year",
-    planLabel: "Annual fee level. Your exact scope is confirmed before you sign up.",
+    planLabel: "Annual fee level. Your exact scope is confirmed in writing.",
     cta: pricing.cta,
     closing:
-      "We tell you which plan fits before you commit. If you don’t need the broader scope, we don’t pretend you do.",
+      "We tell you which fee level fits. If you don’t need the broader scope, we don’t pretend you do.",
   } satisfies PricingContent,
 
   feeCovers: {
@@ -146,7 +153,8 @@ export const pricingPage = {
   },
 
   scopeAgreed: {
-    label: "Before you pay anything",
+    /* The "Before you pay anything" eyebrow came off: it restated the heading
+       below it and was the fourth "before you ..." on the page. */
     title: "How your scope gets agreed",
     steps: [
       {

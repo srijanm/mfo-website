@@ -7,5 +7,5 @@ export { OperatingModel } from "./OperatingModel";
 export { RecognitionStrip } from "./RecognitionStrip";
 export { StructuralMismatch } from "./StructuralMismatch";
 export { TemporalLedger } from "./TemporalLedger";
-export { TrustLedger } from "./TrustLedger";
+export { ReassuranceStrip } from "./ReassuranceStrip";
 export { WhyItMatters } from "./WhyItMatters";

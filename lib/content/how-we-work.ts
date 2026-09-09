@@ -1,29 +1,38 @@
-// /how-we-work. Replaces /about. No people, stated plainly rather than
-// avoided. Copy verbatim from the final structure doc.
+// /how-we-work.
+//
+// One job: what happens when I become a client. The page used to open with why
+// the firm exists and how it feels about software, then argue the trust case
+// twice more in blocks the homepage and every audience page were also carrying.
+// It is five steps now, with each commitment attached to the step it describes.
+//
+// The origin story, the alternatives comparison and the "what we won't do" list
+// are gone. What survived of them is one sentence and one question.
 
 export const howWeWork = {
-  headline: "How we work, and what we won’t do.",
-  lead: "A CA firm built for work that became normal before most CA practices were built for it.",
+  headline: "How working with us works.",
+  lead: "We agree the scope and the fee first. Then we run that work through the year — setting it up, keeping the dates, and telling you what needs attention before you would have thought to ask.",
 
   /**
-   * What actually happens, in order, from an enquiry to a filed return.
+   * The five steps, and the whole of this page's argument.
    *
-   * Every step is a compression of approved material already in lib/content:
-   * steps 1-3 are the scope-agreement sequence from pricing.ts, step 4 is the
-   * core scope and the calendar commitment, step 5 is the trust ledger's
-   * "You see the draft first."
+   * Each step says what you do and what we do, because "what happens when I
+   * become a client" is a question about a relationship, not a list of
+   * features. The reassurance that used to be argued twice more on this page —
+   * a "How we behave" block and a "What we won't do" block — is attached to the
+   * step it actually describes: the fee to agreeing scope, portal access to
+   * setup, professional responsibility to the work, draft approval to filing.
    *
-   * The `phase` split is the point of the block. The first three steps happen
-   * before anyone is a client and before any fee is owed; the last two are what
-   * being a client consists of. Running them together made a four-step
-   * pre-sales process look like the whole service.
+   * Steps 1-3 happen before anyone is a client and before any fee is owed.
+   * Steps 4 and 5 are what being a client consists of, and they repeat: the
+   * `recurring` flag is what stops the page reading as a sequence that ends
+   * after one filing.
    *
-   * No step names a channel, a turnaround or a service level, because none has
-   * been approved.
+   * Every line is drawn from approved content already in lib/content. Nothing
+   * here names a channel, a turnaround, a response time or a document
+   * requirement, because none has been approved.
    */
   journey: {
-    label: "What happens",
-    title: "From your first message to a filed return",
+    title: "From your first message onwards",
     phases: [
       {
         id: "before",
@@ -32,125 +41,69 @@ export const howWeWork = {
           {
             id: "tell-us",
             title: "Tell us how you earn.",
-            body: "Where the money comes from, how it reaches you, how many clients, and what has already been set up.",
+            you: "Describe where the money comes from, how it reaches you, how many clients, and anything already set up.",
+            us: "We read it. A person, not a form.",
+            note: null,
           },
           {
             id: "we-review",
-            title: "We review what is relevant.",
-            body: "A person reads it. Including the parts that don’t apply to you yet, and what would change that.",
+            title: "We review what’s relevant.",
+            you: "Answer anything we need to ask about the arrangement.",
+            us: "We work out what applies to your facts — including the parts that do not apply yet, and what would change that.",
+            note: null,
           },
           {
-            id: "in-writing",
-            title: "Scope and fee are agreed in writing.",
-            body: "One number for the year, and a list of what it covers. You decide from there.",
+            id: "agree",
+            title: "We agree the scope and fee.",
+            you: "Read it and decide. If the honest answer is that you don’t need us yet, that is what you will have been told at step two.",
+            us: "One number for the year and a list of what it covers, in writing. Not an estimate, and not a headline price that grows.",
+            note: null,
           },
         ],
       },
       {
         id: "after",
         label: "Once you are a client",
+        recurring: true,
         steps: [
           {
             id: "run-the-year",
             title: "We set up and track the agreed work.",
-            body: "The dates that apply to you sit on our calendar. You hear from us before you would have remembered.",
+            you: "Send us what we ask for when we ask for it. Your phone number and email stay on your own portals — you keep access to your own records.",
+            us: "We put the relevant registrations in place and keep the dates that apply to you on our calendar. You hear from us before you would have remembered.",
+            note: "This is the part that repeats. It is not a one-off setup.",
           },
           {
             id: "drafts",
             title: "You review drafts before filing.",
-            body: "You read what is going to be filed before it goes anywhere. If something looks wrong, it is still a draft.",
+            you: "Read what is about to be filed. If something looks wrong, it is still a draft.",
+            us: "We prepare it, show it to you, and file it once you are happy. An ICAI-registered chartered accountant signs it, and you will know who before anything is filed.",
+            note: null,
           },
         ],
       },
     ],
   },
 
-  /** What you do, and what we own. Neither list invents a delivery channel. */
-  responsibilities: {
-    title: "What you provide, and what we own",
-    yours: {
-      title: "You provide",
-      rows: [
-        "A description of how you earn, and the documents behind it when we ask.",
-        "A decision on the scope and fee before anything starts.",
-        "A read of the draft before it is filed.",
-      ],
-    },
-    ours: {
-      title: "We own",
-      rows: [
-        "Working out what applies to your facts, and what does not yet.",
-        "Keeping the relevant dates and doing the work they belong to.",
-        "The professional responsibility for what is filed, and the name against it.",
-      ],
-    },
-  },
+  /**
+   * One genuinely distinct commitment, in one sentence rather than a section.
+   * The other three rows of the old "What we won't do" block restated things
+   * the steps above now say.
+   */
+  distinct:
+    "If a simpler setup is right for you, we will say so — including when the right answer is that you do not need us yet.",
 
-  sections: [
-    {
-      id: "why",
-      title: "Why this firm exists",
-      paragraphs: [
-        "Most CA practices are excellent at what they’ve done for thirty years. Very few of them were built around someone invoicing a company abroad, taking brand deals, or running three client relationships from a laptop.",
-        "That isn’t a criticism of them. It’s a description of a gap. The work changed faster than the practices did, and the people doing the new work are usually the first in their family to do it — so there’s nobody obvious to ask.",
-        "We built a practice for that specific situation, and nothing else.",
-      ],
-    },
-    {
-      id: "run-the-year",
-      title: "We run the year, not just the return",
-      paragraphs: [
-        /* The structure doc's wording tripped CLAUDE.md rule 6's register ban
-           here, so the sentence makes the same point in permitted words. */
-        "Filing is the visible part, and the least of it. The part that goes wrong is the eleven months before it, where nobody is watching and nothing is due yet.",
-        "Every deadline that applies to you sits on our calendar. You hear from us before you’d have remembered.",
-      ],
-    },
-    {
-      id: "who-signs",
-      title: "Who signs your return",
-      paragraphs: [
-        /* The sentence announcing that the team is not published "yet" came out:
-           it made the firm sound half-built, and it is not information anyone
-           needed. Whether individual profiles are published is an owner
-           decision held in lib/content/firm.ts, and the site says nothing about
-           people either way until it is populated. */
-        "Every return we file is signed by an ICAI-registered chartered accountant. You’ll know who that is before anything is filed — the name is on your engagement, not just on the return.",
-      ],
-    },
+  /**
+   * How software is used. Kept only because it answers a real question people
+   * ask about a small firm, and kept as a question rather than a section of
+   * philosophy.
+   */
+  questions: [
     {
       id: "software",
-      title: "How we use software",
-      paragraphs: [
-        "We use software so a small team can do the work of a larger one. It handles tracking, reminders, drafting and the parts that are genuinely mechanical.",
-        "It does not decide what applies to you, and it does not sign anything. A person is accountable for the professional work, and you know who.",
-      ],
+      question: "Are you using AI to do my taxes?",
+      answer:
+        "We use software so a small team can do the work of a larger one — tracking, reminders, drafting, the parts that are genuinely mechanical. It does not decide what applies to you and it does not sign anything. A person is accountable for the professional work, and you know who.",
     },
   ],
-
-  wontDo: {
-    title: "What we won’t do",
-    rows: [
-      {
-        id: "no-upsell",
-        title: "We won’t sell you a structure you don’t need.",
-        body: "If a simple setup is right for you, we’ll say so, even where a more complicated one would bill better for years.",
-      },
-      {
-        id: "no-credentials",
-        title: "We won’t keep your credentials.",
-        body: "Your phone number and email stay on your own portals. You retain access to your own records.",
-      },
-      {
-        id: "no-fear",
-        title: "We won’t frighten you into buying.",
-        body: "Some firms in this market run on fear. We’ll state a consequence once, plainly, and leave it there.",
-      },
-      {
-        id: "not-yet",
-        title: "We won’t take you on if you don’t need us yet.",
-        body: "We’ll tell you what would change that, and you can come back then.",
-      },
-    ],
-  },
 } as const;

@@ -309,10 +309,24 @@ body {
 /* The small muted label above a section heading. Sentence case — decorative
    uppercase eyebrows are banned; this carries a real name for the section's
    register ("Your situation", "Included in the annual fee"). */
+/* The small label above a section heading.
+ *
+ * Only used where it carries context the heading does not — an audience name,
+ * the layer of service being described. The ones that merely restated their own
+ * heading ("Your situation", "Before you pay anything", "What happens") are
+ * gone rather than restyled.
+ *
+ * 15px rather than 13px: these were set at the same size as a form error and a
+ * document field, which are different jobs. Sentence case, no letter spacing,
+ * and close enough to the heading to read as belonging to it. Deliberately not
+ * a site-wide change to every small element — captions, metadata and errors
+ * keep their own sizes. */
 .section-label {
-  margin: 0 0 14px;
-  font-size: var(--fs-small);
+  margin: 0 0 10px;
+  font-size: var(--fs-ui);
   font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
   color: var(--muted);
 }
 

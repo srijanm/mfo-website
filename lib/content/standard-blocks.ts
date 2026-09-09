@@ -2,13 +2,18 @@
 // page references them, from this one content source — never copied into
 // another file.
 
-import { pricingPoints } from "./site-content";
 import { primaryCta } from "./navigation";
 
 /**
- * "How we behave". Four rows, shared verbatim by every audience page. The
- * homepage trust ledger states the same commitments in its own approved
- * wording; these are the audience-page versions from the final copy doc.
+ * The four behaviour commitments, in the copy doc's wording.
+ *
+ * No longer a section anywhere. They were a full block on all three audience
+ * pages *and* the homepage trust ledger *and* implied again on /how-we-work —
+ * four statements argued four times. Each one now sits with the step of the
+ * work it actually describes on /how-we-work, and the homepage keeps three of
+ * them as one quiet strip beside pricing.
+ *
+ * Kept here as the single source those places read from.
  */
 export const howWeBehave = {
   label: "Before we file anything",
@@ -38,16 +43,22 @@ export const howWeBehave = {
 } as const;
 
 /**
- * The compact price block on audience pages. The full tier presentation lives
- * on /pricing; this states the three figures and routes there.
+ * The compact price block on audience pages.
+ *
+ * It used to print all three annual figures and re-explain the arrangement,
+ * which is /pricing's whole job. An audience page now states the shape of the
+ * commercial arrangement in one sentence and links to the page that owns it.
+ *
+ * `pricingPoints` is deliberately no longer read here: three figures on a page
+ * that cannot explain which one applies invites the reader to guess.
  */
-export const priceBlock = {
-  title: "Three annual prices. Your scope is agreed before you sign up.",
-  points: pricingPoints,
-  perYear: "per year",
-  closing:
-    "Which one fits depends on the work you actually need. We tell you before you commit.",
-  cta: { href: "/pricing", label: "See the full pricing" },
+export const audienceClose = {
+  headline: "One annual fee, agreed before anything starts.",
+  body: "We read how you actually earn, tell you which of the work above applies to you, and put the scope and the fee in writing. You decide from there.",
+  pricingLink: "See the fees",
+  processLink: "How working with us works",
+  /** Heading for an audience page's own questions, where it has any. */
+  questionsHeadline: "Questions people in your situation ask.",
 } as const;
 
 /** The standard closing panel. */

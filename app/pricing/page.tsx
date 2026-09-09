@@ -48,7 +48,6 @@ export default function PricingPage() {
 
       <Section labelledBy="scope-agreed">
         <Container>
-          <p className="section-label">{pricingPage.scopeAgreed.label}</p>
           <h2 id="scope-agreed" className="section-headline section-headline--wide">
             {pricingPage.scopeAgreed.title}
           </h2>

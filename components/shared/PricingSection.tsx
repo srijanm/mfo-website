@@ -4,6 +4,8 @@ import { approvedPlanScope } from "@/lib/content/pricing-scope";
 import { conversionAssurance } from "@/lib/content/navigation";
 import { cx } from "@/lib/cx";
 
+import { ReassuranceStrip } from "@/components/sections/ReassuranceStrip";
+
 import { PlanComparisonMatrix } from "./PlanComparisonMatrix";
 import styles from "./PricingSection.module.css";
 
@@ -12,6 +14,12 @@ type PricingSectionProps = {
   content: PricingContent;
   /** Stable hook for the positioning tests that assert what precedes pricing. */
   id?: string;
+  /**
+   * Three lines about what is agreed before anything starts. Shown on the
+   * homepage, where they replace a whole section that argued the same case at
+   * length; /pricing explains the arrangement in full and does not need them.
+   */
+  reassurance?: boolean;
 };
 
 /**
@@ -31,7 +39,11 @@ type PricingSectionProps = {
  * comparison matrix below is wired but never mounted in that state, so
  * revealing it later is a data change rather than a redesign.
  */
-export function PricingSection({ content, id = "pricing" }: PricingSectionProps) {
+export function PricingSection({
+  content,
+  id = "pricing",
+  reassurance = false,
+}: PricingSectionProps) {
   return (
     <Section id={id} labelledBy={content.headline ? `${id}-headline` : undefined}>
       <Container>
@@ -101,6 +113,8 @@ export function PricingSection({ content, id = "pricing" }: PricingSectionProps)
             <p className={styles.assurance}>{conversionAssurance}</p>
           </div>
         </div>
+
+        {reassurance ? <ReassuranceStrip /> : null}
       </Container>
     </Section>
   );

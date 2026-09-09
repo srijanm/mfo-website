@@ -79,7 +79,7 @@
   min-width: 0;
 }
 
-/* ----------------------------------------------------- 1. the situations */
+/* ------------------------------------------------------- the situations */
 
 .situations {
   display: grid;
@@ -130,7 +130,7 @@
   color: var(--ink-2);
 }
 
-/* ------------------------------------------------------- 2. what we run */
+/* --------------------------------------------------------- what we run */
 
 .scopeLayout {
   display: grid;
@@ -200,63 +200,6 @@
   color: var(--ink-2);
 }
 
-/* ------------------------------------------------- 3. accountability strip */
-
-/* Four short commitments across one row, not a fourth stack of large rows. */
-.proof {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--sp-5);
-  margin: var(--sp-5) 0 0;
-  padding: var(--sp-4) 0 0;
-  list-style: none;
-  border-top: 1px solid var(--rule);
-}
-
-.proofItem {
-  min-width: 0;
-}
-
-.proofTitle {
-  margin: 0;
-  font-size: var(--fs-ui);
-  font-weight: 500;
-  line-height: 1.35;
-}
-
-.proofBody {
-  margin: 6px 0 0;
-  font-size: var(--fs-small);
-  line-height: 1.5;
-  color: var(--ink-2);
-}
-
-/* ------------------------------------------------------------- 4. price */
-
-.prices {
-  margin: var(--sp-4) 0 0;
-  font-size: var(--fs-h3);
-  font-weight: 400;
-  letter-spacing: -.022em;
-}
-
-.perYear {
-  font-size: var(--fs-ui);
-  color: var(--muted);
-}
-
-.priceClosing {
-  margin: var(--sp-3) 0 0;
-  max-width: 56ch;
-  font-size: var(--fs-body);
-  line-height: 1.56;
-  color: var(--ink-2);
-}
-
-.priceAction {
-  margin-top: var(--sp-4);
-}
-
 /* ---------------------------------------------------------------- narrow */
 
 @media (max-width: 1023px) {
@@ -285,10 +228,6 @@
     gap: var(--sp-5);
   }
 
-  .proof {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--sp-4);
-  }
 }
 
 @media (max-width: 767px) {
@@ -329,21 +268,32 @@
     border-top: 0;
   }
 
-  /* Stacked, the four commitments are separated by rules rather than by a
-     gap. A gap with a border beside it leaves each rule terminating in empty
-     space, which is the one thing the site's rule system forbids — the spacing
-     goes inside the item instead. */
-  .proof {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
-  }
+}
 
-  .proofItem {
-    padding: var(--sp-3) 0;
-    border-bottom: 1px solid var(--rule);
-  }
+/* ------------------------------------------------------------- the close */
 
-  .proofItem:first-child {
-    padding-top: 0;
-  }
+/* One statement, the enquiry, and links to the two pages that own the detail.
+   Compact on purpose: the oversized acid panel that used to sit here was the
+   same closing argument the homepage already makes. */
+.close {
+  max-width: 720px;
+}
+
+.closeHeadline {
+  max-width: 20ch;
+}
+
+.closeBody {
+  margin: var(--sp-3) 0 0;
+  max-width: 56ch;
+  font-size: var(--fs-body);
+  line-height: 1.56;
+  color: var(--ink-2);
+}
+
+.closeActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-5);
 }

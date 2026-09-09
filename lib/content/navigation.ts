@@ -121,7 +121,6 @@ export const sectionIndex = [
   { id: "core-scope-headline", label: "What we run" },
   { id: "income-axis", label: "As things change" },
   { id: "latent-problem", label: "Why it matters" },
-  { id: "trust-ledger", label: "Before we file" },
   { id: "pricing", label: "Pricing" },
   { id: "final-cta", label: "Start an enquiry" },
 ] as const;

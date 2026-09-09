@@ -4,7 +4,6 @@ import {
   Hero,
   IncomeAxis,
   RecognitionStrip,
-  TrustLedger,
   WhyItMatters,
 } from "@/components/sections";
 import { FaqSection, FinalCtaSection, PricingSection } from "@/components/shared";
@@ -23,14 +22,16 @@ import { pricing } from "@/lib/content/pricing";
  * 3. What we take responsibility for — three commitments, then eight areas
  * 4. How the work changes as a situation changes (the ink chapter)
  * 5. Why that matters — the delayed-problem examples and the mismatch, once
- * 6. What we commit to before filing anything
- * 7. The annual fee levels
- * 8. Questions people ask
- * 9. The closing enquiry
+ * 6. The annual fee levels, with three lines of reassurance beside them
+ * 7. Questions people ask
+ * 8. The closing enquiry
  *
- * Two sections were consolidated into one and the full alternatives comparison
- * moved to /how-we-work, where a reader who wants it has already chosen to
- * look. The page is shorter than it was, not longer.
+ * The standalone trust section — "Judge us by what happens before we file
+ * anything", five ruled rows and a filing sequence — is gone. It argued against
+ * an objection nobody had raised, repeated a promise the page had already made
+ * twice, and duplicated a block that also sat on all three audience pages. Its
+ * three strongest statements now sit quietly beside the fee, and the sequence
+ * itself is explained on /how-we-work.
  *
  * Surfaces: paper is the default, white is reserved for literal document
  * objects, and there is at most one ink block and one acid block, never
@@ -50,8 +51,7 @@ export default function HomePage() {
       <CoreScopeMatrix />
       <IncomeAxis />
       <WhyItMatters />
-      <TrustLedger />
-      <PricingSection content={pricing} />
+      <PricingSection content={pricing} reassurance />
       <FaqSection items={homepageFaq} headline={homepageFaqHeadline} />
       <FinalCtaSection content={finalCta} />
     </>

@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 
-import { Container, Section } from "@/components/foundation";
-import { StructuralMismatch, TrustLedger } from "@/components/sections";
-import { FinalCtaSection } from "@/components/shared";
+import { Button, Container, Section } from "@/components/foundation";
+import { FaqSection, FinalCtaSection } from "@/components/shared";
 import { howWeWork } from "@/lib/content/how-we-work";
+import { conversionAssurance } from "@/lib/content/navigation";
 import { standardClose } from "@/lib/content/standard-blocks";
 import { pageMetadata } from "@/lib/metadata";
-import { cx } from "@/lib/cx";
 
 import styles from "./page.module.css";
 
@@ -17,21 +16,23 @@ export const metadata: Metadata = pageMetadata({
 });
 
 /**
- * /how-we-work.
+ * /how-we-work — what happens when you become a client.
  *
- * Rebuilt around the client experience. The page used to open with why the firm
- * exists and how it uses software, which is the firm talking about itself; a
- * visitor arriving here wants to know what actually happens to them, in what
- * order, and who is responsible for it.
+ * One job, and everything that was not that job is gone: the origin story, the
+ * four-alternative comparison, the "How we behave" block and the "What we won't
+ * do" list. Those were the homepage's argument repeated, and the same four
+ * commitments were on all three audience pages as well.
  *
- * So: the five steps first, split at the point where someone becomes a client;
- * then who provides what; then the accountability commitments; then the
- * comparison that used to sit on the homepage, where a reader who has got this
- * far may genuinely want it; and only then the origin story and the software
- * explanation, which are context rather than answers.
+ * The five steps are the page. Each one says what you do and what we do, and
+ * carries the reassurance that belongs to it — the fee with agreeing scope,
+ * portal access with setup, professional responsibility with the work, draft
+ * approval with filing.
+ *
+ * Steps four and five are marked as the recurring part, so the service does not
+ * read as a sequence that finishes after one filing.
  */
 export default function HowWeWorkPage() {
-  const { journey, responsibilities } = howWeWork;
+  const { journey } = howWeWork;
 
   return (
     <>
@@ -44,10 +45,8 @@ export default function HowWeWorkPage() {
         </Container>
       </section>
 
-      {/* What happens, in order. */}
       <Section labelledBy="journey">
         <Container>
-          <p className="section-label">{journey.label}</p>
           <h2 id="journey" className="section-headline section-headline--wide">
             {journey.title}
           </h2>
@@ -55,87 +54,51 @@ export default function HowWeWorkPage() {
           <div className={styles.phases}>
             {journey.phases.map((phase) => (
               <section key={phase.id} className={styles.phase} aria-label={phase.label}>
-                <h3 className={styles.phaseLabel}>{phase.label}</h3>
+                <h3 className={styles.phaseLabel}>
+                  {phase.label}
+                  {"recurring" in phase && phase.recurring ? (
+                    <span className={styles.recurring}>Every year</span>
+                  ) : null}
+                </h3>
+
                 <ol className={styles.steps}>
                   {phase.steps.map((step) => (
                     <li key={step.id} className={styles.step}>
                       <h4 className={styles.stepTitle}>{step.title}</h4>
-                      <p className={styles.stepBody}>{step.body}</p>
+
+                      <dl className={styles.stepParts}>
+                        <div className={styles.stepPart}>
+                          <dt className={styles.stepWho}>You</dt>
+                          <dd className={styles.stepText}>{step.you}</dd>
+                        </div>
+                        <div className={styles.stepPart}>
+                          <dt className={styles.stepWho}>We</dt>
+                          <dd className={styles.stepText}>{step.us}</dd>
+                        </div>
+                      </dl>
+
+                      {step.note ? <p className={styles.stepNote}>{step.note}</p> : null}
                     </li>
                   ))}
                 </ol>
               </section>
             ))}
           </div>
-        </Container>
-      </Section>
 
-      {/* Who provides what. */}
-      <Section dense labelledBy="responsibilities">
-        <Container>
-          <h2 id="responsibilities" className="section-headline section-headline--wide">
-            {responsibilities.title}
-          </h2>
-          <div className={styles.responsibilities}>
-            {[responsibilities.yours, responsibilities.ours].map((column) => (
-              <div key={column.title} className={styles.responsibility}>
-                <h3 className={styles.responsibilityTitle}>{column.title}</h3>
-                <ul className={styles.responsibilityList}>
-                  {column.rows.map((row) => (
-                    <li key={row} className={styles.responsibilityRow}>
-                      {row}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+          {/* The one commitment the five steps do not already make. */}
+          <p className={styles.distinct}>{howWeWork.distinct}</p>
+
+          <div className={styles.action}>
+            <Button href={standardClose.cta.href} placement="section">
+              {standardClose.cta.label}
+            </Button>
+            <p className={styles.assurance}>{conversionAssurance}</p>
           </div>
         </Container>
       </Section>
 
-      {/* The accountability commitments, and the filing sequence. */}
-      <TrustLedger />
-
-      {/* The comparison that used to delay the homepage. A reader who has come
-          this far has chosen to look at it. */}
-      <StructuralMismatch />
-
-      {/* Context: why the firm exists, how it uses software, who signs. Below
-          the answers rather than in front of them. */}
-      {howWeWork.sections.map((section) => (
-        <Section key={section.id} dense labelledBy={section.id}>
-          <Container>
-            <div className={styles.split}>
-              <h2 id={section.id} className={styles.sectionTitle}>
-                {section.title}
-              </h2>
-              <div className={styles.body}>
-                {section.paragraphs.map((paragraph) => (
-                  <p key={paragraph} className={styles.paragraph}>
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </div>
-          </Container>
-        </Section>
-      ))}
-
-      <Section dense labelledBy="wont-do">
-        <Container>
-          <h2 id="wont-do" className={cx("section-headline", "section-headline--wide")}>
-            {howWeWork.wontDo.title}
-          </h2>
-          <ul className={styles.rows}>
-            {howWeWork.wontDo.rows.map((row) => (
-              <li key={row.id} className={styles.row}>
-                <h3 className={styles.rowTitle}>{row.title}</h3>
-                <p className={styles.rowBody}>{row.body}</p>
-              </li>
-            ))}
-          </ul>
-        </Container>
-      </Section>
+      {/* One question, because people genuinely ask it about a small firm. */}
+      <FaqSection items={howWeWork.questions} headline="One question people ask." />
 
       <FinalCtaSection content={standardClose} />
     </>
